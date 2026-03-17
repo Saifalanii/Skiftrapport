@@ -10,16 +10,16 @@
 <meta name="theme-color" content="#2a4d69">
 
 <style>
-body{font-family: Arial;margin:15px;max-width:600px;}
+body{font-family: Arial; margin:15px; max-width:600px;}
 h1{color:#2a4d69;}
-label{display:block;margin-top:12px;font-weight:bold;}
-input, select, textarea{width:100%;padding:10px;margin-top:5px;font-size:16px;box-sizing:border-box;}
-button{width:100%;padding:15px;margin-top:15px;font-size:18px;background:#2a4d69;color:white;border:none;border-radius:6px;}
-button.clearBtn{background:#888;margin-top:10px;}
+label{display:block; margin-top:12px; font-weight:bold;}
+input, select, textarea{width:100%; padding:10px; margin-top:5px; font-size:16px; box-sizing:border-box;}
+button{width:100%; padding:15px; margin-top:15px; font-size:18px; background:#2a4d69; color:white; border:none; border-radius:6px;}
+button.clearBtn{background:#888;}
 .hidden{display:none;}
-.shiftBox{margin-top:10px;padding:10px;background:#eef3f7;border-radius:6px;font-weight:bold;}
-.error{border:2px solid red;background:#ffe6e6;}
-.previewBox{margin-top:20px;padding:15px;background:#f4f4f4;border-radius:6px;white-space:pre-line;}
+.error{border:2px solid red; background:#ffe6e6;}
+.previewBox{margin-top:20px; padding:15px; background:#f4f4f4; border-radius:6px; white-space:pre-line;}
+.shiftBox{margin-top:10px; padding:10px; background:#eef3f7; border-radius:6px; font-weight:bold;}
 </style>
 </head>
 <body>
@@ -124,7 +124,7 @@ function scrollToError(){let error = document.querySelector(".error"); if(error)
 function validate(){
     clearErrors();
     let errorFound = false;
-    if(truckstatusEl.value==="NOK" && truckfel.value.trim()===""){truckfel.classList.add("error"); errorFound=true;}
+    if(truckstatus.value==="NOK" && truckfel.value.trim()===""){truckfel.classList.add("error"); errorFound=true;}
     if(tillsyn.value==="NOK" && tillsynfel.value.trim()===""){tillsynfel.classList.add("error"); errorFound=true;}
     if(maskin.value==="NOK" && maskinfel.value.trim()===""){maskinfel.classList.add("error"); errorFound=true;}
     if(rengoring.value==="NOK" && rengoringKommentar.value.trim()===""){rengoringKommentar.classList.add("error"); errorFound=true;}
@@ -139,8 +139,8 @@ function buildText(){
     let text = "";
     text += "Datum: "+datum+"\n\n";
     text += "Avdelning: "+avdelning.value+"\n\n";
-    text += "Truckstatus: "+truckstatusEl.value+"\n";
-    if(truckstatusEl.value==="NOK") text += "Orsak: "+truckfel.value+"\n\n";
+    text += "Truckstatus: "+truckstatus.value+"\n";
+    if(truckstatus.value==="NOK") text += "Orsak: "+truckfel.value+"\n\n";
     text += "Daglig tillsyn truckar: "+tillsyn.value+"\n";
     if(tillsyn.value==="NOK") text += "Orsak: "+tillsynfel.value+"\n\n";
     text += "Maskin/verktyg: "+maskin.value+"\n";
@@ -162,7 +162,7 @@ document.getElementById("reportForm").addEventListener("submit", function(e){
     if(!validate()) return;
     let subject = "Skiftrapport "+datumEl.value+" - "+getSkift();
     let body = buildText();
-    let emails = "mail1@foretag.se;mail2@foretag.se"; // lägg till fler med semikolon
+    let emails = "mail1@foretag.se;mail2@foretag.se"; // Lägg till fler om du vill
     window.location.href = "mailto:"+emails+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
 });
 
@@ -170,13 +170,13 @@ document.getElementById("reportForm").addEventListener("submit", function(e){
 function clearForm(){
     document.getElementById("reportForm").reset();
     document.getElementById("preview").classList.add("hidden");
-    document.getElementById("datum").valueAsDate = new Date();
+    datumEl.valueAsDate = new Date();
 }
 
 // ===== ELEMENT =====
 let datumEl = document.getElementById("datum");
 let avdelning = document.getElementById("avdelning");
-let truckstatusEl = document.getElementById("truckstatus");
+let truckstatus = document.getElementById("truckstatus");
 let truckfel = document.getElementById("truckfel");
 let tillsyn = document.getElementById("tillsyn");
 let tillsynfel = document.getElementById("tillsynfel");
@@ -192,11 +192,9 @@ let atgard = document.getElementById("atgard");
 datumEl.valueAsDate = new Date();
 
 // ===== REGISTRERA SERVICE WORKER =====
-    if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('sw.js');
+if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js').catch(err=>console.log("Service worker fel: ", err));
 }
-
 </script>
-
 </body>
 </html>
