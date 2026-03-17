@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skiftrapport</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2a4d69">
+
+<style>
+body{font-family: Arial;margin:15px;max-width:600px;}
+h1{color:#2a4d69;}
+label{display:block;margin-top:12px;font-weight:bold;}
+input, select, textarea{width:100%;padding:10px;margin-top:5px;font-size:16px;box-sizing:border-box;}
+button{width:100%;padding:15px;margin-top:15px;font-size:18px;background:#2a4d69;color:white;border:none;border-radius:6px;}
+button.clearBtn{background:#888;margin-top:10px;}
+.hidden{display:none;}
+.shiftBox{margin-top:10px;padding:10px;background:#eef3f7;border-radius:6px;font-weight:bold;}
+.error{border:2px solid red;background:#ffe6e6;}
+.previewBox{margin-top:20px;padding:15px;background:#f4f4f4;border-radius:6px;white-space:pre-line;}
+</style>
+</head>
+<body>
+
+<h1>📋 Skiftrapport</h1>
+<div class="shiftBox" id="skiftText"></div>
+
+<form id="reportForm">
+
+<label>Datum</label>
+<input type="date" id="datum">
+
+<label>Avdelning</label>
+<select id="avdelning">
+<option value="">Välj avdelning</option>
+<option>TVS</option>
+<option>TPB</option>
+</select>
+
+<label>Truckstatus</label>
+<select id="truckstatus" onchange="toggleField('truckstatus','truckOrsak')">
+<option>OK</option>
+<option>NOK</option>
+</select>
+<div id="truckOrsak" class="hidden">
+<label>Orsak</label>
+<textarea id="truckfel"></textarea>
+</div>
+
+<label>Daglig tillsyn truckar</label>
+<select id="tillsyn" onchange="toggleField('tillsyn','tillsynOrsak')">
+<option>OK</option>
+<option>NOK</option>
+</select>
+<div id="tillsynOrsak" class="hidden">
+<label>Orsak</label>
+<textarea id="tillsynfel"></textarea>
+</div>
+
+<label>Status maskin och verktyg</label>
+<select id="maskin" onchange="toggleField('maskin','maskinOrsak')">
+<option>OK</option>
+<option>NOK</option>
+</select>
+<div id="maskinOrsak" class="hidden">
+<label>Orsak</label>
+<textarea id="maskinfel"></textarea>
+</div>
+
+<label>Rengöring bandningsmaskiner</label>
+<select id="rengoring" onchange="toggleField('rengoring','rengoringOrsak')">
+<option>OK</option>
+<option>NOK</option>
+</select>
+<div id="rengoringOrsak" class="hidden">
+<label>Kommentar</label>
+<textarea id="rengoringKommentar"></textarea>
+</div>
+
+<label>Övriga driftstörningar</label>
+<textarea id="drift"></textarea>
+
+<label>Avvikelse - Vad</label>
+<textarea id="avvikelse"></textarea>
+
+<label>Åtgärd</label>
+<textarea id="atgard"></textarea>
+
+<button type="button" onclick="previewReport()">Förhandsgranska</button>
+<button type="submit">Skicka</button>
+<button type="button" class="clearBtn" onclick="clearForm()">Rensa formulär</button>
+</form>
+
+<div id="preview" class="previewBox hidden"></div>
+
+<script>
+// ===== SKIFT =====
+function getSkift(){
+    let now = new Date();
+    let min = now.getHours()*60 + now.getMinutes();
+    if(min>=350 && min<=480) return "Nattskift";   // 05:50-08:00
+    if(min>=840 && min<=1020) return "Dagskift";   // 14:00-17:00
+    if(min>=1320 || min<=120) return "Kvällsskift"; // 22:00-02:00
+    return "Okänt skift";
+}
+document.getElementById("skiftText").textContent = "Skift: " + getSkift();
+
+// ===== VISA/GÖM =====
+function toggleField(selectId, fieldId){
+    let status = document.getElementById(selectId).value;
+    let field = document.getElementById(fieldId);
+    field.style.display = (status==="NOK") ? "block" : "none";
+}
+
+// ===== RENSAR FEL =====
+function clearErrors(){document.querySelectorAll(".error").forEach(el => el.classList.remove("error"));}
+
+// ===== SCROLL TILL FEL =====
+function scrollToError(){let error = document.querySelector(".error"); if(error){error.scrollIntoView({behavior:"smooth", block:"center"});}}
+
+// ===== VALIDERING =====
+function validate(){
+    clearErrors();
+    let errorFound = false;
+    if(truckstatusEl.value==="NOK" && truckfel.value.trim()===""){truckfel.classList.add("error"); errorFound=true;}
+    if(tillsyn.value==="NOK" && tillsynfel.value.trim()===""){tillsynfel.classList.add("error"); errorFound=true;}
+    if(maskin.value==="NOK" && maskinfel.value.trim()===""){maskinfel.classList.add("error"); errorFound=true;}
+    if(rengoring.value==="NOK" && rengoringKommentar.value.trim()===""){rengoringKommentar.classList.add("error"); errorFound=true;}
+    if(avdelning.value===""){avdelning.classList.add("error"); errorFound=true;}
+    if(errorFound){alert("Fyll i alla obligatoriska fält (orsak vid NOK)."); scrollToError(); return false;}
+    return true;
+}
+
+// ===== BYGG TEXT =====
+function buildText(){
+    let datum = datumEl.value;
+    let text = "";
+    text += "Datum: "+datum+"\n\n";
+    text += "Avdelning: "+avdelning.value+"\n\n";
+    text += "Truckstatus: "+truckstatusEl.value+"\n";
+    if(truckstatusEl.value==="NOK") text += "Orsak: "+truckfel.value+"\n\n";
+    text += "Daglig tillsyn truckar: "+tillsyn.value+"\n";
+    if(tillsyn.value==="NOK") text += "Orsak: "+tillsynfel.value+"\n\n";
+    text += "Maskin/verktyg: "+maskin.value+"\n";
+    if(maskin.value==="NOK") text += "Orsak: "+maskinfel.value+"\n\n";
+    text += "Rengöring bandningsmaskiner: "+rengoring.value+"\n";
+    if(rengoring.value==="NOK") text += "Kommentar: "+rengoringKommentar.value+"\n\n";
+    text += "Driftstörningar:\n"+drift.value+"\n\n";
+    text += "Avvikelse:\n"+avvikelse.value+"\n\n";
+    text += "Åtgärd:\n"+atgard.value;
+    return text;
+}
+
+// ===== FÖRHANDSGRANSKA =====
+function previewReport(){if(!validate()) return; let preview = document.getElementById("preview"); preview.textContent = buildText(); preview.classList.remove("hidden");}
+
+// ===== SKICKA =====
+document.getElementById("reportForm").addEventListener("submit", function(e){
+    e.preventDefault(); 
+    if(!validate()) return;
+    let subject = "Skiftrapport "+datumEl.value+" - "+getSkift();
+    let body = buildText();
+    let emails = "mail1@foretag.se;mail2@foretag.se"; // lägg till fler med semikolon
+    window.location.href = "mailto:"+emails+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
+});
+
+// ===== RENSNING =====
+function clearForm(){
+    document.getElementById("reportForm").reset();
+    document.getElementById("preview").classList.add("hidden");
+    document.getElementById("datum").valueAsDate = new Date();
+}
+
+// ===== ELEMENT =====
+let datumEl = document.getElementById("datum");
+let avdelning = document.getElementById("avdelning");
+let truckstatusEl = document.getElementById("truckstatus");
+let truckfel = document.getElementById("truckfel");
+let tillsyn = document.getElementById("tillsyn");
+let tillsynfel = document.getElementById("tillsynfel");
+let maskin = document.getElementById("maskin");
+let maskinfel = document.getElementById("maskinfel");
+let rengoring = document.getElementById("rengoring");
+let rengoringKommentar = document.getElementById("rengoringKommentar");
+let drift = document.getElementById("drift");
+let avvikelse = document.getElementById("avvikelse");
+let atgard = document.getElementById("atgard");
+
+// ===== DATUM =====
+datumEl.valueAsDate = new Date();
+
+// ===== REGISTRERA SERVICE WORKER =====
+if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js');
+}
+</script>
+
+</body>
+</html>
