@@ -162,14 +162,15 @@ document.getElementById("reportForm").addEventListener("submit", function(e){
     if(!validate()) return;
     let subject = "Skiftrapport "+datumEl.value+" - "+getSkift();
     let body = buildText();
-    let emailList = [
-"rapport.vovlo@samhall.se",
-"volvooc@samhall.onmicrosoft.com"
-];
-
 let separator = /android/i.test(navigator.userAgent) ? "," : ";";
 
-let emails = emailList.join(separator);
+let emails = [
+"rapport.vovlo@samhall.se",
+"volvooc@samhall.onmicrosoft.com"
+].join(separator);
+
+window.location.href =
+"mailto:"+emails+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
 });
 
 // ===== RENSNING =====
