@@ -162,8 +162,14 @@ document.getElementById("reportForm").addEventListener("submit", function(e){
     if(!validate()) return;
     let subject = "Skiftrapport "+datumEl.value+" - "+getSkift();
     let body = buildText();
-    let emails = "rapport.vovlo@samhall.se,volvooc@samhall.onmicrosoft.com"; // Lägg till fler om du vill
-    window.location.href = "mailto:"+emails+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
+    let emailList = [
+"rapport.vovlo@samhall.se",
+"volvooc@samhall.onmicrosoft.com"
+];
+
+let separator = /android/i.test(navigator.userAgent) ? "," : ";";
+
+let emails = emailList.join(separator);
 });
 
 // ===== RENSNING =====
