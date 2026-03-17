@@ -162,7 +162,7 @@ document.getElementById("reportForm").addEventListener("submit", function(e){
     if(!validate()) return;
     let subject = "Skiftrapport "+datumEl.value+" - "+getSkift();
     let body = buildText();
-    let emails = "mail1@foretag.se;mail2@foretag.se"; // Lägg till fler om du vill
+    let emails = "rapport.vovlo@samhall.se;volvooc@samhall.onmicrosoft.com"; // Lägg till fler om du vill
     window.location.href = "mailto:"+emails+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
 });
 
