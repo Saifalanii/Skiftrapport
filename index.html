@@ -87,8 +87,6 @@ button.clearBtn{background:#888;}
 <script>
 datum.valueAsDate=new Date();
 
- 
-
 let truckArray=[];
 
 function getSkift(){
@@ -100,11 +98,26 @@ function getSkift(){
   return "Okänt skift";
 }
 
+// ===== VISA/GÖM + PLACEHOLDER =====
 function toggleField(sel, box){
-  document.getElementById(box).style.display=
-    document.getElementById(sel).value==="NOK"?"block":"none";
+  const selEl = document.getElementById(sel);
+  const boxEl = document.getElementById(box);
+  const textarea = boxEl.querySelector('textarea');
+
+  if(selEl.value === "NOK"){
+    boxEl.style.display = "block";
+    if(textarea){
+      if(sel === "tillsyn") textarea.placeholder = "Skriv orsaken till varför daglig tillsyn är NOK...";
+      if(sel === "maskin") textarea.placeholder = "Skriv vilken maskin/verktyg och orsaken...";
+      if(sel === "rengoring") textarea.placeholder = "Skriv kommentar om rengöring...";
+    }
+  } else {
+    boxEl.style.display = "none";
+    if(textarea) textarea.placeholder = "";
+  }
 }
 
+// ===== TRUCK AVVIKELSE =====
 function toggleTruck(){
   if(truckstatus.value==="NOK"){
     truckContainer.style.display="block";
@@ -117,7 +130,6 @@ function toggleTruck(){
   }
 }
 
-// Skapar fälten för truck avvikelse
 function createTruckInput(){
   truckFields.innerHTML=`
     <select id="truckId">
@@ -149,9 +161,7 @@ function confirmTruck(){
   let kom=document.getElementById("truckKom").value;
   if(!id || !fel){alert("Fyll i truck ID och feltyp"); return;}
   truckArray.push({id,fel,kom});
-  // Visa i lista under
   renderConfirmedTrucks();
-  // Rensa input
   document.getElementById("truckId").value="";
   document.getElementById("truckFel").value="";
   document.getElementById("truckKom").value="";
@@ -167,6 +177,7 @@ function renderConfirmedTrucks(){
   truckConfirmed.innerHTML=html;
 }
 
+// ===== VALIDERING =====
 function validate(){
   if(avdelning.value===""){alert("Välj avdelning");return false;}
   if(truckstatus.value==="NOK" && truckArray.length===0){alert("Lägg till minst en truckavvikelse"); return false;}
@@ -176,6 +187,7 @@ function validate(){
   return true;
 }
 
+// ===== SKICKA =====
 form.addEventListener("submit",function(e){
   e.preventDefault();
   if(!validate()) return;
@@ -223,10 +235,10 @@ form.addEventListener("submit",function(e){
   let emails="rapport.vovlo@samhall.se,volvooc@samhall.onmicrosoft.com";
   window.location.href="mailto:"+emails+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
 
-  // Rensa formulär efter skick
   clearForm();
 });
 
+// ===== RENSNING =====
 function clearForm(){
   form.reset();
   truckArray=[];
