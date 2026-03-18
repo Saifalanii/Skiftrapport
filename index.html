@@ -27,7 +27,7 @@ button.clearBtn{background:#888;}
 
 <label>Avdelning</label>
 <select id="avdelning">
-<option value="">Välj</option>
+<option value="">Välj Avdelning</option>
 <option>TVS</option>
 <option>TPB</option>
 </select>
@@ -44,7 +44,7 @@ button.clearBtn{background:#888;}
 <button type="button" id="addTruckBtn" onclick="addTruck()" disabled>+ Lägg till avvikelse</button>
 </div>
 
-<label>Daglig tillsyn</label>
+<label>Daglig tillsyn truckar</label>
 <select id="tillsyn" onchange="toggleField('tillsyn','tillsynBox')">
 <option>OK</option>
 <option>NOK</option>
@@ -53,7 +53,7 @@ button.clearBtn{background:#888;}
 <textarea id="tillsynfel"></textarea>
 </div>
 
-<label>Maskin</label>
+<label>Maskiner & Verktyg</label>
 <select id="maskin" onchange="toggleField('maskin','maskinBox')">
 <option>OK</option>
 <option>NOK</option>
@@ -62,7 +62,7 @@ button.clearBtn{background:#888;}
 <textarea id="maskinfel"></textarea>
 </div>
 
-<label>Rengöring</label>
+<label>Rengöring av Bandningsmaskiner</label>
 <select id="rengoring" onchange="toggleField('rengoring','rengoringBox')">
 <option>OK</option>
 <option>NOK</option>
@@ -81,7 +81,7 @@ button.clearBtn{background:#888;}
 <textarea id="atgard"></textarea>
 
 <button type="submit">Skicka</button>
-<button type="button" class="clearBtn" onclick="clearForm()">Rensa formulär</button>
+<button type="button" class="clearBtn" onclick="clearForm()">Börja om</button>
 </form>
 
 <script>
@@ -136,7 +136,7 @@ function createTruckInput(){
       <option>Linde Connect</option>
       <option>Övrigt</option>
     </select>
-    <textarea id="truckKom" placeholder="Kommentar (valfri)"></textarea>
+    <textarea id="truckKom" placeholder="Lägg en beskrivning på felet"></textarea>
     <button type="button" onclick="confirmTruck()">Bekräfta avvikelse</button>
   `;
 }
