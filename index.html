@@ -14,7 +14,6 @@ button{width:100%;padding:15px;margin-top:15px;background:#2a4d69;color:white;bo
 .hidden{display:none;}
 .truckBox{border:1px solid #ccc;padding:10px;margin-top:10px;border-radius:6px;}
 .removeBtn{background:red;margin-top:5px;}
-.error{border:2px solid red;background:#ffe6e6;}
 </style>
 </head>
 <body>
@@ -101,7 +100,6 @@ function toggleTruck(){
 if(truckstatus.value==="NOK"){
 truckContainer.style.display="block";
 
-// skapa första raden om tom
 if(document.querySelectorAll(".truckBox").length===0){
 addTruck();
 }
@@ -114,7 +112,6 @@ truckList.innerHTML="";
 
 // ===== LÄGG TILL TRUCK =====
 function addTruck(){
-
 let div = document.createElement("div");
 div.className="truckBox";
 
@@ -156,14 +153,11 @@ return false;
 }
 
 if(truckstatus.value==="NOK"){
-
-let trucks = document.querySelectorAll(".truckBox");
-
 let valid=false;
 
-trucks.forEach(t=>{
-let id = t.querySelector(".truckid").value;
-let fel = t.querySelector(".feltyp").value;
+document.querySelectorAll(".truckBox").forEach(t=>{
+let id=t.querySelector(".truckid").value;
+let fel=t.querySelector(".feltyp").value;
 
 if(id && fel) valid=true;
 });
@@ -196,11 +190,7 @@ let fel=t.querySelector(".feltyp").value;
 let kom=t.querySelector(".kommentar").value;
 
 if(id && fel){
-truckArray.push({
-truckId:id,
-feltyp:fel,
-kommentar:kom
-});
+truckArray.push({id,fel,kom});
 }
 });
 
@@ -224,22 +214,40 @@ truckar:truckArray
 })
 });
 
-// ===== MAIL =====
+// ===== MAIL (FULL VERSION) =====
 let body="";
 
+body += "Datum: "+datum.value+"\n\n";
+body += "Avdelning: "+avdelning.value+"\n\n";
+
+body += "Truckstatus: "+truckstatus.value+"\n";
+
 truckArray.forEach(t=>{
-body+=t.truckId+" - "+t.feltyp+"\n";
-if(t.kommentar) body+=t.kommentar+"\n";
-body+="\n";
+body += "- "+t.id+" ("+t.fel+")\n";
+if(t.kom) body += "  Kommentar: "+t.kom+"\n";
 });
+body += "\n";
+
+body += "Daglig tillsyn: "+tillsyn.value+"\n";
+if(tillsyn.value==="NOK") body += tillsynfel.value+"\n\n";
+
+body += "Maskin: "+maskin.value+"\n";
+if(maskin.value==="NOK") body += maskinfel.value+"\n\n";
+
+body += "Rengöring: "+rengoring.value+"\n";
+if(rengoring.value==="NOK") body += rengoringKommentar.value+"\n\n";
+
+body += "Driftstörningar:\n"+drift.value+"\n\n";
+body += "Avvikelse:\n"+avvikelse.value+"\n\n";
+body += "Åtgärd:\n"+atgard.value;
 
 let emails="rapport.vovlo@samhall.se,volvooc@samhall.onmicrosoft.com";
 
 window.location.href =
 "mailto:"+emails+"?subject=Skiftrapport&body="+encodeURIComponent(body);
 
-alert("Skickat!");
 });
+
 
 // ===== RENSNING =====
 function clearForm(){
