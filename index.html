@@ -12,6 +12,8 @@ input,select,textarea{width:100%;padding:10px;margin-top:5px;}
 button{width:100%;padding:15px;margin-top:15px;background:#2a4d69;color:white;border:none;border-radius:6px;}
 .hidden{display:none;}
 .error{border:2px solid red;background:#ffe6e6;}
+.truckBox{border:1px solid #ccc;padding:10px;margin-top:10px;border-radius:6px;}
+.removeBtn{background:red;margin-top:5px;}
 </style>
 </head>
 <body>
@@ -47,7 +49,7 @@ button{width:100%;padding:15px;margin-top:15px;background:#2a4d69;color:white;bo
 <option>NOK</option>
 </select>
 <div id="tillsynBox" class="hidden">
-<textarea id="tillsynfel" placeholder="Orsak"></textarea>
+<textarea id="tillsynfel"></textarea>
 </div>
 
 <label>Maskin</label>
@@ -56,7 +58,7 @@ button{width:100%;padding:15px;margin-top:15px;background:#2a4d69;color:white;bo
 <option>NOK</option>
 </select>
 <div id="maskinBox" class="hidden">
-<textarea id="maskinfel" placeholder="Orsak"></textarea>
+<textarea id="maskinfel"></textarea>
 </div>
 
 <label>Rengöring</label>
@@ -65,7 +67,7 @@ button{width:100%;padding:15px;margin-top:15px;background:#2a4d69;color:white;bo
 <option>NOK</option>
 </select>
 <div id="rengoringBox" class="hidden">
-<textarea id="rengoringKommentar" placeholder="Kommentar"></textarea>
+<textarea id="rengoringKommentar"></textarea>
 </div>
 
 <label>Driftstörningar</label>
@@ -94,13 +96,14 @@ document.getElementById(sel).value==="NOK" ? "block":"none";
 
 // ===== TRUCK =====
 function toggleTruck(){
-let status = truckstatus.value;
-truckContainer.style.display = status==="NOK" ? "block":"none";
+truckContainer.style.display =
+truckstatus.value==="NOK" ? "block":"none";
 }
 
 // ===== LÄGG TILL TRUCK =====
 function addTruck(){
 let div = document.createElement("div");
+div.className="truckBox";
 
 div.innerHTML = `
 <select class="truckid">
@@ -123,8 +126,9 @@ div.innerHTML = `
 <option>Övrigt</option>
 </select>
 
-<textarea class="kommentar" placeholder="Kommentar (valfri)"></textarea>
-<hr>
+<textarea class="kommentar" placeholder="Kommentar"></textarea>
+
+<button type="button" class="removeBtn" onclick="this.parentElement.remove()">Ta bort</button>
 `;
 
 truckList.appendChild(div);
@@ -133,52 +137,34 @@ truckList.appendChild(div);
 // ===== VALIDERING =====
 function validate(){
 
-document.querySelectorAll(".error").forEach(e=>e.classList.remove("error"));
-
 if(avdelning.value===""){
-avdelning.classList.add("error");
 alert("Välj avdelning");
 return false;
 }
 
-// truckar
 if(truckstatus.value==="NOK"){
 
-let rows = document.querySelectorAll("#truckList > div");
+let trucks = document.querySelectorAll(".truckBox");
 
-if(rows.length===0){
+if(trucks.length===0){
 alert("Lägg till minst en truck");
 return false;
 }
 
-let validTruck = false;
+let valid=false;
 
-rows.forEach(row=>{
-let id = row.querySelector(".truckid");
-let fel = row.querySelector(".feltyp");
+trucks.forEach(t=>{
+let id = t.querySelector(".truckid").value;
+let fel = t.querySelector(".feltyp").value;
 
-if(id.value || fel.value){
-validTruck = true;
-
-if(id.value===""){
-id.classList.add("error");
-}
-if(fel.value===""){
-fel.classList.add("error");
-}
-}
+if(id && fel) valid=true;
 });
 
-if(!validTruck){
-alert("Fyll i minst en truck");
+if(!valid){
+alert("Fyll i minst en truck korrekt");
 return false;
 }
 }
-
-// övrigt NOK
-if(tillsyn.value==="NOK" && tillsynfel.value===""){tillsynfel.classList.add("error"); return false;}
-if(maskin.value==="NOK" && maskinfel.value===""){maskinfel.classList.add("error"); return false;}
-if(rengoring.value==="NOK" && rengoringKommentar.value===""){rengoringKommentar.classList.add("error"); return false;}
 
 return true;
 }
@@ -186,23 +172,26 @@ return true;
 // ===== SKICKA =====
 form.addEventListener("submit", function(e){
 e.preventDefault();
-
 if(!validate()) return;
 
 // samla truckar
 let truckArray = [];
 
-document.querySelectorAll("#truckList > div").forEach(row=>{
-let id = row.querySelector(".truckid").value;
-let fel = row.querySelector(".feltyp").value;
-let kom = row.querySelector(".kommentar").value;
+document.querySelectorAll(".truckBox").forEach(t=>{
+let id = t.querySelector(".truckid").value;
+let fel = t.querySelector(".feltyp").value;
+let kom = t.querySelector(".kommentar").value;
 
 if(id && fel){
-truckArray.push({id,fel,kom});
+truckArray.push({
+truckId: id,
+feltyp: fel,
+kommentar: kom
+});
 }
 });
 
-// ===== GOOGLE SHEETS =====
+// ===== SEND TO GOOGLE SHEETS =====
 fetch("https://script.google.com/macros/s/AKfycbzmoMBgSfTsLPMbfUNOa-Y2XSzjRwd2l1bnWqsq5np6OntT6z4Hjaw-SX65XHS8sjk7/exec",{
 method:"POST",
 body:JSON.stringify({
@@ -223,33 +212,18 @@ truckar: truckArray
 });
 
 // ===== MAIL =====
-let subject = "Skiftrapport "+datum.value;
-
-let body = "Datum: "+datum.value+"\n\n";
-body += "Avdelning: "+avdelning.value+"\n\n";
+let body="";
 
 truckArray.forEach(t=>{
-body += "Truck: "+t.id+" - "+t.fel+"\n";
-if(t.kom) body += "Kommentar: "+t.kom+"\n";
-body += "\n";
+body += t.truckId+" - "+t.feltyp+"\n";
+if(t.kommentar) body += t.kommentar+"\n";
+body+="\n";
 });
 
-body += "Tillsyn: "+tillsyn.value+"\n";
-if(tillsyn.value==="NOK") body += tillsynfel.value+"\n\n";
-
-body += "Maskin: "+maskin.value+"\n";
-if(maskin.value==="NOK") body += maskinfel.value+"\n\n";
-
-body += "Rengöring: "+rengoring.value+"\n";
-if(rengoring.value==="NOK") body += rengoringKommentar.value+"\n\n";
-
-let emails = [
-"rapport.vovlo@samhall.se",
-"volvooc@samhall.onmicrosoft.com"
-].join(",");
+let emails="rapport.vovlo@samhall.se,volvooc@samhall.onmicrosoft.com";
 
 window.location.href =
-"mailto:"+emails+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
+"mailto:"+emails+"?subject=Skiftrapport&body="+encodeURIComponent(body);
 
 alert("Skickat!");
 });
