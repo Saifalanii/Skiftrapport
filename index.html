@@ -84,119 +84,174 @@ button{width:100%;padding:15px;margin-top:15px;background:#2a4d69;color:white;bo
 <script>
 
 // ===== DATUM =====
-document.getElementById("datum").valueAsDate = new Date();
+datum.valueAsDate = new Date();
 
 // ===== VISA/GÖM =====
 function toggleField(sel, box){
-    document.getElementById(box).style.display =
-    document.getElementById(sel).value==="NOK" ? "block":"none";
+document.getElementById(box).style.display =
+document.getElementById(sel).value==="NOK" ? "block":"none";
 }
 
 // ===== TRUCK =====
 function toggleTruck(){
-    let status = document.getElementById("truckstatus").value;
-    document.getElementById("truckContainer").style.display =
-    status==="NOK" ? "block":"none";
+let status = truckstatus.value;
+truckContainer.style.display = status==="NOK" ? "block":"none";
 }
 
+// ===== LÄGG TILL TRUCK =====
 function addTruck(){
-    let div = document.createElement("div");
-    div.innerHTML = `
-    <select class="truckid">
-        <option value="">Truck ID</option>
-        <option>TVS-01</option>
-        <option>TVS-02</option>
-        <option>TPB-01</option>
-        <option>TPB-02</option>
-    </select>
+let div = document.createElement("div");
 
-    <select class="feltyp">
-        <option value="">Feltyp</option>
-        <option>Hydraulik/Olja</option>
-        <option>Chassi</option>
-        <option>Stativ</option>
-        <option>Batteri</option>
-        <option>Drag</option>
-        <option>Däck</option>
-        <option>Linde Connect</option>
-        <option>Övrigt</option>
-    </select>
+div.innerHTML = `
+<select class="truckid">
+<option value="">Truck ID</option>
+<option>TVS-01</option>
+<option>TVS-02</option>
+<option>TPB-01</option>
+<option>TPB-02</option>
+</select>
 
-    <textarea class="kommentar" placeholder="Kommentar"></textarea>
-    <hr>
-    `;
-    document.getElementById("truckList").appendChild(div);
+<select class="feltyp">
+<option value="">Feltyp</option>
+<option>Hydraulik/Olja</option>
+<option>Chassi</option>
+<option>Stativ</option>
+<option>Batteri</option>
+<option>Drag</option>
+<option>Däck</option>
+<option>Linde Connect</option>
+<option>Övrigt</option>
+</select>
+
+<textarea class="kommentar" placeholder="Kommentar (valfri)"></textarea>
+<hr>
+`;
+
+truckList.appendChild(div);
 }
 
 // ===== VALIDERING =====
 function validate(){
-    let ok = true;
-    document.querySelectorAll(".error").forEach(e=>e.classList.remove("error"));
 
-    if(avdelning.value===""){avdelning.classList.add("error"); ok=false;}
+document.querySelectorAll(".error").forEach(e=>e.classList.remove("error"));
 
-    if(truckstatus.value==="NOK"){
-        let trucks = document.querySelectorAll(".truckid");
-        if(trucks.length===0){alert("Lägg till truck"); return false;}
+if(avdelning.value===""){
+avdelning.classList.add("error");
+alert("Välj avdelning");
+return false;
+}
 
-        trucks.forEach((t,i)=>{
-            let fel = document.querySelectorAll(".feltyp")[i];
-            if(t.value===""){t.classList.add("error"); ok=false;}
-            if(fel.value===""){fel.classList.add("error"); ok=false;}
-        });
-    }
+// truckar
+if(truckstatus.value==="NOK"){
 
-    if(tillsyn.value==="NOK" && tillsynfel.value===""){tillsynfel.classList.add("error"); ok=false;}
-    if(maskin.value==="NOK" && maskinfel.value===""){maskinfel.classList.add("error"); ok=false;}
-    if(rengoring.value==="NOK" && rengoringKommentar.value===""){rengoringKommentar.classList.add("error"); ok=false;}
+let rows = document.querySelectorAll("#truckList > div");
 
-    if(!ok) alert("Fyll i alla obligatoriska fält");
-    return ok;
+if(rows.length===0){
+alert("Lägg till minst en truck");
+return false;
+}
+
+let validTruck = false;
+
+rows.forEach(row=>{
+let id = row.querySelector(".truckid");
+let fel = row.querySelector(".feltyp");
+
+if(id.value || fel.value){
+validTruck = true;
+
+if(id.value===""){
+id.classList.add("error");
+}
+if(fel.value===""){
+fel.classList.add("error");
+}
+}
+});
+
+if(!validTruck){
+alert("Fyll i minst en truck");
+return false;
+}
+}
+
+// övrigt NOK
+if(tillsyn.value==="NOK" && tillsynfel.value===""){tillsynfel.classList.add("error"); return false;}
+if(maskin.value==="NOK" && maskinfel.value===""){maskinfel.classList.add("error"); return false;}
+if(rengoring.value==="NOK" && rengoringKommentar.value===""){rengoringKommentar.classList.add("error"); return false;}
+
+return true;
 }
 
 // ===== SKICKA =====
-document.getElementById("form").addEventListener("submit", function(e){
+form.addEventListener("submit", function(e){
 e.preventDefault();
 
 if(!validate()) return;
 
 // samla truckar
 let truckArray = [];
-document.querySelectorAll("#truckList > div").forEach(div=>{
-    let id = div.querySelector(".truckid").value;
-    let fel = div.querySelector(".feltyp").value;
-    let kom = div.querySelector(".kommentar").value;
 
-    if(id && fel){
-        truckArray.push({id,fel,kom});
-    }
+document.querySelectorAll("#truckList > div").forEach(row=>{
+let id = row.querySelector(".truckid").value;
+let fel = row.querySelector(".feltyp").value;
+let kom = row.querySelector(".kommentar").value;
+
+if(id && fel){
+truckArray.push({id,fel,kom});
+}
 });
 
+// ===== GOOGLE SHEETS =====
 fetch("https://script.google.com/macros/s/AKfycbzmoMBgSfTsLPMbfUNOa-Y2XSzjRwd2l1bnWqsq5np6OntT6z4Hjaw-SX65XHS8sjk7/exec",{
 method:"POST",
 body:JSON.stringify({
-    datum: datum.value,
-    avdelning: avdelning.value,
-    truckstatus: truckstatus.value,
-
-    tillsyn: tillsyn.value,
-    tillsynfel: tillsynfel.value,
-
-    maskin: maskin.value,
-    maskinfel: maskinfel.value,
-
-    rengoring: rengoring.value,
-    rengoringKommentar: rengoringKommentar.value,
-
-    drift: drift.value,
-    avvikelse: avvikelse.value,
-    atgard: atgard.value,
-
-    truckar: truckArray
+datum: datum.value,
+avdelning: avdelning.value,
+truckstatus: truckstatus.value,
+tillsyn: tillsyn.value,
+tillsynfel: tillsynfel.value,
+maskin: maskin.value,
+maskinfel: maskinfel.value,
+rengoring: rengoring.value,
+rengoringKommentar: rengoringKommentar.value,
+drift: drift.value,
+avvikelse: avvikelse.value,
+atgard: atgard.value,
+truckar: truckArray
 })
-})
-.then(()=>alert("Skickat!"))
-.catch(()=>alert("Fel vid skick"));
+});
+
+// ===== MAIL =====
+let subject = "Skiftrapport "+datum.value;
+
+let body = "Datum: "+datum.value+"\n\n";
+body += "Avdelning: "+avdelning.value+"\n\n";
+
+truckArray.forEach(t=>{
+body += "Truck: "+t.id+" - "+t.fel+"\n";
+if(t.kom) body += "Kommentar: "+t.kom+"\n";
+body += "\n";
+});
+
+body += "Tillsyn: "+tillsyn.value+"\n";
+if(tillsyn.value==="NOK") body += tillsynfel.value+"\n\n";
+
+body += "Maskin: "+maskin.value+"\n";
+if(maskin.value==="NOK") body += maskinfel.value+"\n\n";
+
+body += "Rengöring: "+rengoring.value+"\n";
+if(rengoring.value==="NOK") body += rengoringKommentar.value+"\n\n";
+
+let emails = [
+"rapport.vovlo@samhall.se",
+"volvooc@samhall.onmicrosoft.com"
+].join(",");
+
+window.location.href =
+"mailto:"+emails+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
+
+alert("Skickat!");
 });
 
 </script>
