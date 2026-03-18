@@ -3,236 +3,251 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Skiftrapport v4</title>
+<title>Skiftrapport v2</title>
 <style>
-body{font-family:Arial;margin:15px;max-width:600px;}
-label{display:block;margin-top:12px;font-weight:bold;}
-input,select,textarea{width:100%;padding:10px;margin-top:5px;}
-button{width:100%;padding:15px;margin-top:15px;background:#2a4d69;color:white;border:none;border-radius:6px;}
+body{font-family: Arial; margin:15px; max-width:600px;}
+h1{color:#2a4d69;}
+label{display:block; margin-top:12px; font-weight:bold;}
+input, select, textarea{width:100%; padding:10px; margin-top:5px; font-size:16px; box-sizing:border-box;}
+button{width:100%; padding:15px; margin-top:15px; font-size:18px; background:#2a4d69; color:white; border:none; border-radius:6px;}
 button.clearBtn{background:#888;}
 .hidden{display:none;}
-.truckBox{border:1px solid #ccc;padding:10px;margin-top:10px;border-radius:6px;}
-.truckListConfirmed{margin-top:10px;background:#eef3f7;padding:10px;border-radius:6px;}
-.removeBtn{background:red;margin-top:5px;}
+.error{border:2px solid red; background:#ffe6e6;}
+.previewBox{margin-top:20px; padding:15px; background:#f4f4f4; border-radius:6px; white-space:pre-line;}
+.shiftBox{margin-top:10px; padding:10px; background:#eef3f7; border-radius:6px; font-weight:bold;}
+.truckRow{margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:6px;}
 </style>
 </head>
 <body>
 
-<h2>📋 Skiftrapport</h2>
+<h1>📋 Skiftrapport</h1>
+<div class="shiftBox" id="skiftText"></div>
 
-<form id="form">
+<form id="reportForm">
 
 <label>Datum</label>
 <input type="date" id="datum">
 
 <label>Avdelning</label>
 <select id="avdelning">
-<option value="">Välj</option>
+<option value="">Välj avdelning</option>
 <option>TVS</option>
 <option>TPB</option>
 </select>
 
 <label>Truckstatus</label>
-<select id="truckstatus" onchange="toggleTruck()">
+<select id="truckstatus" onchange="toggleTruckFields()">
 <option>OK</option>
 <option>NOK</option>
 </select>
 
-<div id="truckContainer" class="hidden">
-<div id="truckFields"></div>
-<div id="truckConfirmed" class="truckListConfirmed"></div>
-<button type="button" id="addTruckBtn" onclick="addTruck()" disabled>+ Lägg till avvikelse</button>
+<div id="truckFields" class="hidden">
+<div id="truckContainer"></div>
+<button type="button" onclick="addTruck()">Lägg till avvikelse</button>
 </div>
 
-<label>Daglig tillsyn</label>
-<select id="tillsyn" onchange="toggleField('tillsyn','tillsynBox')">
+<label>Daglig tillsyn truckar</label>
+<select id="tillsyn">
 <option>OK</option>
 <option>NOK</option>
 </select>
-<div id="tillsynBox" class="hidden">
-<textarea id="tillsynfel"></textarea>
-</div>
+<textarea id="tillsynfel" placeholder="Orsak om NOK"></textarea>
 
-<label>Maskin</label>
-<select id="maskin" onchange="toggleField('maskin','maskinBox')">
+<label>Status maskin och verktyg</label>
+<select id="maskin">
 <option>OK</option>
 <option>NOK</option>
 </select>
-<div id="maskinBox" class="hidden">
-<textarea id="maskinfel"></textarea>
-</div>
+<textarea id="maskinfel" placeholder="Orsak om NOK"></textarea>
 
-<label>Rengöring</label>
-<select id="rengoring" onchange="toggleField('rengoring','rengoringBox')">
+<label>Rengöring bandningsmaskiner</label>
+<select id="rengoring">
 <option>OK</option>
 <option>NOK</option>
 </select>
-<div id="rengoringBox" class="hidden">
-<textarea id="rengoringKommentar"></textarea>
-</div>
+<textarea id="rengoringKommentar" placeholder="Kommentar"></textarea>
 
 <label>Övriga driftstörningar</label>
 <textarea id="drift"></textarea>
 
-<label>Avvikelse</label>
+<label>Avvikelse - Vad</label>
 <textarea id="avvikelse"></textarea>
 
 <label>Åtgärd</label>
 <textarea id="atgard"></textarea>
 
+<button type="button" onclick="previewReport()">Förhandsgranska</button>
 <button type="submit">Skicka</button>
 <button type="button" class="clearBtn" onclick="clearForm()">Rensa formulär</button>
 </form>
 
+<div id="preview" class="previewBox hidden"></div>
+
 <script>
-datum.valueAsDate=new Date();
-
-let truckArray=[];
-
+// ===== SKIFT =====
 function getSkift(){
-  let now=new Date();
-  let min = now.getHours()*60 + now.getMinutes();
-  if(min>=350 && min<=480) return "Nattskift";
-  if(min>=840 && min<=1020) return "Dagskift";
-  if(min>=1320 || min<=120) return "Kvällsskift";
-  return "Okänt skift";
+    let now = new Date();
+    let min = now.getHours()*60 + now.getMinutes();
+    if(min>=350 && min<=480) return "Nattskift";   
+    if(min>=840 && min<=1020) return "Dagskift";   
+    if(min>=1320 || min<=120) return "Kvällsskift"; 
+    return "Okänt skift";
+}
+document.getElementById("skiftText").textContent = "Skift: " + getSkift();
+
+// ===== TRUCK AVVIKELSER =====
+let truckIdCounter = 0;
+let truckContainer = document.getElementById("truckContainer");
+
+function toggleTruckFields(){
+    truckContainer.parentElement.style.display = truckstatus.value==="NOK"?"block":"none";
 }
 
-function toggleField(sel, box){
-  document.getElementById(box).style.display=
-    document.getElementById(sel).value==="NOK"?"block":"none";
+function addTruck(){
+    truckIdCounter++;
+    let div = document.createElement("div");
+    div.className="truckRow";
+    div.id="truckRow"+truckIdCounter;
+    div.innerHTML = `
+        <label>Truck ID</label>
+        <select class="truckId">
+          <option>TVS-01</option><option>TVS-02</option>
+          <option>TPB-01</option><option>TPB-02</option>
+        </select>
+        <label>Feltyp</label>
+        <select class="feltyp">
+          <option>Hydraulik/Olja</option><option>Chassi</option><option>Stativ</option>
+          <option>Batteri</option><option>Drag</option><option>Däck</option>
+          <option>Linde Connect</option><option>Övrigt</option>
+        </select>
+        <label>Kommentar</label>
+        <textarea class="kom"></textarea>
+        <button type="button" onclick="confirmTruck(${truckIdCounter})">Bekräfta avvikelse</button>
+        <div class="confirmed hidden"></div>
+    `;
+    truckContainer.appendChild(div);
 }
 
-function toggleTruck(){
-  if(truckstatus.value==="NOK"){
-    truckContainer.style.display="block";
-    if(truckFields.childElementCount===0) createTruckInput();
-  }else{
-    truckContainer.style.display="none";
-    truckFields.innerHTML="";
-    truckConfirmed.innerHTML="";
-    truckArray=[];
-  }
+function confirmTruck(id){
+    let row = document.getElementById("truckRow"+id);
+    let truckId = row.querySelector(".truckId").value;
+    let feltyp = row.querySelector(".feltyp").value;
+    let kom = row.querySelector(".kom").value;
+    row.querySelector(".confirmed").textContent = `Inlagd: ${truckId} - ${feltyp} - ${kom}`;
+    row.querySelector(".confirmed").classList.remove("hidden");
 }
 
-// Skapar fälten för truck avvikelse
-function createTruckInput(){
-  truckFields.innerHTML=`
-    <select id="truckId">
-      <option value="">Truck ID</option>
-      <option>TVS-01</option>
-      <option>TVS-02</option>
-      <option>TPB-01</option>
-      <option>TPB-02</option>
-    </select>
-    <select id="truckFel">
-      <option value="">Feltyp</option>
-      <option>Hydraulik/Olja</option>
-      <option>Chassi</option>
-      <option>Stativ</option>
-      <option>Batteri</option>
-      <option>Drag</option>
-      <option>Däck</option>
-      <option>Linde Connect</option>
-      <option>Övrigt</option>
-    </select>
-    <textarea id="truckKom" placeholder="Kommentar (valfri)"></textarea>
-    <button type="button" onclick="confirmTruck()">Bekräfta avvikelse</button>
-  `;
-}
-
-function confirmTruck(){
-  let id=document.getElementById("truckId").value;
-  let fel=document.getElementById("truckFel").value;
-  let kom=document.getElementById("truckKom").value;
-  if(!id || !fel){alert("Fyll i truck ID och feltyp"); return;}
-  truckArray.push({id,fel,kom});
-  // Visa i lista under
-  renderConfirmedTrucks();
-  // Rensa input
-  document.getElementById("truckId").value="";
-  document.getElementById("truckFel").value="";
-  document.getElementById("truckKom").value="";
-}
-
-function renderConfirmedTrucks(){
-  let html="";
-  truckArray.forEach((t,i)=>{
-    html+=`${i+1}. ${t.id} (${t.fel})`;
-    if(t.kom) html+=` - ${t.kom}`;
-    html+="<br>";
-  });
-  truckConfirmed.innerHTML=html;
-}
+// ===== VALIDERING =====
+function clearErrors(){document.querySelectorAll(".error").forEach(e=>e.classList.remove("error"));}
 
 function validate(){
-  if(avdelning.value===""){alert("Välj avdelning");return false;}
-  if(truckstatus.value==="NOK" && truckArray.length===0){alert("Lägg till minst en truckavvikelse"); return false;}
-  if(tillsyn.value==="NOK" && tillsynfel.value===""){alert("Fyll i tillsyn orsak"); return false;}
-  if(maskin.value==="NOK" && maskinfel.value===""){alert("Fyll i maskin orsak"); return false;}
-  if(rengoring.value==="NOK" && rengoringKommentar.value===""){alert("Fyll i rengöring kommentar"); return false;}
-  return true;
+    clearErrors();
+    let error=false;
+    if(avdelning.value===""){avdelning.classList.add("error"); error=true;}
+    if(truckstatus.value==="NOK" && truckContainer.children.length===0){alert("Lägg till minst en truckavvikelse."); error=true;}
+    return !error;
 }
 
-form.addEventListener("submit",function(e){
-  e.preventDefault();
-  if(!validate()) return;
+// ===== BYGG TEXT =====
+function buildText(){
+    let text="";
+    text+="Datum: "+datum.value+"\n";
+    text+="Avdelning: "+avdelning.value+"\n";
+    text+="Skift: "+getSkift()+"\n";
+    text+="Truckstatus: "+truckstatus.value+"\n";
+    if(truckstatus.value==="NOK"){
+        Array.from(truckContainer.children).forEach(div=>{
+            let truckId=div.querySelector(".truckId").value;
+            let fel=div.querySelector(".feltyp").value;
+            let kom=div.querySelector(".kom").value;
+            text+="Truck: "+truckId+" - "+fel+" - "+kom+"\n";
+        });
+    }
+    text+="Daglig tillsyn truckar: "+tillsyn.value+"\n";
+    text+="Maskin/verktyg: "+maskin.value+"\n";
+    text+="Rengöring bandningsmaskiner: "+rengoring.value+"\n";
+    text+="Övriga driftstörningar: "+drift.value+"\n";
+    text+="Avvikelse: "+avvikelse.value+"\n";
+    text+="Åtgärd: "+atgard.value;
+    return text;
+}
 
-  let body="";
-  body+="Datum: "+datum.value+"\n\n";
-  body+="Avdelning: "+avdelning.value+"\n\n";
-  body+="Truckstatus: "+truckstatus.value+"\n";
-  truckArray.forEach(t=>{
-    body+="- "+t.id+" ("+t.fel+")\n";
-    if(t.kom) body+="  Kommentar: "+t.kom+"\n";
-  });
-  body+="\nDaglig tillsyn: "+tillsyn.value+"\n";
-  if(tillsyn.value==="NOK") body+=tillsynfel.value+"\n\n";
-  body+="Maskin: "+maskin.value+"\n";
-  if(maskin.value==="NOK") body+=maskinfel.value+"\n\n";
-  body+="Rengöring: "+rengoring.value+"\n";
-  if(rengoring.value==="NOK") body+=rengoringKommentar.value+"\n\n";
-  body+="Driftstörningar:\n"+drift.value+"\n\n";
-  body+="Avvikelse:\n"+avvikelse.value+"\n\n";
-  body+="Åtgärd:\n"+atgard.value;
+// ===== FÖRHANDSGRANSKA =====
+function previewReport(){
+    if(!validate()) return;
+    let preview=document.getElementById("preview");
+    preview.textContent=buildText();
+    preview.classList.remove("hidden");
+}
 
-  // Skicka till Google Sheets
-  fetch("https://script.google.com/macros/s/AKfycbzZ0tuEEi1750vcvlI-pjbjQABdSDC5-nuBZAwD_IrHkmrd9_3P4Aknv9Vui2v6wVtwDg/exec",{
-    method:"POST",
-    body:JSON.stringify({
-      datum:datum.value,
-      avdelning:avdelning.value,
-      truckstatus:truckstatus.value,
-      truckar:truckArray,
-      tillsyn:tillsyn.value,
-      tillsynfel:tillsynfel.value,
-      maskin:maskin.value,
-      maskinfel:maskinfel.value,
-      rengoring:rengoring.value,
-      rengoringKommentar:rengoringKommentar.value,
-      drift:drift.value,
-      avvikelse:avvikelse.value,
-      atgard:atgard.value
-    })
-  });
+// ===== SKICKA =====
+document.getElementById("reportForm").addEventListener("submit",function(e){
+    e.preventDefault();
+    if(!validate()) return;
+    let subject="Skiftrapport "+datum.value+" - "+getSkift();
+    let body=buildText();
+    let emails=["rapport.vovlo@samhall.se","volvooc@samhall.onmicrosoft.com"].join(/android/i.test(navigator.userAgent)?",":";");
+    window.location.href="mailto:"+emails+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
 
-  // Skicka mail
-  let subject="Skiftrapport "+datum.value+" - "+getSkift();
-  let emails="rapport.vovlo@samhall.se,volvooc@samhall.onmicrosoft.com";
-  window.location.href="mailto:"+emails+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
-
-  // Rensa formulär efter skick
-  clearForm();
+    // ===== Google Sheets =====
+    let url="https://script.google.com/macros/s/AKfycbzZ0tuEEi1750vcvlI-pjbjQABdSDC5-nuBZAwD_IrHkmrd9_3P4Aknv9Vui2v6wVtwDg/exec"; // byt ut till din URL
+    let payload={
+        datum: datum.value,
+        skift: getSkift(),
+        avdelning: avdelning.value,
+        truckstatus: truckstatus.value,
+        trucks: [],
+        tillsyn: tillsyn.value,
+        tillsynKommentar: tillsynfel.value,
+        maskin: maskin.value,
+        maskinKommentar: maskinfel.value,
+        rengoring: rengoring.value,
+        rengoringKommentar: rengoringKommentar.value,
+        drift: drift.value,
+        avvikelse: avvikelse.value,
+        atgard: atgard.value
+    };
+    if(truckstatus.value==="NOK"){
+        Array.from(truckContainer.children).forEach(div=>{
+            payload.trucks.push({
+                truckId: div.querySelector(".truckId").value,
+                feltyp: div.querySelector(".feltyp").value,
+                kommentar: div.querySelector(".kom").value
+            });
+        });
+    }
+    fetch(url, {
+        method:"POST",
+        mode:"no-cors",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify(payload)
+    });
 });
 
+// ===== RENSNING =====
 function clearForm(){
-  form.reset();
-  truckArray=[];
-  truckFields.innerHTML="";
-  truckConfirmed.innerHTML="";
-  truckContainer.style.display="none";
-  datum.valueAsDate=new Date();
+    document.getElementById("reportForm").reset();
+    document.getElementById("preview").classList.add("hidden");
+    truckContainer.innerHTML="";
+    datum.valueAsDate=new Date();
 }
+
+// ===== ELEMENT =====
+let datum=document.getElementById("datum");
+let avdelning=document.getElementById("avdelning");
+let truckstatus=document.getElementById("truckstatus");
+let tillsyn=document.getElementById("tillsyn");
+let tillsynfel=document.getElementById("tillsynfel");
+let maskin=document.getElementById("maskin");
+let maskinfel=document.getElementById("maskinfel");
+let rengoring=document.getElementById("rengoring");
+let rengoringKommentar=document.getElementById("rengoringKommentar");
+let drift=document.getElementById("drift");
+let avvikelse=document.getElementById("avvikelse");
+let atgard=document.getElementById("atgard");
+
+// ===== DATUM =====
+datum.valueAsDate=new Date();
 </script>
 
 </body>
