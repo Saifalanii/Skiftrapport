@@ -87,22 +87,6 @@ button.clearBtn{background:#888;}
 <script>
 datum.valueAsDate=new Date();
 
-  function toggleField(selectId, fieldId){
-    let status = document.getElementById(selectId).value;
-    let field = document.getElementById(fieldId);
-    let textarea = field.querySelector('textarea');
-
-    if(status === "NOK"){
-        field.style.display = "block";
-        if(selectId === "tillsyn") textarea.placeholder = "Skriv orsaken till varför daglig tillsyn är NOK...";
-        if(selectId === "maskin") textarea.placeholder = "Skriv orsaken till varför maskin/verktyg är NOK...";
-        if(selectId === "rengoring") textarea.placeholder = "Skriv kommentar om rengöring...";
-    } else {
-        field.style.display = "none";
-        textarea.placeholder = ""; // ta bort placeholder när OK
-    }
-}
-
 let truckArray=[];
 
 function getSkift(){
