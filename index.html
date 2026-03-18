@@ -88,25 +88,25 @@ document.getElementById("reportForm").addEventListener("submit", function(e){
     // ===== GOOGLE SHEETS (NY DEL) =====
     let url = "https://docs.google.com/spreadsheets/d/1OqkWtPtQs0CX8n2YHGU4Mh0TrIXex4DU1HJ-AeRfGRo/edit?gid=0#gid=0";
 
-    fetch(url, {
-        method: "POST",
-        body: JSON.stringify({
-            datum: datumEl.value,
-            avdelning: avdelning.value,
-            skift: getSkift(),
-            truckstatus: truckstatus.value,
-            truckfel: truckfel.value,
-            tillsyn: tillsyn.value,
-            tillsynfel: tillsynfel.value,
-            maskin: maskin.value,
-            maskinfel: maskinfel.value,
-            rengoring: rengoring.value,
-            rengoringKommentar: rengoringKommentar.value,
-            drift: drift.value,
-            avvikelse: avvikelse.value,
-            atgard: atgard.value
-        })
-    });
+   fetch(url, {
+    method: "POST",
+    body: JSON.stringify({
+        datum: datumEl.value,
+        avdelning: avdelning.value,
+        skift: getSkift(),
+        truckstatus: truckstatus.value,
+        truckfel: truckfel.value,
+        tillsyn: tillsyn.value,
+        tillsynfel: tillsynfel.value,
+        maskin: maskin.value,
+        maskinfel: maskinfel.value,
+        rengoring: rengoring.value,
+        rengoringKommentar: rengoringKommentar.value,
+        drift: drift.value,
+        avvikelse: avvikelse.value,
+        atgard: atgard.value
+    })
+});
 
     // ===== MAIL =====
     let separator = /android/i.test(navigator.userAgent) ? "," : ";";
