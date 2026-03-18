@@ -10,10 +10,11 @@ body{font-family:Arial;margin:15px;max-width:600px;}
 label{display:block;margin-top:12px;font-weight:bold;}
 input,select,textarea{width:100%;padding:10px;margin-top:5px;}
 button{width:100%;padding:15px;margin-top:15px;background:#2a4d69;color:white;border:none;border-radius:6px;}
+.clearBtn{background:#888;}
 .hidden{display:none;}
-.error{border:2px solid red;background:#ffe6e6;}
 .truckBox{border:1px solid #ccc;padding:10px;margin-top:10px;border-radius:6px;}
 .removeBtn{background:red;margin-top:5px;}
+.error{border:2px solid red;background:#ffe6e6;}
 </style>
 </head>
 <body>
@@ -80,6 +81,7 @@ button{width:100%;padding:15px;margin-top:15px;background:#2a4d69;color:white;bo
 <textarea id="atgard"></textarea>
 
 <button type="submit">Skicka</button>
+<button type="button" class="clearBtn" onclick="clearForm()">Rensa formulär</button>
 
 </form>
 
@@ -96,12 +98,23 @@ document.getElementById(sel).value==="NOK" ? "block":"none";
 
 // ===== TRUCK =====
 function toggleTruck(){
-truckContainer.style.display =
-truckstatus.value==="NOK" ? "block":"none";
+if(truckstatus.value==="NOK"){
+truckContainer.style.display="block";
+
+// skapa första raden om tom
+if(document.querySelectorAll(".truckBox").length===0){
+addTruck();
+}
+
+}else{
+truckContainer.style.display="none";
+truckList.innerHTML="";
+}
 }
 
 // ===== LÄGG TILL TRUCK =====
 function addTruck(){
+
 let div = document.createElement("div");
 div.className="truckBox";
 
@@ -126,7 +139,7 @@ div.innerHTML = `
 <option>Övrigt</option>
 </select>
 
-<textarea class="kommentar" placeholder="Kommentar"></textarea>
+<textarea class="kommentar" placeholder="Kommentar (valfri)"></textarea>
 
 <button type="button" class="removeBtn" onclick="this.parentElement.remove()">Ta bort</button>
 `;
@@ -146,11 +159,6 @@ if(truckstatus.value==="NOK"){
 
 let trucks = document.querySelectorAll(".truckBox");
 
-if(trucks.length===0){
-alert("Lägg till minst en truck");
-return false;
-}
-
 let valid=false;
 
 trucks.forEach(t=>{
@@ -166,48 +174,53 @@ return false;
 }
 }
 
+if(tillsyn.value==="NOK" && tillsynfel.value===""){alert("Fyll i tillsyn orsak");return false;}
+if(maskin.value==="NOK" && maskinfel.value===""){alert("Fyll i maskin orsak");return false;}
+if(rengoring.value==="NOK" && rengoringKommentar.value===""){alert("Fyll i rengöring kommentar");return false;}
+
 return true;
 }
 
 // ===== SKICKA =====
 form.addEventListener("submit", function(e){
 e.preventDefault();
+
 if(!validate()) return;
 
 // samla truckar
-let truckArray = [];
+let truckArray=[];
 
 document.querySelectorAll(".truckBox").forEach(t=>{
-let id = t.querySelector(".truckid").value;
-let fel = t.querySelector(".feltyp").value;
-let kom = t.querySelector(".kommentar").value;
+let id=t.querySelector(".truckid").value;
+let fel=t.querySelector(".feltyp").value;
+let kom=t.querySelector(".kommentar").value;
 
 if(id && fel){
 truckArray.push({
-truckId: id,
-feltyp: fel,
-kommentar: kom
+truckId:id,
+feltyp:fel,
+kommentar:kom
 });
 }
 });
 
-// ===== SEND TO GOOGLE SHEETS =====
+// ===== GOOGLE SHEETS =====
 fetch("https://script.google.com/macros/s/AKfycbxIdJRBJc1PL_qcTzPsmlqx7iASFu3wbIcewKHdsQLAjYLBjjihGZmqGm-fVcjsNAo4sQ/exec",{
 method:"POST",
 body:JSON.stringify({
-datum: datum.value,
-avdelning: avdelning.value,
-truckstatus: truckstatus.value,
-tillsyn: tillsyn.value,
-tillsynfel: tillsynfel.value,
-maskin: maskin.value,
-maskinfel: maskinfel.value,
-rengoring: rengoring.value,
-rengoringKommentar: rengoringKommentar.value,
-drift: drift.value,
-avvikelse: avvikelse.value,
-atgard: atgard.value,
-truckar: truckArray
+datum:datum.value,
+avdelning:avdelning.value,
+truckstatus:truckstatus.value,
+tillsyn:tillsyn.value,
+tillsynfel:tillsynfel.value,
+maskin:maskin.value,
+maskinfel:maskinfel.value,
+rengoring:rengoring.value,
+rengoringKommentar:rengoringKommentar.value,
+drift:drift.value,
+avvikelse:avvikelse.value,
+atgard:atgard.value,
+truckar:truckArray
 })
 });
 
@@ -215,8 +228,8 @@ truckar: truckArray
 let body="";
 
 truckArray.forEach(t=>{
-body += t.truckId+" - "+t.feltyp+"\n";
-if(t.kommentar) body += t.kommentar+"\n";
+body+=t.truckId+" - "+t.feltyp+"\n";
+if(t.kommentar) body+=t.kommentar+"\n";
 body+="\n";
 });
 
@@ -227,6 +240,14 @@ window.location.href =
 
 alert("Skickat!");
 });
+
+// ===== RENSNING =====
+function clearForm(){
+document.getElementById("form").reset();
+truckList.innerHTML="";
+truckContainer.style.display="none";
+datum.valueAsDate=new Date();
+}
 
 </script>
 </body>
