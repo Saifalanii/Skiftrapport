@@ -14,6 +14,7 @@ button.clearBtn{background:#888;}
 .truckBox{border:1px solid #ccc;padding:10px;margin-top:10px;border-radius:6px;}
 .truckListConfirmed{margin-top:10px;background:#eef3f7;padding:10px;border-radius:6px;}
 .removeBtn{background:red;margin-top:5px;}
+.error{border:2px solid red; background:#ffe6e6;}
 </style>
 </head>
 <body>
@@ -87,8 +88,6 @@ button.clearBtn{background:#888;}
 <script>
 datum.valueAsDate=new Date();
 
- 
-
 let truckArray=[];
 
 function getSkift(){
@@ -147,11 +146,15 @@ function confirmTruck(){
   let id=document.getElementById("truckId").value;
   let fel=document.getElementById("truckFel").value;
   let kom=document.getElementById("truckKom").value;
-  if(!id || !fel){alert("Fyll i truck ID och feltyp"); return;}
+  if(!id || !fel){
+    if(!id) document.getElementById("truckId").classList.add("error"); else document.getElementById("truckId").classList.remove("error");
+    if(!fel) document.getElementById("truckFel").classList.add("error"); else document.getElementById("truckFel").classList.remove("error");
+    return;
+  }
+  document.getElementById("truckId").classList.remove("error");
+  document.getElementById("truckFel").classList.remove("error");
   truckArray.push({id,fel,kom});
-  // Visa i lista under
   renderConfirmedTrucks();
-  // Rensa input
   document.getElementById("truckId").value="";
   document.getElementById("truckFel").value="";
   document.getElementById("truckKom").value="";
@@ -168,12 +171,16 @@ function renderConfirmedTrucks(){
 }
 
 function validate(){
-  if(avdelning.value===""){alert("Välj avdelning");return false;}
-  if(truckstatus.value==="NOK" && truckArray.length===0){alert("Lägg till minst en truckavvikelse"); return false;}
-  if(tillsyn.value==="NOK" && tillsynfel.value===""){alert("Fyll i Daglig tillsyn orsak"); return false;}
-  if(maskin.value==="NOK" && maskinfel.value===""){alert("Fyll i vilken Maskin/verktyg samt orsak"); return false;}
-  if(rengoring.value==="NOK" && rengoringKommentar.value===""){alert("Fyll i varför bandnigsmaskiner är ej rengjorda"); return false;}
-  return true;
+  // Rensa tidigare felmarkeringar
+  document.querySelectorAll("select,textarea").forEach(el=>el.classList.remove("error"));
+
+  let valid=true;
+  if(avdelning.value===""){avdelning.classList.add("error"); valid=false;}
+  if(truckstatus.value==="NOK" && truckArray.length===0){truckstatus.classList.add("error"); valid=false;}
+  if(tillsyn.value==="NOK" && tillsynfel.value===""){tillsynfel.classList.add("error"); valid=false;}
+  if(maskin.value==="NOK" && maskinfel.value===""){maskinfel.classList.add("error"); valid=false;}
+  if(rengoring.value==="NOK" && rengoringKommentar.value===""){rengoringKommentar.classList.add("error"); valid=false;}
+  return valid;
 }
 
 form.addEventListener("submit",function(e){
@@ -198,7 +205,6 @@ form.addEventListener("submit",function(e){
   body+="Avvikelse:\n"+avvikelse.value+"\n\n";
   body+="Åtgärd:\n"+atgard.value;
 
-  // Skicka till Google Sheets
   fetch("https://script.google.com/macros/s/AKfycbzZ0tuEEi1750vcvlI-pjbjQABdSDC5-nuBZAwD_IrHkmrd9_3P4Aknv9Vui2v6wVtwDg/exec",{
     method:"POST",
     body:JSON.stringify({
@@ -218,12 +224,10 @@ form.addEventListener("submit",function(e){
     })
   });
 
-  // Skicka mail
   let subject="Skiftrapport "+datum.value+" - "+getSkift();
   let emails="rapport.vovlo@samhall.se,volvooc@samhall.onmicrosoft.com";
   window.location.href="mailto:"+emails+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
 
-  // Rensa formulär efter skick
   clearForm();
 });
 
