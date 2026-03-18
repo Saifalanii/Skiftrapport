@@ -88,7 +88,7 @@ document.getElementById("reportForm").addEventListener("submit", function(e){
     // ===== GOOGLE SHEETS (NY DEL) =====
     let url = "https://docs.google.com/spreadsheets/d/1OqkWtPtQs0CX8n2YHGU4Mh0TrIXex4DU1HJ-AeRfGRo/edit?gid=0#gid=0";
 
-   fetch(url, {
+  
     method: "POST",
     body: JSON.stringify({
         datum: datumEl.value,
