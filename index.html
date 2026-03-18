@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Skiftrapport v3</title>
+<title>Skiftrapport v4</title>
 <style>
 body{font-family:Arial;margin:15px;max-width:600px;}
 label{display:block;margin-top:12px;font-weight:bold;}
@@ -12,6 +12,7 @@ button{width:100%;padding:15px;margin-top:15px;background:#2a4d69;color:white;bo
 button.clearBtn{background:#888;}
 .hidden{display:none;}
 .truckBox{border:1px solid #ccc;padding:10px;margin-top:10px;border-radius:6px;}
+.truckListConfirmed{margin-top:10px;background:#eef3f7;padding:10px;border-radius:6px;}
 .removeBtn{background:red;margin-top:5px;}
 </style>
 </head>
@@ -38,8 +39,9 @@ button.clearBtn{background:#888;}
 </select>
 
 <div id="truckContainer" class="hidden">
-<div id="truckList"></div>
-<button type="button" id="addTruckBtn" onclick="addTruck()" disabled>+ Lägg till truckavvikelse</button>
+<div id="truckFields"></div>
+<div id="truckConfirmed" class="truckListConfirmed"></div>
+<button type="button" id="addTruckBtn" onclick="addTruck()" disabled>+ Lägg till avvikelse</button>
 </div>
 
 <label>Daglig tillsyn</label>
@@ -69,7 +71,7 @@ button.clearBtn{background:#888;}
 <textarea id="rengoringKommentar"></textarea>
 </div>
 
-<label>Driftstörningar</label>
+<label>Övriga driftstörningar</label>
 <textarea id="drift"></textarea>
 
 <label>Avvikelse</label>
@@ -104,26 +106,26 @@ function toggleField(sel, box){
 function toggleTruck(){
   if(truckstatus.value==="NOK"){
     truckContainer.style.display="block";
-    if(truckList.childElementCount===0) createTruckFields();
+    if(truckFields.childElementCount===0) createTruckInput();
   }else{
     truckContainer.style.display="none";
-    truckList.innerHTML="";
+    truckFields.innerHTML="";
+    truckConfirmed.innerHTML="";
     truckArray=[];
   }
 }
 
-function createTruckFields(){
-  let div=document.createElement("div");
-  div.className="truckBox";
-  div.innerHTML=`
-    <select class="truckid">
+// Skapar fälten för truck avvikelse
+function createTruckInput(){
+  truckFields.innerHTML=`
+    <select id="truckId">
       <option value="">Truck ID</option>
       <option>TVS-01</option>
       <option>TVS-02</option>
       <option>TPB-01</option>
       <option>TPB-02</option>
     </select>
-    <select class="feltyp">
+    <select id="truckFel">
       <option value="">Feltyp</option>
       <option>Hydraulik/Olja</option>
       <option>Chassi</option>
@@ -134,34 +136,41 @@ function createTruckFields(){
       <option>Linde Connect</option>
       <option>Övrigt</option>
     </select>
-    <textarea class="kommentar" placeholder="Kommentar (valfri)"></textarea>
-    <button type="button" onclick="confirmTruck(this)">Bekräfta avvikelse</button>
+    <textarea id="truckKom" placeholder="Kommentar (valfri)"></textarea>
+    <button type="button" onclick="confirmTruck()">Bekräfta avvikelse</button>
   `;
-  truckList.appendChild(div);
 }
 
-function confirmTruck(btn){
-  let box=btn.parentElement;
-  let id=box.querySelector(".truckid").value;
-  let fel=box.querySelector(".feltyp").value;
-  let kom=box.querySelector(".kommentar").value;
-  if(!id || !fel){alert("Fyll i truck ID och feltyp");return;}
+function confirmTruck(){
+  let id=document.getElementById("truckId").value;
+  let fel=document.getElementById("truckFel").value;
+  let kom=document.getElementById("truckKom").value;
+  if(!id || !fel){alert("Fyll i truck ID och feltyp"); return;}
   truckArray.push({id,fel,kom});
-  // Rensa för nästa avvikelse
-  box.querySelector(".truckid").value="";
-  box.querySelector(".feltyp").value="";
-  box.querySelector(".kommentar").value="";
-  alert("Avvikelse sparad, lägg till nästa om det finns.");
+  // Visa i lista under
+  renderConfirmedTrucks();
+  // Rensa input
+  document.getElementById("truckId").value="";
+  document.getElementById("truckFel").value="";
+  document.getElementById("truckKom").value="";
+}
+
+function renderConfirmedTrucks(){
+  let html="";
+  truckArray.forEach((t,i)=>{
+    html+=`${i+1}. ${t.id} (${t.fel})`;
+    if(t.kom) html+=` - ${t.kom}`;
+    html+="<br>";
+  });
+  truckConfirmed.innerHTML=html;
 }
 
 function validate(){
   if(avdelning.value===""){alert("Välj avdelning");return false;}
-  if(truckstatus.value==="NOK" && truckArray.length===0){
-    alert("Lägg till minst en truckavvikelse"); return false;
-  }
-  if(tillsyn.value==="NOK" && tillsynfel.value===""){alert("Fyll i tillsyn orsak");return false;}
-  if(maskin.value==="NOK" && maskinfel.value===""){alert("Fyll i maskin orsak");return false;}
-  if(rengoring.value==="NOK" && rengoringKommentar.value===""){alert("Fyll i rengöring kommentar");return false;}
+  if(truckstatus.value==="NOK" && truckArray.length===0){alert("Lägg till minst en truckavvikelse"); return false;}
+  if(tillsyn.value==="NOK" && tillsynfel.value===""){alert("Fyll i tillsyn orsak"); return false;}
+  if(maskin.value==="NOK" && maskinfel.value===""){alert("Fyll i maskin orsak"); return false;}
+  if(rengoring.value==="NOK" && rengoringKommentar.value===""){alert("Fyll i rengöring kommentar"); return false;}
   return true;
 }
 
@@ -188,7 +197,7 @@ form.addEventListener("submit",function(e){
   body+="Åtgärd:\n"+atgard.value;
 
   // Skicka till Google Sheets
-  fetch("https://script.google.com/macros/s/AKfycbyc6h88-DQcAmgLBdyOnz3I5xVFeRP-c7D89NS3kceOcNOqei2YIzwvhx_9tGRtKiHdBQ/exec",{
+  fetch("https://script.google.com/macros/s/AKfycbzZ0tuEEi1750vcvlI-pjbjQABdSDC5-nuBZAwD_IrHkmrd9_3P4Aknv9Vui2v6wVtwDg/exec",{
     method:"POST",
     body:JSON.stringify({
       datum:datum.value,
@@ -211,14 +220,18 @@ form.addEventListener("submit",function(e){
   let subject="Skiftrapport "+datum.value+" - "+getSkift();
   let emails="rapport.vovlo@samhall.se,volvooc@samhall.onmicrosoft.com";
   window.location.href="mailto:"+emails+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
+
+  // Rensa formulär efter skick
+  clearForm();
 });
 
 function clearForm(){
   form.reset();
-  truckList.innerHTML="";
+  truckArray=[];
+  truckFields.innerHTML="";
+  truckConfirmed.innerHTML="";
   truckContainer.style.display="none";
   datum.valueAsDate=new Date();
-  truckArray=[];
 }
 </script>
 
