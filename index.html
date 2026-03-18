@@ -85,12 +85,30 @@ button.clearBtn{background:#888;}
 </form>
 
 <script>
-datum.valueAsDate=new Date();
+<script>
+const datum = document.getElementById("datum");
+const avdelning = document.getElementById("avdelning");
+const truckstatus = document.getElementById("truckstatus");
+const truckFields = document.getElementById("truckFields");
+const truckConfirmed = document.getElementById("truckConfirmed");
+const truckContainer = document.getElementById("truckContainer");
+const tillsyn = document.getElementById("tillsyn");
+const tillsynfel = document.getElementById("tillsynfel");
+const maskin = document.getElementById("maskin");
+const maskinfel = document.getElementById("maskinfel");
+const rengoring = document.getElementById("rengoring");
+const rengoringKommentar = document.getElementById("rengoringKommentar");
+const drift = document.getElementById("drift");
+const avvikelse = document.getElementById("avvikelse");
+const atgard = document.getElementById("atgard");
+const form = document.getElementById("form");
+
+datum.valueAsDate = new Date(); // sätt dagens datum automatiskt
 
 let truckArray=[];
 
 function getSkift(){
-  let now=new Date();
+  let now = new Date();
   let min = now.getHours()*60 + now.getMinutes();
   if(min>=350 && min<=480) return "Nattskift";
   if(min>=840 && min<=1020) return "Dagskift";
@@ -98,7 +116,7 @@ function getSkift(){
   return "Okänt skift";
 }
 
-// ===== VISA/GÖM + PLACEHOLDER =====
+// VISA/GÖM + PLACEHOLDER
 function toggleField(sel, box){
   const selEl = document.getElementById(sel);
   const boxEl = document.getElementById(box);
@@ -109,8 +127,7 @@ function toggleField(sel, box){
     if(textarea){
       if(sel === "tillsyn") textarea.placeholder = "Skriv orsaken till varför daglig tillsyn är NOK...";
       if(sel === "maskin") textarea.placeholder = "Skriv vilken maskin/verktyg och orsaken...";
-      if(sel === "rengoring") textarea.placeholder = Skriv orsaken till varför rengöringen är NOK...";
-     
+      if(sel === "rengoring") textarea.placeholder = "Skriv kommentar om rengöring...";
     }
   } else {
     boxEl.style.display = "none";
@@ -118,7 +135,7 @@ function toggleField(sel, box){
   }
 }
 
-// ===== TRUCK AVVIKELSE =====
+// TRUCK
 function toggleTruck(){
   if(truckstatus.value==="NOK"){
     truckContainer.style.display="block";
@@ -157,9 +174,9 @@ function createTruckInput(){
 }
 
 function confirmTruck(){
-  let id=document.getElementById("truckId").value;
-  let fel=document.getElementById("truckFel").value;
-  let kom=document.getElementById("truckKom").value;
+  const id=document.getElementById("truckId").value;
+  const fel=document.getElementById("truckFel").value;
+  const kom=document.getElementById("truckKom").value;
   if(!id || !fel){alert("Fyll i truck ID och feltyp"); return;}
   truckArray.push({id,fel,kom});
   renderConfirmedTrucks();
@@ -178,7 +195,7 @@ function renderConfirmedTrucks(){
   truckConfirmed.innerHTML=html;
 }
 
-// ===== VALIDERING =====
+// VALIDERA
 function validate(){
   if(avdelning.value===""){alert("Välj avdelning");return false;}
   if(truckstatus.value==="NOK" && truckArray.length===0){alert("Lägg till minst en truckavvikelse"); return false;}
@@ -188,7 +205,7 @@ function validate(){
   return true;
 }
 
-// ===== SKICKA =====
+// SKICKA
 form.addEventListener("submit",function(e){
   e.preventDefault();
   if(!validate()) return;
@@ -211,7 +228,6 @@ form.addEventListener("submit",function(e){
   body+="Avvikelse:\n"+avvikelse.value+"\n\n";
   body+="Åtgärd:\n"+atgard.value;
 
-  // Skicka till Google Sheets
   fetch("https://script.google.com/macros/s/AKfycbzZ0tuEEi1750vcvlI-pjbjQABdSDC5-nuBZAwD_IrHkmrd9_3P4Aknv9Vui2v6wVtwDg/exec",{
     method:"POST",
     body:JSON.stringify({
@@ -231,7 +247,6 @@ form.addEventListener("submit",function(e){
     })
   });
 
-  // Skicka mail
   let subject="Skiftrapport "+datum.value+" - "+getSkift();
   let emails="rapport.vovlo@samhall.se,volvooc@samhall.onmicrosoft.com";
   window.location.href="mailto:"+emails+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
@@ -239,7 +254,7 @@ form.addEventListener("submit",function(e){
   clearForm();
 });
 
-// ===== RENSNING =====
+// RENSNING
 function clearForm(){
   form.reset();
   truckArray=[];
@@ -249,6 +264,3 @@ function clearForm(){
   datum.valueAsDate=new Date();
 }
 </script>
-
-</body>
-</html>
