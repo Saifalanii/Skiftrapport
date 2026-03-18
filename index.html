@@ -155,30 +155,6 @@ function buildText(){
 
 // ===== FÖRHANDSGRANSKA =====
 function previewReport(){if(!validate()) return; let preview = document.getElementById("preview"); preview.textContent = buildText(); preview.classList.remove("hidden");}
-    
-    // ===== SKICKA TILL GOOGLE SHEETS =====
-
-let url = "https://script.google.com/macros/s/AKfycbz7TwNpQCIzy1GV82np0cZhThjYEyf_o07lKJxLDf3Q_czYri_HSDI6lQiT5Lym_2cP-A/exec";
-
-fetch(url, {
-    method: "POST",
-    body: JSON.stringify({
-        datum: datum.value,
-        avdelning: avdelning.value,
-        skift: getSkift(),
-        truckstatus: truckstatus.value,
-        truckfel: truckfel.value,
-        tillsyn: tillsyn.value,
-        tillsynfel: tillsynfel.value,
-        maskin: maskin.value,
-        maskinfel: maskinfel.value,
-        rengoring: rengoring.value,
-        rengoringKommentar: rengoringKommentar.value,
-        drift: drift.value,
-        avvikelse: avvikelse.value,
-        atgard: atgard.value
-    })
-});
 
 // ===== SKICKA =====
 document.getElementById("reportForm").addEventListener("submit", function(e){
