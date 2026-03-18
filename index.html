@@ -80,36 +80,6 @@ button.clearBtn{background:#888;}
 <label>Åtgärd</label>
 <textarea id="atgard"></textarea>
 
-  <label>Daglig tillsyn truckar</label>
-<select id="tillsyn" onchange="toggleField('tillsyn','tillsynOrsak','Skriv orsaken till varför daglig tillsyn är NOK...')">
-  <option>OK</option>
-  <option>NOK</option>
-</select>
-<div id="tillsynOrsak" class="hidden">
-  <label>Orsak</label>
-  <textarea id="tillsynfel"></textarea>
-</div>
-
-<label>Status maskin och verktyg</label>
-<select id="maskin" onchange="toggleField('maskin','maskinOrsak','Skriv orsaken till varför maskin/verktyg är NOK...')">
-  <option>OK</option>
-  <option>NOK</option>
-</select>
-<div id="maskinOrsak" class="hidden">
-  <label>Orsak</label>
-  <textarea id="maskinfel"></textarea>
-</div>
-
-<label>Rengöring bandningsmaskiner</label>
-<select id="rengoring" onchange="toggleField('rengoring','rengoringOrsak','Skriv kommentar om rengöring...')">
-  <option>OK</option>
-  <option>NOK</option>
-</select>
-<div id="rengoringOrsak" class="hidden">
-  <label>Kommentar</label>
-  <textarea id="rengoringKommentar"></textarea>
-</div>
-
 <button type="submit">Skicka</button>
 <button type="button" class="clearBtn" onclick="clearForm()">Börja om</button>
 </form>
@@ -117,19 +87,7 @@ button.clearBtn{background:#888;}
 <script>
 datum.valueAsDate=new Date();
 
-  function toggleField(selectId, fieldId, placeholderText){
-    const selectEl = document.getElementById(selectId);
-    const field = document.getElementById(fieldId);
-    const textarea = field.querySelector('textarea') || field; // fallback
-
-    if(selectEl.value === "NOK"){
-        field.style.display = "block";
-        textarea.placeholder = placeholderText; // sätt placeholder
-    } else {
-        field.style.display = "none";
-        textarea.placeholder = ""; // ta bort placeholder när OK
-    }
-}
+ 
 
 let truckArray=[];
 
