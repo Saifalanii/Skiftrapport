@@ -195,11 +195,11 @@ form.addEventListener("submit",function(e){
     body+="- "+t.id+" ("+t.fel+")\n";
     if(t.kom) body+="  Kommentar: "+t.kom+"\n";
   });
-  body+="\nDaglig tillsyn: "+tillsyn.value+"\n";
+  body+="\nDaglig tillsyn Truckar: "+tillsyn.value+"\n";
   if(tillsyn.value==="NOK") body+=tillsynfel.value+"\n\n";
-  body+="Maskiner & Verktyg: "+maskin.value+"\n";
+  body+="Maskiner & verktyg: "+maskin.value+"\n";
   if(maskin.value==="NOK") body+=maskinfel.value+"\n\n";
-  body+="Rengöring: "+rengoring.value+"\n";
+  body+="Rengöring av bandningsmaskiner: "+rengoring.value+"\n";
   if(rengoring.value==="NOK") body+=rengoringKommentar.value+"\n\n";
   body+="Driftstörningar:\n"+drift.value+"\n\n";
   body+="Avvikelse:\n"+avvikelse.value+"\n\n";
