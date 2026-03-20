@@ -253,7 +253,9 @@ function validate(){
   return valid;
 }
 
-form.addEventListener("submit",function(e){
+<script>
+
+form.addEventListener("submit", async function(e){
   e.preventDefault();
   if(!validate()) return;
 
@@ -275,49 +277,55 @@ form.addEventListener("submit",function(e){
   body+="\nAvvikelse:\n"+avvikelse.value+"\n";
   body+="\nÅtgärd:\n"+atgard.value;
 
-  function sendDataToWebApp(data) {
-  fetch("https://script.google.com/macros/s/AKfycbyxhOyRE43YmngpyiosiUaYIsVC_ZuTZUlrnckwdDxDLU3rOCvhT5WzV2QzSVuXYO7IWQ/exec", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(data)
-  })
-  .then(response => response.json())
-  .then(result => {
-    console.log("Respons från Web App:", result);
-    alert("Respons från Web App: " + JSON.stringify(result));
-  })
-  .catch(error => {
-    console.error("Fel vid skickande:", error);
-    alert("Fel vid skickande: " + error);
-  });
-}
+  async function sendDataToWebApp(data) {
+    try {
+      let response = await fetch("https://script.google.com/macros/s/AKfycbyxhOyRE43YmngpyiosiUaYIsVC_ZuTZUlrnckwdDxDLU3rOCvhT5WzV2QzSVuXYO7IWQ/exec", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      });
 
-// Exempel på hur du kan kalla funktionen
-sendDataToWebApp({
-  datum: "2026-03-20",
-  avdelning: "TVS",
-  truckstatus: "OK",
-  truckar: [{id: "TVS-01", fel: "Hydraulik", kom: "Test"}],
-  tillsyn: "OK",
-  tillsynfel: "",
-  maskin: "OK",
-  maskinfel: "",
-  rengoring: "OK",
-  rengoringKommentar: "",
-  drift: "Test drift",
-  avvikelse: "Test avvikelse",
-  atgard: "Test åtgärd"
-});
+      let result = await response.text(); // <-- ÄNDRAD
+      console.log("Respons:", result);
+
+    } catch(error) {
+      console.error("Fel vid skickande:", error);
+      alert("Fel vid skickande: " + error);
+    }
+  }
+
+
+  await sendDataToWebApp({
+    datum: datum.value,
+    avdelning: avdelning.value,
+    truckstatus: truckstatus.value,
+    truckar: truckArray,
+    tillsyn: tillsyn.value,
+    tillsynfel: tillsynfel.value,
+    maskin: maskin.value,
+    maskinfel: maskinfel.value,
+    rengoring: rengoring.value,
+    rengoringKommentar: rengoringKommentar.value,
+    drift: drift.value,
+    avvikelse: avvikelse.value,
+    atgard: atgard.value
+  });
 
   let subject="Skiftrapport "+datum.value+" - "+getSkift();
 
-  // BULLETPROOF MAILTO
+  // MAIL
   let userAgent = navigator.userAgent.toLowerCase();
   let separator = (userAgent.includes("windows") || userAgent.includes("outlook")) ? ";" : ",";
   let emails = ["rapport.vovlo@samhall.se","volvooc@samhall.onmicrosoft.com"].join(separator);
+
   window.location.href = "mailto:" + emails + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+
+  clearForm();
+});
+
+</script>
 
   clearForm();
 });
