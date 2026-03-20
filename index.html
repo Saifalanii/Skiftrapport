@@ -129,10 +129,9 @@ let truckArray=[];
 
 function openStats(){
   let frame = document.getElementById("statsFrame");
-  frame.src = frame.src.split("&t=")[0] + "&t=" + new Date().getTime(); // cache fix
+  frame.src = frame.src.split("&t=")[0] + "&t=" + new Date().getTime();
   document.getElementById("statsModal").style.display="flex";
 }
-
 function closeStats(){document.getElementById("statsModal").style.display="none";}
 
 function getSkift(){
@@ -167,8 +166,28 @@ function createTruckInput(){
       <option value="">Välj Truck</option>
       <option>TVS-01</option>
       <option>TVS-02</option>
-      <option>TPB-01</option>
-      <option>TPB-02</option>
+      <option>TVS-03</option>
+      <option>TVS-04</option>
+      <option>TVS-05</option>
+      <option>TVS-06</option>
+      <option>TVS-13</option>
+      <option>TVS-22</option>
+      <option>TVS-23</option>
+      <option>TVS-33</option>
+      <option>TVS-34</option>
+      
+      <option>TPB-07</option>
+      <option>TPB-08</option>
+      <option>TPB-09</option>
+      <option>TPB-10</option>
+      <option>TPB-14</option>
+      <option>TPB-15</option>
+      <option>TPB-20</option>
+      <option>TPB-21</option>
+
+      <option>Extra truck</option>
+      <option>Grå Skjutsativ</option>
+      
     </select>
     <select id="truckFel">
       <option value="">Välj Feltyp</option>
@@ -220,19 +239,12 @@ function renderConfirmedTrucks(){
 
 function validate(){
   document.querySelectorAll("input,select,textarea").forEach(el=>el.classList.remove("error"));
-
   let valid=true;
-
   if(avdelning.value===""){avdelning.classList.add("error"); valid=false;}
-
   if(truckstatus.value==="NOK" && truckArray.length===0){truckstatus.classList.add("error"); valid=false;}
-
   if(tillsyn.value==="NOK" && tillsynfel.value===""){tillsynfel.classList.add("error"); valid=false;}
-
   if(maskin.value==="NOK" && maskinfel.value===""){maskinfel.classList.add("error"); valid=false;}
-
   if(rengoring.value==="NOK" && rengoringKommentar.value===""){rengoringKommentar.classList.add("error"); valid=false;}
-
   return valid;
 }
 
@@ -243,22 +255,17 @@ form.addEventListener("submit",function(e){
   let body="";
   body+="Datum: "+datum.value+"\n\n";
   body+="Avdelning: "+avdelning.value+"\n\n";
-
   body+="Truckstatus: "+truckstatus.value+"\n";
   truckArray.forEach(t=>{
     body+="- "+t.id+" ("+t.fel+")\n";
     if(t.kom) body+="  Orsak: "+t.kom+"\n";
   });
-
   body+="\nDaglig tillsyn: "+tillsyn.value+"\n";
   if(tillsyn.value==="NOK") body+="Orsak: "+tillsynfel.value+"\n";
-
   body+="\nMaskiner: "+maskin.value+"\n";
   if(maskin.value==="NOK") body+="Orsak: "+maskinfel.value+"\n";
-
   body+="\nRengöring: "+rengoring.value+"\n";
   if(rengoring.value==="NOK") body+="Orsak: "+rengoringKommentar.value+"\n";
-
   body+="\nDriftstörningar:\n"+drift.value+"\n";
   body+="\nAvvikelse:\n"+avvikelse.value+"\n";
   body+="\nÅtgärd:\n"+atgard.value;
@@ -284,10 +291,11 @@ form.addEventListener("submit",function(e){
 
   let subject="Skiftrapport "+datum.value+" - "+getSkift();
 
-  
-  let emails="rapport.vovlo@samhall.se,volvooc@samhall.onmicrosoft.com";
-
-  window.location.href="mailto:"+emails+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
+  // BULLETPROOF MAILTO
+  let userAgent = navigator.userAgent.toLowerCase();
+  let separator = (userAgent.includes("windows") || userAgent.includes("outlook")) ? ";" : ",";
+  let emails = ["rapport.vovlo@samhall.se","volvooc@samhall.onmicrosoft.com"].join(separator);
+  window.location.href = "mailto:" + emails + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
 
   clearForm();
 });
