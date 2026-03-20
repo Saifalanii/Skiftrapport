@@ -284,7 +284,7 @@ form.addEventListener("submit",function(e){
 
   let subject="Skiftrapport "+datum.value+" - "+getSkift();
 
-  // UNIVERSAL lösning (funkar som din original)
+  
   let emails="rapport.vovlo@samhall.se,volvooc@samhall.onmicrosoft.com";
 
   window.location.href="mailto:"+emails+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
