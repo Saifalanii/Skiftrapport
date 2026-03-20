@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Skiftrapport</title>
 
-<!-- IKONER -->
 <link rel="icon" type="image/png" href="icon.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
 
@@ -16,7 +15,6 @@ h2{text-align:center;}
 .card{background:white;padding:15px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.08);margin-bottom:15px;}
 
 label{display:block;margin-top:12px;font-weight:bold;}
-
 #datum{width:60%;}
 
 input,select,textarea{
@@ -180,7 +178,6 @@ function createTruckInput(){
       <option>TVS-23</option>
       <option>TVS-33</option>
       <option>TVS-34</option>
-      
       <option>TPB-07</option>
       <option>TPB-08</option>
       <option>TPB-09</option>
@@ -189,10 +186,8 @@ function createTruckInput(){
       <option>TPB-15</option>
       <option>TPB-20</option>
       <option>TPB-21</option>
-
       <option>Extra truck</option>
       <option>Grå Skjutsativ</option>
-      
     </select>
     <select id="truckFel">
       <option value="">Välj Feltyp</option>
@@ -253,8 +248,6 @@ function validate(){
   return valid;
 }
 
-<script>
-
 form.addEventListener("submit", async function(e){
   e.preventDefault();
   if(!validate()) return;
@@ -287,7 +280,7 @@ form.addEventListener("submit", async function(e){
         body: JSON.stringify(data)
       });
 
-      let result = await response.text(); // <-- ÄNDRAD
+      let result = await response.text();
       console.log("Respons:", result);
 
     } catch(error) {
@@ -295,7 +288,6 @@ form.addEventListener("submit", async function(e){
       alert("Fel vid skickande: " + error);
     }
   }
-
 
   await sendDataToWebApp({
     datum: datum.value,
@@ -315,17 +307,11 @@ form.addEventListener("submit", async function(e){
 
   let subject="Skiftrapport "+datum.value+" - "+getSkift();
 
-  // MAIL
   let userAgent = navigator.userAgent.toLowerCase();
   let separator = (userAgent.includes("windows") || userAgent.includes("outlook")) ? ";" : ",";
   let emails = ["rapport.vovlo@samhall.se","volvooc@samhall.onmicrosoft.com"].join(separator);
 
   window.location.href = "mailto:" + emails + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
-
-  clearForm();
-});
-
-</script>
 
   clearForm();
 });
