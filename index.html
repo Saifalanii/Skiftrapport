@@ -286,6 +286,7 @@ form.addEventListener("submit", async function(e){
   await sendDataToWebApp({
     datum: datum.value,
     avdelning: avdelning.value,
+    skift: getSkift(),
     truckstatus: truckstatus.value,
     truckar: truckArray,
     tillsyn: tillsyn.value,
