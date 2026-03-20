@@ -131,8 +131,14 @@ datum.valueAsDate=new Date();
 let truckArray=[];
 
 function openStats(){
-  let frame = document.getElementById("statsFrame");
-  frame.src = frame.src.split("&t=")[0] + "&t=" + new Date().getTime();
+  // Skiftrapport iframe
+  let frame1 = document.getElementById("statsFrameSkiftrapport");
+  frame1.src = frame1.src.split("&t=")[0] + "&t=" + new Date().getTime();
+
+  // Truckavvikelse iframe
+  let frame2 = document.getElementById("statsFrameTruckavvikelse");
+  frame2.src = frame2.src.split("&t=")[0] + "&t=" + new Date().getTime();
+
   document.getElementById("statsModal").style.display="flex";
 }
 function closeStats(){document.getElementById("statsModal").style.display="none";}
