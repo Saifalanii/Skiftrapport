@@ -275,24 +275,40 @@ form.addEventListener("submit",function(e){
   body+="\nAvvikelse:\n"+avvikelse.value+"\n";
   body+="\nÅtgärd:\n"+atgard.value;
 
-  fetch("https://script.google.com/macros/s/AKfycbypbPlGyz2Dx0nXjVVkkRX-j_G_huCJS2VNu9W586M4ip061KrEUF_QAKCODcIVmzw2nA/exec", {
-  method: "POST",
-  headers: {'Content-Type': 'application/json'},
-  body: JSON.stringify({
-    datum: datum.value,
-    avdelning: avdelning.value,
-    truckstatus: truckstatus.value,
-    truckar: truckArray,
-    tillsyn: tillsyn.value,
-    tillsynfel: tillsynfel.value,
-    maskin: maskin.value,
-    maskinfel: maskinfel.value,
-    rengoring: rengoring.value,
-    rengoringKommentar: rengoringKommentar.value,
-    drift: drift.value,
-    avvikelse: avvikelse.value,
-    atgard: atgard.value
+  function sendDataToWebApp(data) {
+  fetch("https://script.google.com/macros/s/AKfycbyxhOyRE43YmngpyiosiUaYIsVC_ZuTZUlrnckwdDxDLU3rOCvhT5WzV2QzSVuXYO7IWQ/exec", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
   })
+  .then(response => response.json())
+  .then(result => {
+    console.log("Respons från Web App:", result);
+    alert("Respons från Web App: " + JSON.stringify(result));
+  })
+  .catch(error => {
+    console.error("Fel vid skickande:", error);
+    alert("Fel vid skickande: " + error);
+  });
+}
+
+// Exempel på hur du kan kalla funktionen
+sendDataToWebApp({
+  datum: "2026-03-20",
+  avdelning: "TVS",
+  truckstatus: "OK",
+  truckar: [{id: "TVS-01", fel: "Hydraulik", kom: "Test"}],
+  tillsyn: "OK",
+  tillsynfel: "",
+  maskin: "OK",
+  maskinfel: "",
+  rengoring: "OK",
+  rengoringKommentar: "",
+  drift: "Test drift",
+  avvikelse: "Test avvikelse",
+  atgard: "Test åtgärd"
 });
 
   let subject="Skiftrapport "+datum.value+" - "+getSkift();
