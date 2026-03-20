@@ -272,10 +272,10 @@ form.addEventListener("submit", async function(e){
 
   async function sendDataToWebApp(data) {
     try {
-      await fetch("https://script.google.com/macros/s/AKfycbyxhOyRE43YmngpyiosiUaYIsVC_ZuTZUlrnckwdDxDLU3rOCvhT5WzV2QzSVuXYO7IWQ/exec", {
+      await fetch("https://script.google.com/macros/s/AKfycbwbMARWAC8XGsxyWo4j-It76zQfdSLoqFWvD_WIHicuUgWMCE4C5EqD2YonTeH-NJKmCA/exec", {
         method: "POST",
-        mode: "no-cors", // ✅ ENDA ÄNDRINGEN SOM FIXAR CORS
-        body: JSON.stringify(data) // ❌ header borttagen
+        mode: "no-cors", 
+        body: JSON.stringify(data) 
       });
     } catch(error) {
       console.error("Fel vid skickande:", error);
