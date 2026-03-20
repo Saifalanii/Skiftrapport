@@ -12,13 +12,19 @@ h2{text-align:center;}
 .card{background:white;padding:15px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.08);margin-bottom:15px;}
 
 label{display:block;margin-top:12px;font-weight:bold;}
+
+/* DATUM smalare */
+#datum{
+  width:60%;
+}
+
 input,select,textarea{
   width:100%;
   padding:10px;
   margin-top:5px;
   border-radius:6px;
   border:1px solid #ccc;
-  box-sizing:border-box; /* FIX mobil */
+  box-sizing:border-box;
 }
 
 textarea{min-height:80px;resize:vertical;}
@@ -252,7 +258,6 @@ form.addEventListener("submit",function(e){
   body+="\nAvvikelse:\n"+avvikelse.value+"\n";
   body+="\nÅtgärd:\n"+atgard.value;
 
-  // SKICKA TILL GOOGLE SHEETS (FIX)
   fetch("https://script.google.com/macros/s/AKfycbzZ0tuEEi1750vcvlI-pjbjQABdSDC5-nuBZAwD_IrHkmrd9_3P4Aknv9Vui2v6wVtwDg/exec",{
     method:"POST",
     body:JSON.stringify({
@@ -273,7 +278,9 @@ form.addEventListener("submit",function(e){
   });
 
   let subject="Skiftrapport "+datum.value+" - "+getSkift();
-  let emails="rapport.vovlo@samhall.se,volvooc@samhall.onmicrosoft.com";
+
+  // FIX: separata mail
+  let emails="rapport.vovlo@samhall.se;volvooc@samhall.onmicrosoft.com";
 
   window.location.href="mailto:"+emails+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
 
