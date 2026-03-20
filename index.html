@@ -261,7 +261,7 @@ form.addEventListener("submit", async function(e){
   body+="Truckstatus: "+truckstatus.value+"\n";
   truckArray.forEach(t=>{
     body+="- "+t.id+" ("+t.fel+")\n";
-    if(t.kom) body+="  Orsak: "+t.kom+"\n";
+    if(t.kom) body+=""+t.kom+"\n";
   });
   body+="\nDaglig tillsyn: "+tillsyn.value+"\n";
   if(tillsyn.value==="NOK") body+="Orsak: "+tillsynfel.value+"\n";
