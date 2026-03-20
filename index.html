@@ -6,27 +6,10 @@
 <title>Skiftrapport</title>
 
 <style>
-body{
-  font-family:Arial;
-  margin:0;
-  background:#f4f6f8;
-}
-
-.container{
-  max-width:600px;
-  margin:auto;
-  padding:15px;
-}
-
+body{font-family:Arial;margin:0;background:#f4f6f8;}
+.container{max-width:600px;margin:auto;padding:15px;}
 h2{text-align:center;}
-
-.card{
-  background:white;
-  padding:15px;
-  border-radius:12px;
-  box-shadow:0 4px 10px rgba(0,0,0,0.08);
-  margin-bottom:15px;
-}
+.card{background:white;padding:15px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.08);margin-bottom:15px;}
 
 label{display:block;margin-top:12px;font-weight:bold;}
 input,select,textarea{
@@ -35,61 +18,30 @@ input,select,textarea{
   margin-top:5px;
   border-radius:6px;
   border:1px solid #ccc;
+  box-sizing:border-box; /* FIX mobil */
 }
 
-button{
-  width:100%;
-  padding:14px;
-  margin-top:12px;
-  border:none;
-  border-radius:8px;
-  font-size:16px;
-  cursor:pointer;
-}
+textarea{min-height:80px;resize:vertical;}
 
+button{width:100%;padding:14px;margin-top:12px;border:none;border-radius:8px;font-size:16px;cursor:pointer;}
 .primary{background:#2a4d69;color:white;}
 .secondary{background:#888;color:white;}
 .danger{background:#c0392b;color:white;}
 
 .hidden{display:none;}
+.truckListConfirmed{margin-top:10px;background:#eef3f7;padding:10px;border-radius:6px;}
 
-.truckListConfirmed{
-  margin-top:10px;
-  background:#eef3f7;
-  padding:10px;
-  border-radius:6px;
-}
+.error{border:2px solid red !important;background:#ffe6e6;}
 
-.error{border:2px solid red; background:#ffe6e6;}
-
-/* MODAL */
-.modal{
-  position:fixed;
-  top:0;left:0;
-  width:100%;height:100%;
-  background:rgba(0,0,0,0.6);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:1000;
-}
-
-.modalContent{
-  background:white;
-  width:90%;
-  max-width:700px;
-  border-radius:12px;
-  padding:10px;
-}
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:1000;}
+.modalContent{background:white;width:90%;max-width:700px;border-radius:12px;padding:10px;}
 </style>
 </head>
 
 <body>
 
 <div class="container">
-
 <h2>📋 Skiftrapport</h2>
-
 <button class="primary" onclick="openStats()">📊 Visa statistik</button>
 
 <form id="form" class="card">
@@ -121,7 +73,7 @@ button{
 <option>NOK</option>
 </select>
 <div id="tillsynBox" class="hidden">
-<textarea id="tillsynfel"></textarea>
+<textarea id="tillsynfel" placeholder="Orsak"></textarea>
 </div>
 
 <label>Maskiner & Verktyg</label>
@@ -130,7 +82,7 @@ button{
 <option>NOK</option>
 </select>
 <div id="maskinBox" class="hidden">
-<textarea id="maskinfel"></textarea>
+<textarea id="maskinfel" placeholder="Orsak"></textarea>
 </div>
 
 <label>Rengöring av Bandningsmaskiner</label>
@@ -139,7 +91,7 @@ button{
 <option>NOK</option>
 </select>
 <div id="rengoringBox" class="hidden">
-<textarea id="rengoringKommentar"></textarea>
+<textarea id="rengoringKommentar" placeholder="Orsak"></textarea>
 </div>
 
 <label>Övriga driftstörningar</label>
@@ -157,14 +109,10 @@ button{
 </form>
 </div>
 
-<!-- STATISTIK MODAL -->
 <div id="statsModal" class="modal">
   <div class="modalContent">
     <button class="danger" onclick="closeStats()">Stäng</button>
-    <iframe 
-      src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQY0jbcHllFP-BC4h08x-mU28_9QuPBKOhcB4ue4HFUV8G7daNOsfoTUbAfDnMKmKm2-2T2NDLGDZIW/pubhtml?gid=1458081070&single=true&widget=true&headers=false"
-      width="100%" height="500" style="border:none;">
-    </iframe>
+    <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQY0jbcHllFP-BC4h08x-mU28_9QuPBKOhcB4ue4HFUV8G7daNOsfoTUbAfDnMKmKm2-2T2NDLGDZIW/pubhtml?gid=1458081070&single=true&widget=true&headers=false" width="100%" height="500"></iframe>
   </div>
 </div>
 
@@ -173,24 +121,19 @@ button{
 datum.valueAsDate=new Date();
 let truckArray=[];
 
-function openStats(){
-  document.getElementById("statsModal").style.display="flex";
-}
-
-function closeStats(){
-  document.getElementById("statsModal").style.display="none";
-}
+function openStats(){document.getElementById("statsModal").style.display="flex";}
+function closeStats(){document.getElementById("statsModal").style.display="none";}
 
 function getSkift(){
   let now=new Date();
-  let min = now.getHours()*60 + now.getMinutes();
-  if(min>=350 && min<=480) return "Nattskift";
-  if(min>=840 && min<=1020) return "Dagskift";
-  if(min>=1320 || min<=120) return "Kvällsskift";
-  return "Okänt skift";
+  let min=now.getHours()*60+now.getMinutes();
+  if(min>=350&&min<=480)return"Nattskift";
+  if(min>=840&&min<=1020)return"Dagskift";
+  if(min>=1320||min<=120)return"Kvällsskift";
+  return"Okänt";
 }
 
-function toggleField(sel, box){
+function toggleField(sel,box){
   document.getElementById(box).style.display=
   document.getElementById(sel).value==="NOK"?"block":"none";
 }
@@ -227,7 +170,7 @@ function createTruckInput(){
       <option>Linde Connect</option>
       <option>Övrigt</option>
     </select>
-    <textarea id="truckKom" placeholder="Beskriv felet"></textarea>
+    <textarea id="truckKom" placeholder="Orsak"></textarea>
     <button type="button" onclick="confirmTruck()">Bekräfta</button>
   `;
 }
@@ -236,9 +179,19 @@ function confirmTruck(){
   let id=truckId.value;
   let fel=truckFel.value;
   let kom=truckKom.value;
-  if(!id||!fel) return;
+
+  if(!id||!fel){
+    if(!id) truckId.classList.add("error"); else truckId.classList.remove("error");
+    if(!fel) truckFel.classList.add("error"); else truckFel.classList.remove("error");
+    return;
+  }
+
+  truckId.classList.remove("error");
+  truckFel.classList.remove("error");
+
   truckArray.push({id,fel,kom});
   renderConfirmedTrucks();
+
   truckId.value="";
   truckFel.value="";
   truckKom.value="";
@@ -255,12 +208,20 @@ function renderConfirmedTrucks(){
 }
 
 function validate(){
+  document.querySelectorAll("input,select,textarea").forEach(el=>el.classList.remove("error"));
+
   let valid=true;
-  if(avdelning.value==="") valid=false;
-  if(truckstatus.value==="NOK" && truckArray.length===0) valid=false;
-  if(tillsyn.value==="NOK" && tillsynfel.value==="") valid=false;
-  if(maskin.value==="NOK" && maskinfel.value==="") valid=false;
-  if(rengoring.value==="NOK" && rengoringKommentar.value==="") valid=false;
+
+  if(avdelning.value===""){avdelning.classList.add("error"); valid=false;}
+
+  if(truckstatus.value==="NOK" && truckArray.length===0){truckstatus.classList.add("error"); valid=false;}
+
+  if(tillsyn.value==="NOK" && tillsynfel.value===""){tillsynfel.classList.add("error"); valid=false;}
+
+  if(maskin.value==="NOK" && maskinfel.value===""){maskinfel.classList.add("error"); valid=false;}
+
+  if(rengoring.value==="NOK" && rengoringKommentar.value===""){rengoringKommentar.classList.add("error"); valid=false;}
+
   return valid;
 }
 
@@ -271,25 +232,45 @@ form.addEventListener("submit",function(e){
   let body="";
   body+="Datum: "+datum.value+"\n\n";
   body+="Avdelning: "+avdelning.value+"\n\n";
-  body+="Truckstatus: "+truckstatus.value+"\n";
 
+  body+="Truckstatus: "+truckstatus.value+"\n";
   truckArray.forEach(t=>{
     body+="- "+t.id+" ("+t.fel+")\n";
-    if(t.kom) body+="  Kommentar: "+t.kom+"\n";
+    if(t.kom) body+="  Orsak: "+t.kom+"\n";
   });
 
   body+="\nDaglig tillsyn: "+tillsyn.value+"\n";
-  if(tillsyn.value==="NOK") body+=tillsynfel.value+"\n";
+  if(tillsyn.value==="NOK") body+="Orsak: "+tillsynfel.value+"\n";
 
   body+="\nMaskiner: "+maskin.value+"\n";
-  if(maskin.value==="NOK") body+=maskinfel.value+"\n";
+  if(maskin.value==="NOK") body+="Orsak: "+maskinfel.value+"\n";
 
   body+="\nRengöring: "+rengoring.value+"\n";
-  if(rengoring.value==="NOK") body+=rengoringKommentar.value+"\n";
+  if(rengoring.value==="NOK") body+="Orsak: "+rengoringKommentar.value+"\n";
 
   body+="\nDriftstörningar:\n"+drift.value+"\n";
   body+="\nAvvikelse:\n"+avvikelse.value+"\n";
   body+="\nÅtgärd:\n"+atgard.value;
+
+  // SKICKA TILL GOOGLE SHEETS (FIX)
+  fetch("https://script.google.com/macros/s/AKfycbzZ0tuEEi1750vcvlI-pjbjQABdSDC5-nuBZAwD_IrHkmrd9_3P4Aknv9Vui2v6wVtwDg/exec",{
+    method:"POST",
+    body:JSON.stringify({
+      datum:datum.value,
+      avdelning:avdelning.value,
+      truckstatus:truckstatus.value,
+      truckar:truckArray,
+      tillsyn:tillsyn.value,
+      tillsynfel:tillsynfel.value,
+      maskin:maskin.value,
+      maskinfel:maskinfel.value,
+      rengoring:rengoring.value,
+      rengoringKommentar:rengoringKommentar.value,
+      drift:drift.value,
+      avvikelse:avvikelse.value,
+      atgard:atgard.value
+    })
+  });
 
   let subject="Skiftrapport "+datum.value+" - "+getSkift();
   let emails="rapport.vovlo@samhall.se,volvooc@samhall.onmicrosoft.com";
