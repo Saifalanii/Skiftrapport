@@ -6,7 +6,7 @@
     <title>Skiftrapport</title>
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
-<style>
+    <style>
         /* KRITISK: Ser till att padding aldrig gör ett element bredare än skärmen */
         * {
             box-sizing: border-box;
@@ -288,7 +288,7 @@
         <textarea id="atgard" placeholder="Vad gjordes för att lösa problemen?"></textarea>
 
         <div class="button-group">
-            <button type="submit" class="primary">Skicka Rapport</button>
+            <button type="submit" id="submitBtn" class="primary">Skicka Rapport</button>
             <button type="button" class="secondary" onclick="clearForm()">Rensa</button>
         </div>
     </form>
@@ -425,6 +425,10 @@
             toggleSection('truckContainer', 'OK');
             toggleSection('maskinContainer', 'OK');
             document.getElementById('datum').valueAsDate = new Date();
+            // Återställ knapp om den var inaktiverad
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Skicka Rapport";
         }
     }
 
@@ -432,6 +436,12 @@
     document.getElementById('reportForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         if (!validateForm()) return;
+
+        // --- SPÄRR FÖR DUBBEL DATA ---
+        const submitBtn = document.getElementById('submitBtn');
+        if (submitBtn.disabled) return; 
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Skickar...";
 
         const formData = {
             datum: document.getElementById('datum').value,
@@ -479,6 +489,12 @@
         const emails = ["rapport.vovlo@samhall.se", "volvooc@samhall.onmicrosoft.com"].join(separator);
 
         window.location.href = `mailto:${emails}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(mailBody)}`;
+
+        // Återställ knappen efter 3 sekunder ifall de behöver ändra något
+        setTimeout(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Skicka Rapport";
+        }, 3000);
     });
 </script>
 
