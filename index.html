@@ -247,12 +247,11 @@
             <div id="maskinFields" class="list-container">
                 <select id="machineId">
                     <option value="">-- Välj Maskin --</option>
-                    <option>Maskin-01</option><option>Maskin-02</option><option>Extra maskin</option>
+                    <option>Ergopack</option><option>Bandningsmaskin</option><option>Pallyftare</option><option>Övrigt</option>
                 </select>
                 <select id="machineFel">
                     <option value="">-- Välj Feltyp --</option>
-                    <option>Hydraulik/Olja</option><option>Chassi</option>
-                    <option>Elektronik</option><option>Övrigt</option>
+                    <option>Övrigt</option>
                 </select>
                 <textarea id="machineKom" placeholder="Kommentar om felet..."></textarea>
                 <button type="button" class="add-btn" onclick="addItem('machine')">➕ Lägg till i listan</button>
@@ -392,7 +391,7 @@
         if (mins >= 350 && mins <= 480) return "Nattskift";
         if (mins >= 840 && mins <= 1020) return "Dagskift";
         if (mins >= 1320 || mins <= 120) return "Kvällsskift";
-        return "Mellan skift";
+        return "Okänt skift";
     }
 
     // --- Validering & Rensa ---
@@ -409,6 +408,11 @@
 
         if (document.getElementById('truckstatus').value === "NOK" && truckArray.length === 0) {
             alert("Du har valt NOK på truckar men inte lagt till några fel i listan.");
+            isValid = false;
+        }
+
+                if (document.getElementById('maskin').value === "NOK" && machineArray.length === 0) {
+            alert("Du har valt NOK på Maskiner & Verktyg men inte lagt till några fel i listan.");
             isValid = false;
         }
 
