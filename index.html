@@ -1,177 +1,445 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Skiftrapport</title>
-<link rel="icon" type="image/png" href="icon.png">
-<link rel="apple-touch-icon" sizes="180x180" href="icon.png">
-<style>
-body{font-family:Arial;margin:0;background:#f4f6f8;}
-.container{max-width:600px;margin:auto;padding:15px;}
-h2{text-align:center;}
-.card{background:white;padding:15px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.08);margin-bottom:15px;}
-label{display:block;margin-top:12px;font-weight:bold;}
-input,select,textarea{width:100%;padding:10px;margin-top:5px;border-radius:6px;border:1px solid #ccc;box-sizing:border-box;}
-textarea{min-height:80px;resize:vertical;}
-button{width:100%;padding:14px;margin-top:12px;border:none;border-radius:8px;font-size:16px;cursor:pointer;}
-.primary{background:#2a4d69;color:white;}
-.secondary{background:#888;color:white;}
-.danger{background:#c0392b;color:white;}
-.hidden{display:none;}
-.truckListConfirmed{margin-top:10px;background:#eef3f7;padding:10px;border-radius:6px;}
-.error{border:2px solid red !important;background:#ffe6e6;}
-.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:1000;}
-.modalContent{background:white;width:90%;max-width:700px;border-radius:12px;padding:10px;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skiftrapport</title>
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
+    <style>
+        :root {
+            --primary: #2a4d69;
+            --secondary: #6c757d;
+            --danger: #c0392b;
+            --light: #f4f6f8;
+            --white: #ffffff;
+            --border: #cccccc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background: var(--light);
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        h2 { text-align: center; color: var(--primary); }
+
+        .card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        textarea { min-height: 100px; resize: vertical; }
+
+        .button-group { display: flex; gap: 10px; margin-top: 15px; }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        button:hover { opacity: 0.9; }
+
+        .primary { background: var(--primary); color: white; }
+        .secondary { background: var(--secondary); color: white; }
+        .danger { background: var(--danger); color: white; }
+        .add-btn { background: #27ae60; color: white; margin-top: 10px; padding: 10px; }
+
+        .hidden { display: none; }
+
+        .list-container {
+            margin-top: 15px;
+            background: #eef3f7;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .list-item:last-child { border-bottom: none; }
+
+        .error { border: 2px solid var(--danger) !important; background: #fff5f5; }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--white);
+            width: 95%;
+            max-width: 800px;
+            border-radius: 15px;
+            padding: 15px;
+            position: relative;
+        }
+
+        .close-modal {
+            margin-bottom: 10px;
+            width: auto;
+            float: right;
+        }
+    </style>
 </head>
 <body>
 
 <div class="container">
-<h2>📋 Skiftrapport</h2>
-<button class="primary" onclick="openStats()">📊 Visa statistik</button>
+    <h2>📋 Skiftrapport</h2>
+    <button class="secondary" style="margin-bottom: 15px;" onclick="openStats()">📊 Visa statistik</button>
 
-<form id="form" class="card">
-<label>Datum</label>
-<input type="date" id="datum">
+    <form id="reportForm" class="card">
+        <label for="datum">Datum</label>
+        <input type="date" id="datum">
 
-<label>Avdelning</label>
-<select id="avdelning">
-<option value="">Välj</option>
-<option>TVS</option>
-<option>TPB</option>
-</select>
+        <label for="avdelning">Avdelning</label>
+        <select id="avdelning">
+            <option value="">-- Välj avdelning --</option>
+            <option value="TVS">TVS</option>
+            <option value="TPB">TPB</option>
+        </select>
 
-<label>Truckstatus</label>
-<select id="truckstatus" onchange="toggleTruck()">
-<option>OK</option>
-<option>NOK</option>
-</select>
+        <label for="truckstatus">Truckstatus</label>
+        <select id="truckstatus" onchange="toggleSection('truckContainer', this.value)">
+            <option value="OK">OK</option>
+            <option value="NOK">Felanmälan (NOK)</option>
+        </select>
 
-<div id="truckContainer" class="hidden">
-<div id="truckFields"></div>
-<div id="truckConfirmed" class="truckListConfirmed"></div>
-</div>
+        <div id="truckContainer" class="hidden">
+            <div id="truckFields" class="list-container">
+                <select id="truckId">
+                    <option value="">-- Välj Truck --</option>
+      <option>TVS-01</option>
+      <option>TVS-02</option>
+      <option>TVS-03</option>
+      <option>TVS-04</option>
+      <option>TVS-05</option>
+      <option>TVS-06</option>
+      <option>TVS-13</option>
+      <option>TVS-22</option>
+      <option>TVS-23</option>
+      <option>TVS-33</option>
+      <option>TVS-34</option>
+      <option>TPB-07</option>
+      <option>TPB-08</option>
+      <option>TPB-09</option>
+      <option>TPB-10</option>
+      <option>TPB-14</option>
+      <option>TPB-15</option>
+      <option>TPB-20</option>
+      <option>TPB-21</option>
+      <option>Extra truck</option>
+      <option>Grå Skjutsativ</option>
 
-<label>Maskiner & Verktyg</label>
-<select id="maskin" onchange="toggleMachine()">
-<option>OK</option>
-<option>NOK</option>
-</select>
+                </select>
+                <select id="truckFel">
+                    <option value="">-- Välj Feltyp --</option>
+      <option>Hydraulik/Olja</option>
+      <option>Chassi</option>
+      <option>Stativ</option>
+      <option>Batteri</option>
+      <option>Drag</option>
+      <option>Däck</option>
+      <option>Linde Connect</option>
+      <option>Övrigt</option>
 
-<div id="maskContainer" class="hidden">
-<div id="maskFields"></div>
-<div id="maskConfirmed" class="truckListConfirmed"></div>
-</div>
+                </select>
+                <textarea id="truckKom" placeholder="Kommentar om felet..."></textarea>
+                <button type="button" class="add-btn" onclick="addItem('truck')">➕ Lägg till i listan</button>
+            </div>
+            <div id="truckList" class="list-container hidden"></div>
+        </div>
 
-<label>Daglig tillsyn truckar</label>
-<select id="tillsyn" onchange="toggleField('tillsyn','tillsynBox')">
-<option>OK</option>
-<option>NOK</option>
-</select>
-<div id="tillsynBox" class="hidden">
-<textarea id="tillsynfel" placeholder="Orsak"></textarea>
-</div>
+        <label for="maskin">Maskiner & Verktyg</label>
+        <select id="maskin" onchange="toggleSection('maskinContainer', this.value)">
+            <option value="OK">OK</option>
+            <option value="NOK">Felanmälan (NOK)</option>
+        </select>
 
-<label>Rengöring av Bandningsmaskiner</label>
-<select id="rengoring" onchange="toggleField('rengoring','rengoringBox')">
-<option>OK</option>
-<option>NOK</option>
-</select>
-<div id="rengoringBox" class="hidden">
-<textarea id="rengoringKommentar" placeholder="Orsak"></textarea>
-</div>
+        <div id="maskinContainer" class="hidden">
+            <div id="maskinFields" class="list-container">
+                <select id="machineId">
+                    <option value="">-- Välj Maskin --</option>
+                    <option>Maskin-01</option><option>Maskin-02</option><option>Extra maskin</option>
+                </select>
+                <select id="machineFel">
+                    <option value="">-- Välj Feltyp --</option>
+                    <option>Hydraulik/Olja</option><option>Chassi</option>
+                    <option>Elektronik</option><option>Övrigt</option>
+                </select>
+                <textarea id="machineKom" placeholder="Kommentar om felet..."></textarea>
+                <button type="button" class="add-btn" onclick="addItem('machine')">➕ Lägg till i listan</button>
+            </div>
+            <div id="machineList" class="list-container hidden"></div>
+        </div>
 
-<label>Övriga driftstörningar</label>
-<textarea id="drift"></textarea>
+        <label for="tillsyn">Daglig tillsyn truckar</label>
+        <select id="tillsyn" onchange="toggleVisibility('tillsynBox', this.value)">
+            <option value="OK">OK</option>
+            <option value="NOK">NOK</option>
+        </select>
+        <div id="tillsynBox" class="hidden">
+            <textarea id="tillsynfel" placeholder="Beskriv vad som saknas i tillsynen"></textarea>
+        </div>
 
-<label>Avvikelse</label>
-<textarea id="avvikelse"></textarea>
+        <label for="rengoring">Rengöring av Bandningsmaskiner</label>
+        <select id="rengoring" onchange="toggleVisibility('rengoringBox', this.value)">
+            <option value="OK">OK</option>
+            <option value="NOK">Ej utfört</option>
+        </select>
+        <div id="rengoringBox" class="hidden">
+            <textarea id="rengoringKommentar" placeholder="Orsak till utebliven rengöring"></textarea>
+        </div>
 
-<label>Åtgärd</label>
-<textarea id="atgard"></textarea>
+        <label for="drift">Övriga driftstörningar</label>
+        <textarea id="drift" placeholder="Beskriv eventuella stopp eller problem..."></textarea>
 
-<button type="submit" class="primary">Skicka</button>
-<button type="button" class="secondary" onclick="clearForm()">Börja om</button>
-</form>
+        <label for="avvikelse">Avvikelse</label>
+        <textarea id="avvikelse" placeholder="Personal, material etc..."></textarea>
+
+        <label for="atgard">Åtgärd</label>
+        <textarea id="atgard" placeholder="Vad gjordes för att lösa problemen?"></textarea>
+
+        <div class="button-group">
+            <button type="submit" class="primary">Skicka Rapport</button>
+            <button type="button" class="secondary" onclick="clearForm()">Rensa</button>
+        </div>
+    </form>
 </div>
 
 <div id="statsModal" class="modal">
-  <div class="modalContent">
-    <button class="danger" onclick="closeStats()">Stäng</button>
-    <iframe 
-      id="statsFrame" 
-      src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQY0jbcHllFP-BC4h08x-mU28_9QuPBKOhcB4ue4HFUV8G7daNOsfoTUbAfDnMKmKm2-2T2NDLGDZIW/pubhtml?widget=true&amp;headers=false" 
-      width="100%" 
-      height="500">
-    </iframe>
-  </div>
+    <div class="modal-content">
+        <button class="danger close-modal" onclick="closeStats()">Stäng</button>
+        <iframe id="statsFrame" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQY0jbcHllFP-BC4h08x-mU28_9QuPBKOhcB4ue4HFUV8G7daNOsfoTUbAfDnMKmKm2-2T2NDLGDZIW/pubhtml?widget=true&amp;headers=false" width="100%" height="500"></iframe>
+    </div>
 </div>
 
 <script>
-datum.valueAsDate = new Date();
-let truckArray = [];
-let machineArray = [];
+    // Initialisering
+    document.getElementById('datum').valueAsDate = new Date();
+    let truckArray = [];
+    let machineArray = [];
 
-// ---------- MODALS ----------
-function openStats(){let f=document.getElementById("statsFrame");f.src=f.src.split("&t=")[0]+"&t="+new Date().getTime();document.getElementById("statsModal").style.display="flex";}
-function closeStats(){document.getElementById("statsModal").style.display="none";}
+    // --- Hjälpfunktioner ---
+    function toggleVisibility(id, val) {
+        document.getElementById(id).style.display = (val === "NOK") ? "block" : "none";
+    }
 
-// ---------- TOGGLE FIELDS ----------
-function toggleField(sel,box){document.getElementById(box).style.display=document.getElementById(sel).value==="NOK"?"block":"none";}
+    function toggleSection(containerId, val) {
+        const container = document.getElementById(containerId);
+        if (val === "NOK") {
+            container.style.display = "block";
+        } else {
+            container.style.display = "none";
+            if(containerId === 'truckContainer') { truckArray = []; renderList('truck'); }
+            if(containerId === 'maskinContainer') { machineArray = []; renderList('machine'); }
+        }
+    }
 
-function toggleTruck(){if(truckstatus.value==="NOK"){truckContainer.style.display="block";if(truckFields.childElementCount===0) createTruckInput();}else{truckContainer.style.display="none";truckFields.innerHTML="";truckConfirmed.innerHTML="";truckArray=[];}}
+    function openStats(){
+        let f = document.getElementById("statsFrame");
+        f.src = f.src.split("&t=")[0] + "&t=" + new Date().getTime();
+        document.getElementById("statsModal").style.display = "flex";
+    }
 
-function toggleMachine(){if(maskin.value==="NOK"){maskContainer.style.display="block";if(maskFields.childElementCount===0) createMachineInput();}else{maskContainer.style.display="none";maskFields.innerHTML="";maskConfirmed.innerHTML="";machineArray=[];}}
+    function closeStats(){
+        document.getElementById("statsModal").style.display = "none";
+    }
 
-// ---------- CREATE INPUTS ----------
-function createTruckInput(){truckFields.innerHTML=`<select id="truckId"><option value="">Välj Truck</option><option>TVS-01</option><option>TVS-02</option><option>TVS-03</option><option>TVS-04</option><option>TVS-05</option><option>Extra truck</option></select><select id="truckFel"><option value="">Välj Feltyp</option><option>Hydraulik/Olja</option><option>Chassi</option><option>Batteri</option><option>Övrigt</option></select><textarea id="truckKom" placeholder="Orsak"></textarea><button type="button" onclick="confirmTruck()">Bekräfta</button>`;}
+    // --- Hantera Listor (Truck/Maskin) ---
+    function addItem(type) {
+        const idEl = document.getElementById(type === 'truck' ? 'truckId' : 'machineId');
+        const felEl = document.getElementById(type === 'truck' ? 'truckFel' : 'machineFel');
+        const komEl = document.getElementById(type === 'truck' ? 'truckKom' : 'machineKom');
 
-function createMachineInput(){maskFields.innerHTML=`<select id="machineId"><option value="">Välj Maskin</option><option>Maskin-01</option><option>Maskin-02</option><option>Extra maskin</option></select><select id="machineFel"><option value="">Välj Feltyp</option><option>Hydraulik/Olja</option><option>Chassi</option><option>Elektronik</option><option>Övrigt</option></select><textarea id="machineKom" placeholder="Orsak"></textarea><button type="button" onclick="confirmMachine()">Bekräfta</button>`;}
+        if (!idEl.value || !felEl.value) {
+            idEl.classList.add('error');
+            felEl.classList.add('error');
+            alert("Vänligen välj både enhet och feltyp.");
+            return;
+        }
 
-// ---------- CONFIRM ----------
-function confirmTruck(){let id=truckId.value,fel=truckFel.value,kom=truckKom.value;if(!id||!fel){if(!id)truckId.classList.add("error");else truckId.classList.remove("error");if(!fel)truckFel.classList.add("error");else truckFel.classList.remove("error");return;} truckArray.push({id,fel,kom}); renderConfirmedTrucks(); truckId.value=""; truckFel.value=""; truckKom.value="";}
+        idEl.classList.remove('error');
+        felEl.classList.remove('error');
 
-function confirmMachine(){let id=machineId.value,fel=machineFel.value,kom=machineKom.value;if(!id||!fel){if(!id)machineId.classList.add("error");else machineId.classList.remove("error");if(!fel)machineFel.classList.add("error");else machineFel.classList.remove("error");return;} machineArray.push({id,fel,kom}); renderConfirmedMachines(); machineId.value=""; machineFel.value=""; machineKom.value="";}
+        const item = { id: idEl.value, fel: felEl.value, kom: komEl.value };
+        
+        if (type === 'truck') {
+            truckArray.push(item);
+        } else {
+            machineArray.push(item);
+        }
 
-// ---------- RENDER ----------
-function renderConfirmedTrucks(){let html="";truckArray.forEach((t,i)=>{html+=`${i+1}. ${t.id} (${t.fel})`;if(t.kom) html+=` - ${t.kom}`;html+="<br>";}); truckConfirmed.innerHTML=html;}
-function renderConfirmedMachines(){let html="";machineArray.forEach((m,i)=>{html+=`${i+1}. ${m.id} (${m.fel})`;if(m.kom) html+=` - ${m.kom}`;html+="<br>";}); maskConfirmed.innerHTML=html;}
+        idEl.value = ""; felEl.value = ""; komEl.value = "";
+        renderList(type);
+    }
 
-// ---------- VALIDATE ----------
-function validate(){document.querySelectorAll("input,select,textarea").forEach(el=>el.classList.remove("error"));let valid=true;if(avdelning.value===""){avdelning.classList.add("error");valid=false;}if(truckstatus.value==="NOK"&&truckArray.length===0){truckstatus.classList.add("error");valid=false;}if(maskin.value==="NOK"&&machineArray.length===0){maskin.classList.add("error");valid=false;}return valid;}
+    function removeItem(type, index) {
+        if (type === 'truck') truckArray.splice(index, 1);
+        else machineArray.splice(index, 1);
+        renderList(type);
+    }
 
-// ---------- GET SHIFT ----------
-function getSkift(){let n=new Date();let m=n.getHours()*60+n.getMinutes();if(m>=350&&m<=480)return"Nattskift";if(m>=840&&m<=1020)return"Dagskift";if(m>=1320||m<=120)return"Kvällsskift";return"Okänt Skift";}
+    function renderList(type) {
+        const listDiv = document.getElementById(type === 'truck' ? 'truckList' : 'machineList');
+        const arr = (type === 'truck') ? truckArray : machineArray;
+        
+        if (arr.length === 0) {
+            listDiv.classList.add('hidden');
+            return;
+        }
 
-// ---------- CLEAR FORM ----------
-function clearForm(){form.reset();truckArray=[];machineArray=[];truckFields.innerHTML="";truckConfirmed.innerHTML="";maskFields.innerHTML="";maskConfirmed.innerHTML="";truckContainer.style.display="none";maskContainer.style.display="none";datum.valueAsDate=new Date();}
+        listDiv.classList.remove('hidden');
+        listDiv.innerHTML = arr.map((item, index) => `
+            <div class="list-item">
+                <span><strong>${item.id}</strong>: ${item.fel} ${item.kom ? `(${item.kom})` : ''}</span>
+                <button type="button" style="width:auto; padding:5px 10px; font-size:12px;" class="danger" onclick="removeItem('${type}', ${index})">Ta bort</button>
+            </div>
+        `).join('');
+    }
 
-// ---------- SUBMIT ----------
-form.addEventListener("submit",async function(e){
-  e.preventDefault(); if(!validate()) return;
-  let body="Datum: "+datum.value+"\nAvdelning: "+avdelning.value+"\nTruckstatus: "+truckstatus.value+"\n";
-  truckArray.forEach(t=>{body+="- "+t.id+" ("+t.fel+") "+t.kom+"\n";});
-  body+="Maskiner: "+maskin.value+"\n"; machineArray.forEach(m=>{body+="- "+m.id+" ("+m.fel+") "+m.kom+"\n";});
-  body+="\nDaglig tillsyn: "+tillsyn.value+"\nRengöring: "+rengoring.value+"\nDriftstörningar:\n"+drift.value+"\nAvvikelse:\n"+avvikelse.value+"\nÅtgärd:\n"+atgard.value;
+    // --- Logik för Skift ---
+    function getSkift() {
+        const now = new Date();
+        const mins = now.getHours() * 60 + now.getMinutes();
+        if (mins >= 350 && mins <= 480) return "Nattskift";
+        if (mins >= 840 && mins <= 1020) return "Dagskift";
+        if (mins >= 1320 || mins <= 120) return "Kvällsskift";
+        return "Mellan skift";
+    }
 
-  async function sendDataToWebApp(data){
-    try{await fetch("https://script.google.com/macros/s/AKfycbzfIdO_XYpu7sbL1mxEw6JWNeuw15PFIi83ogSTUxdAwVZ1b1K0DCbmS9dV6ptFTw238w/exec",{method:"POST",mode:"no-cors",body:JSON.stringify(data)});}catch(err){console.error(err);alert("Fel vid skickande: "+err);}
-  }
+    // --- Validering & Rensa ---
+    function validateForm() {
+        let isValid = true;
+        const avdelning = document.getElementById('avdelning');
+        
+        if (!avdelning.value) {
+            avdelning.classList.add('error');
+            isValid = false;
+        } else {
+            avdelning.classList.remove('error');
+        }
 
-  await sendDataToWebApp({
-    datum: datum.value, avdelning: avdelning.value, skift: getSkift(), truckstatus: truckstatus.value, truckar: truckArray,
-    maskin: maskin.value, maskiner: machineArray, tillsyn: tillsyn.value, tillsynfel: tillsynfel.value,
-    rengoring: rengoring.value, rengoringKommentar: rengoringKommentar.value, drift: drift.value,
-    avvikelse: avvikelse.value, atgard: atgard.value
-  });
+        if (document.getElementById('truckstatus').value === "NOK" && truckArray.length === 0) {
+            alert("Du har valt NOK på truckar men inte lagt till några fel i listan.");
+            isValid = false;
+        }
 
-  let subject="Skiftrapport "+datum.value+" - "+getSkift();
-  let separator=(navigator.userAgent.toLowerCase().includes("windows")||navigator.userAgent.toLowerCase().includes("outlook"))?";":",";
-  let emails=["rapport.vovlo@samhall.se","volvooc@samhall.onmicrosoft.com"].join(separator);
+        return isValid;
+    }
 
-  window.location.href="mailto:"+emails+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
-});
+    function clearForm() {
+        if(confirm("Vill du verkligen rensa hela formuläret?")) {
+            document.getElementById('reportForm').reset();
+            truckArray = [];
+            machineArray = [];
+            renderList('truck');
+            renderList('machine');
+            toggleSection('truckContainer', 'OK');
+            toggleSection('maskinContainer', 'OK');
+            document.getElementById('datum').valueAsDate = new Date();
+        }
+    }
+
+    // --- Submit ---
+    document.getElementById('reportForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        if (!validateForm()) return;
+
+        const formData = {
+            datum: document.getElementById('datum').value,
+            avdelning: document.getElementById('avdelning').value,
+            skift: getSkift(),
+            truckstatus: document.getElementById('truckstatus').value,
+            truckar: truckArray,
+            maskin: document.getElementById('maskin').value,
+            maskiner: machineArray,
+            tillsyn: document.getElementById('tillsyn').value,
+            tillsynfel: document.getElementById('tillsynfel').value,
+            rengoring: document.getElementById('rengoring').value,
+            rengoringKommentar: document.getElementById('rengoringKommentar').value,
+            drift: document.getElementById('drift').value,
+            avvikelse: document.getElementById('avvikelse').value,
+            atgard: document.getElementById('atgard').value
+        };
+
+        // Skicka till Google Sheets (Script)
+        try {
+            await fetch("https://script.google.com/macros/s/AKfycbzfIdO_XYpu7sbL1mxEw6JWNeuw15PFIi83ogSTUxdAwVZ1b1K0DCbmS9dV6ptFTw238w/exec", {
+                method: "POST",
+                mode: "no-cors",
+                body: JSON.stringify(formData)
+            });
+        } catch (err) {
+            console.error("Fel vid Sheets-överföring:", err);
+        }
+
+        // Förbered Mailto
+        let mailBody = `SKIFTRAPPORT - ${formData.datum}\n`;
+        mailBody += `Skift: ${formData.skift}\nAvdelning: ${formData.avdelning}\n\n`;
+        mailBody += `Truckstatus: ${formData.truckstatus}\n`;
+        truckArray.forEach(t => mailBody += `- ${t.id}: ${t.fel} (${t.kom})\n`);
+        
+        mailBody += `\nMaskiner: ${formData.maskin}\n`;
+        machineArray.forEach(m => mailBody += `- ${m.id}: ${m.fel} (${m.kom})\n`);
+        
+        mailBody += `\nÖvrigt:\n- Tillsyn: ${formData.tillsyn}\n- Rengöring: ${formData.rengoring}\n`;
+        mailBody += `\nDriftstörningar:\n${formData.drift}\n\nAvvikelser:\n${formData.avvikelse}\n\nÅtgärder:\n${formData.atgard}`;
+
+        const subject = `Skiftrapport ${formData.datum} - ${formData.skift}`;
+        const isWindows = navigator.userAgent.toLowerCase().includes("windows");
+        const separator = isWindows ? ";" : ",";
+        const emails = ["rapport.vovlo@samhall.se", "volvooc@samhall.onmicrosoft.com"].join(separator);
+
+        window.location.href = `mailto:${emails}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(mailBody)}`;
+    });
 </script>
+
 </body>
 </html>
