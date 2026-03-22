@@ -133,11 +133,8 @@ let truckArray=[];
 let maskinArray=[];
 
 function openStats(){
-  let frame = document.getElementById("statsFrame");
-  frame.src = frame.src.split("&t=")[0] + "&t=" + new Date().getTime();
   document.getElementById("statsModal").style.display="flex";
 }
-
 function closeStats(){
   document.getElementById("statsModal").style.display="none";
 }
@@ -156,7 +153,7 @@ function toggleField(sel,box){
   document.getElementById(sel).value==="NOK"?"block":"none";
 }
 
-/* -------- TRUCK -------- */
+/* Truck */
 function toggleTruck(){
   if(truckstatus.value==="NOK"){
     truckContainer.style.display="block";
@@ -212,26 +209,21 @@ function createTruckInput(){
 }
 
 function confirmTruck(){
-  let id=truckId.value;
-  let fel=truckFel.value;
-  let kom=truckKom.value;
+  let id=truckId.value, fel=truckFel.value, kom=truckKom.value;
   if(!id||!fel) return;
   truckArray.push({id,fel,kom});
   renderTrucks();
   truckId.value=""; truckFel.value=""; truckKom.value="";
 }
-
 function renderTrucks(){
-  let html="";
-  truckArray.forEach((t,i)=>{
+  let html=""; truckArray.forEach((t,i)=>{
     html+=`${i+1}. ${t.id} (${t.fel})`;
-    if(t.kom) html+=" - "+t.kom;
-    html+="<br>";
+    if(t.kom) html+=" - "+t.kom; html+="<br>";
   });
   truckConfirmed.innerHTML=html;
 }
 
-/* -------- MASKIN -------- */
+/* Maskin */
 function toggleMaskin(){
   if(maskin.value==="NOK"){
     maskinBox.style.display="block";
@@ -243,7 +235,6 @@ function toggleMaskin(){
     maskinArray=[];
   }
 }
-
 function createMaskinInput(){
   maskinFields.innerHTML=`
     <select id="maskinId">
@@ -263,48 +254,39 @@ function createMaskinInput(){
     <button type="button" onclick="confirmMaskin()">Bekräfta</button>
   `;
 }
-
 function confirmMaskin(){
-  let id=maskinId.value;
-  let fel=maskinFelTyp.value;
-  let kom=maskinKommentar.value;
+  let id=maskinId.value, fel=maskinFelTyp.value, kom=maskinKommentar.value;
   if(!id||!fel) return;
   maskinArray.push({id,fel,kom});
   renderMaskiner();
   maskinId.value=""; maskinFelTyp.value=""; maskinKommentar.value="";
 }
-
 function renderMaskiner(){
-  let html="";
-  maskinArray.forEach((m,i)=>{
+  let html=""; maskinArray.forEach((m,i)=>{
     html+=`${i+1}. ${m.id} (${m.fel})`;
-    if(m.kom) html+=" - "+m.kom;
-    html+="<br>";
+    if(m.kom) html+=" - "+m.kom; html+="<br>";
   });
   maskinConfirmed.innerHTML=html;
 }
 
-/* -------- SUBMIT -------- */
+/* SUBMIT */
 form.addEventListener("submit", async function(e){
   e.preventDefault();
 
   let body="";
-  body+="Datum: "+datum.value+"\n\n";
-  body+="Avdelning: "+avdelning.value+"\n\n";
+  body+="Datum: "+datum.value+"\nAvdelning: "+avdelning.value+"\n\n";
   body+="Truckstatus: "+truckstatus.value+"\n";
   truckArray.forEach(t=>{ body+="- "+t.id+" ("+t.fel+")"; if(t.kom) body+=" - "+t.kom; body+="\n"; });
   body+="\nMaskiner: "+maskin.value+"\n";
   maskinArray.forEach(m=>{ body+="- "+m.id+" ("+m.fel+")"; if(m.kom) body+=" - "+m.kom; body+="\n"; });
-  body+="\nDaglig tillsyn: "+tillsyn.value;
-  if(tillsyn.value==="NOK") body+="\nOrsak: "+tillsynfel.value;
-  body+="\nRengöring: "+rengoring.value;
-  if(rengoring.value==="NOK") body+="\nOrsak: "+rengoringKommentar.value;
+  body+="\nDaglig tillsyn: "+tillsyn.value; if(tillsyn.value==="NOK") body+="\nOrsak: "+tillsynfel.value;
+  body+="\nRengöring: "+rengoring.value; if(rengoring.value==="NOK") body+="\nOrsak: "+rengoringKommentar.value;
   body+="\nÖvriga driftstörningar: "+drift.value;
   body+="\nAvvikelse: "+avvikelse.value;
   body+="\nÅtgärd: "+atgard.value;
 
-  // SEND TO GOOGLE SCRIPT (for NOK notification only)
-  await fetch("https://script.google.com/macros/s/AKfycbzHO3Dvej7rA9rTQwTWBZIWydA2p4vtWcYgyXZFg9oOgCkWmJL3Ta2OKWLzzrgHth-pSA/exec", {
+  // SEND TO GOOGLE SHEETS (all reports)
+  await fetch("https://script.google.com/macros/s/AKfycby240ZXZhVS6_c-Dg8PihpwY1fYKeXZhUM2Buh85kCYa_tyaKY2ka36Qhakh9lUPec_qA/exec", {
     method:"POST",
     body: JSON.stringify({
       datum: datum.value,
@@ -324,27 +306,21 @@ form.addEventListener("submit", async function(e){
     })
   });
 
-  // OPEN OUTLOOK MAIL TO BOTH RECIPIENTS
+  // OPEN OUTLOOK MAIL TO BOTH RECIPIENTS (ALL REPORTS)
   let subject="Skiftrapport "+datum.value+" - "+getSkift();
-  let outlookEmails = ["rapport.vovlo@samhall.se","volvooc@samhall.onmicrosoft.com"].join(";");
-  window.location.href = "mailto:" + outlookEmails
-                         + "?subject=" + encodeURIComponent(subject)
-                         + "&body=" + encodeURIComponent(body);
+  let outlookEmails=["rapport.vovlo@samhall.se","volvooc@samhall.onmicrosoft.com"].join(";");
+  window.location.href="mailto:"+outlookEmails+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
 
   clearForm();
 });
 
-/* -------- CLEAR -------- */
+/* CLEAR */
 function clearForm(){
   form.reset();
-  truckArray=[];
-  maskinArray=[];
-  truckFields.innerHTML="";
-  maskinFields.innerHTML="";
-  truckConfirmed.innerHTML="";
-  maskinConfirmed.innerHTML="";
-  truckContainer.style.display="none";
-  maskinBox.style.display="none";
+  truckArray=[]; maskinArray=[];
+  truckFields.innerHTML=""; maskinFields.innerHTML="";
+  truckConfirmed.innerHTML=""; maskinConfirmed.innerHTML="";
+  truckContainer.style.display="none"; maskinBox.style.display="none";
   datum.valueAsDate=new Date();
 }
 </script>
