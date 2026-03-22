@@ -80,7 +80,6 @@ button{width:100%;padding:14px;margin-top:12px;border:none;border-radius:8px;fon
 <textarea id="tillsynfel" placeholder="Orsak"></textarea>
 </div>
 
-<!-- ✅ UPDATED MASKIN SECTION -->
 <label>Maskiner & Verktyg</label>
 <select id="maskin" onchange="toggleMaskin()">
 <option>OK</option>
@@ -143,7 +142,7 @@ function openStats(){
 function closeStats(){
   document.getElementById("statsModal").style.display="none";
 }
-  
+
 function getSkift(){
   let now=new Date();
   let min=now.getHours()*60+now.getMinutes();
@@ -158,6 +157,7 @@ function toggleField(sel,box){
   document.getElementById(sel).value==="NOK"?"block":"none";
 }
 
+/* -------- TRUCK -------- */
 function toggleTruck(){
   if(truckstatus.value==="NOK"){
     truckContainer.style.display="block";
@@ -216,36 +216,23 @@ function confirmTruck(){
   let id=truckId.value;
   let fel=truckFel.value;
   let kom=truckKom.value;
-
-  if(!id||!fel){
-    if(!id) truckId.classList.add("error"); else truckId.classList.remove("error");
-    if(!fel) truckFel.classList.add("error"); else truckFel.classList.remove("error");
-    return;
-  }
-
-  truckId.classList.remove("error");
-  truckFel.classList.remove("error");
-
+  if(!id||!fel) return;
   truckArray.push({id,fel,kom});
-  renderConfirmedTrucks();
-
-  truckId.value="";
-  truckFel.value="";
-  truckKom.value="";
+  renderTrucks();
+  truckId.value=""; truckFel.value=""; truckKom.value="";
 }
 
-function renderConfirmedTrucks(){
+function renderTrucks(){
   let html="";
   truckArray.forEach((t,i)=>{
     html+=`${i+1}. ${t.id} (${t.fel})`;
-    if(t.kom) html+=` - ${t.kom}`;
+    if(t.kom) html+=" - "+t.kom;
     html+="<br>";
   });
   truckConfirmed.innerHTML=html;
 }
 
-/* ----------- MASKIN ----------- */
-
+/* -------- MASKIN -------- */
 function toggleMaskin(){
   if(maskin.value==="NOK"){
     maskinBox.style.display="block";
@@ -264,18 +251,13 @@ function createMaskinInput(){
       <option value="">Välj Maskin</option>
       <option>Bandare-01</option>
       <option>Bandare-02</option>
-      <option>Bandare-03</option>
       <option>Verktyg-01</option>
       <option>Verktyg-02</option>
-      <option>Verktyg-03</option>
-      <option>Övrig Maskin</option>
     </select>
     <select id="maskinFelTyp">
       <option value="">Välj Feltyp</option>
-      <option>Mekaniskt fel</option>
-      <option>Elektriskt fel</option>
-      <option>Slitage</option>
-      <option>Skada</option>
+      <option>Mekaniskt</option>
+      <option>Elektriskt</option>
       <option>Övrigt</option>
     </select>
     <textarea id="maskinKommentar" placeholder="Orsak"></textarea>
@@ -287,88 +269,45 @@ function confirmMaskin(){
   let id=maskinId.value;
   let fel=maskinFelTyp.value;
   let kom=maskinKommentar.value;
-
-  if(!id||!fel){
-    if(!id) maskinId.classList.add("error"); else maskinId.classList.remove("error");
-    if(!fel) maskinFelTyp.classList.add("error"); else maskinFelTyp.classList.remove("error");
-    return;
-  }
-
-  maskinId.classList.remove("error");
-  maskinFelTyp.classList.remove("error");
-
+  if(!id||!fel) return;
   maskinArray.push({id,fel,kom});
   renderMaskiner();
-
-  maskinId.value="";
-  maskinFelTyp.value="";
-  maskinKommentar.value="";
+  maskinId.value=""; maskinFelTyp.value=""; maskinKommentar.value="";
 }
 
 function renderMaskiner(){
   let html="";
   maskinArray.forEach((m,i)=>{
     html+=`${i+1}. ${m.id} (${m.fel})`;
-    if(m.kom) html+=` - ${m.kom}`;
+    if(m.kom) html+=" - "+m.kom;
     html+="<br>";
   });
   maskinConfirmed.innerHTML=html;
 }
 
-/* ----------- VALIDATION ----------- */
-
-function validate(){
-  document.querySelectorAll("input,select,textarea").forEach(el=>el.classList.remove("error"));
-  let valid=true;
-  if(avdelning.value===""){avdelning.classList.add("error"); valid=false;}
-  if(truckstatus.value==="NOK" && truckArray.length===0){truckstatus.classList.add("error"); valid=false;}
-  if(maskin.value==="NOK" && maskinArray.length===0){maskin.classList.add("error"); valid=false;}
-  if(tillsyn.value==="NOK" && tillsynfel.value===""){tillsynfel.classList.add("error"); valid=false;}
-  if(rengoring.value==="NOK" && rengoringKommentar.value===""){rengoringKommentar.classList.add("error"); valid=false;}
-  return valid;
-}
-
-/* ----------- SUBMIT ----------- */
-
+/* -------- SUBMIT -------- */
 form.addEventListener("submit", async function(e){
   e.preventDefault();
-  if(!validate()) return;
+  let body="";
+  body+="Datum: "+datum.value+"\n\n";
+  body+="Avdelning: "+avdelning.value+"\n\n";
+  body+="Truckstatus: "+truckstatus.value+"\n";
+  truckArray.forEach(t=>{ body+="- "+t.id+" ("+t.fel+")"; if(t.kom) body+=" - "+t.kom; body+="\n"; });
+  body+="\nMaskiner: "+maskin.value+"\n";
+  maskinArray.forEach(m=>{ body+="- "+m.id+" ("+m.fel+")"; if(m.kom) body+=" - "+m.kom; body+="\n"; });
 
-  async function sendDataToWebApp(data) {
-    try {
-      await fetch("https://script.google.com/macros/s/AKfycbzHO3Dvej7rA9rTQwTWBZIWydA2p4vtWcYgyXZFg9oOgCkWmJL3Ta2OKWLzzrgHth-pSA/exec", {
-        method: "POST",
-        mode: "no-cors", 
-        body: JSON.stringify(data) 
-      });
-    } catch(error) {
-      console.error("Fel vid skickande:", error);
-      alert("Fel vid skickande: " + error);
-    }
-  }
+  let subject="Skiftrapport "+datum.value+" - "+getSkift();
 
-  await sendDataToWebApp({
-    datum: datum.value,
-    avdelning: avdelning.value,
-    skift: getSkift(),
-    truckstatus: truckstatus.value,
-    truckar: truckArray,
-    maskin: maskin.value,
-    maskiner: maskinArray,
-    tillsyn: tillsyn.value,
-    tillsynfel: tillsynfel.value,
-    rengoring: rengoring.value,
-    rengoringKommentar: rengoringKommentar.value,
-    drift: drift.value,
-    avvikelse: avvikelse.value,
-    atgard: atgard.value
-  });
+  let userAgent = navigator.userAgent.toLowerCase();
+  let separator = (userAgent.includes("windows") || userAgent.includes("outlook")) ? ";" : ",";
+  let emails = ["rapport.vovlo@samhall.se","volvooc@samhall.onmicrosoft.com"].join(separator);
+
+  window.location.href = "mailto:" + emails + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
 
   clearForm();
 });
 
-/* ----------- CLEAR ----------- */
-
+/* -------- CLEAR -------- */
 function clearForm(){
   form.reset();
   truckArray=[];
