@@ -81,12 +81,14 @@ button{width:100%;padding:14px;margin-top:12px;border:none;border-radius:8px;fon
 </div>
 
 <label>Maskiner & Verktyg</label>
-<select id="maskin" onchange="toggleField('maskin','maskinBox')">
+<select id="maskin" onchange="toggleMaskin()">
 <option>OK</option>
 <option>NOK</option>
 </select>
+
 <div id="maskinBox" class="hidden">
-<textarea id="maskinfel" placeholder="Orsak"></textarea>
+  <div id="maskinFields"></div>
+  <div id="maskinConfirmed" class="truckListConfirmed"></div>
 </div>
 
 <label>Rengöring av Bandningsmaskiner</label>
