@@ -80,6 +80,7 @@ button{width:100%;padding:14px;margin-top:12px;border:none;border-radius:8px;fon
 <textarea id="tillsynfel" placeholder="Orsak"></textarea>
 </div>
 
+<!-- ✅ UPDATED MASKIN SECTION -->
 <label>Maskiner & Verktyg</label>
 <select id="maskin" onchange="toggleMaskin()">
 <option>OK</option>
@@ -131,10 +132,11 @@ button{width:100%;padding:14px;margin-top:12px;border:none;border-radius:8px;fon
 
 datum.valueAsDate=new Date();
 let truckArray=[];
+let maskinArray=[];
 
 function openStats(){
   let frame = document.getElementById("statsFrame");
-  frame.src = frame.src.split("&t=")[0] + "&t=" + new Date().getTime(); // tvingar reload
+  frame.src = frame.src.split("&t=")[0] + "&t=" + new Date().getTime();
   document.getElementById("statsModal").style.display="flex";
 }
 
@@ -242,42 +244,99 @@ function renderConfirmedTrucks(){
   truckConfirmed.innerHTML=html;
 }
 
+/* ----------- MASKIN ----------- */
+
+function toggleMaskin(){
+  if(maskin.value==="NOK"){
+    maskinBox.style.display="block";
+    if(maskinFields.childElementCount===0) createMaskinInput();
+  }else{
+    maskinBox.style.display="none";
+    maskinFields.innerHTML="";
+    maskinConfirmed.innerHTML="";
+    maskinArray=[];
+  }
+}
+
+function createMaskinInput(){
+  maskinFields.innerHTML=`
+    <select id="maskinId">
+      <option value="">Välj Maskin</option>
+      <option>Bandare-01</option>
+      <option>Bandare-02</option>
+      <option>Bandare-03</option>
+      <option>Verktyg-01</option>
+      <option>Verktyg-02</option>
+      <option>Verktyg-03</option>
+      <option>Övrig Maskin</option>
+    </select>
+    <select id="maskinFelTyp">
+      <option value="">Välj Feltyp</option>
+      <option>Mekaniskt fel</option>
+      <option>Elektriskt fel</option>
+      <option>Slitage</option>
+      <option>Skada</option>
+      <option>Övrigt</option>
+    </select>
+    <textarea id="maskinKommentar" placeholder="Orsak"></textarea>
+    <button type="button" onclick="confirmMaskin()">Bekräfta</button>
+  `;
+}
+
+function confirmMaskin(){
+  let id=maskinId.value;
+  let fel=maskinFelTyp.value;
+  let kom=maskinKommentar.value;
+
+  if(!id||!fel){
+    if(!id) maskinId.classList.add("error"); else maskinId.classList.remove("error");
+    if(!fel) maskinFelTyp.classList.add("error"); else maskinFelTyp.classList.remove("error");
+    return;
+  }
+
+  maskinId.classList.remove("error");
+  maskinFelTyp.classList.remove("error");
+
+  maskinArray.push({id,fel,kom});
+  renderMaskiner();
+
+  maskinId.value="";
+  maskinFelTyp.value="";
+  maskinKommentar.value="";
+}
+
+function renderMaskiner(){
+  let html="";
+  maskinArray.forEach((m,i)=>{
+    html+=`${i+1}. ${m.id} (${m.fel})`;
+    if(m.kom) html+=` - ${m.kom}`;
+    html+="<br>";
+  });
+  maskinConfirmed.innerHTML=html;
+}
+
+/* ----------- VALIDATION ----------- */
+
 function validate(){
   document.querySelectorAll("input,select,textarea").forEach(el=>el.classList.remove("error"));
   let valid=true;
   if(avdelning.value===""){avdelning.classList.add("error"); valid=false;}
   if(truckstatus.value==="NOK" && truckArray.length===0){truckstatus.classList.add("error"); valid=false;}
+  if(maskin.value==="NOK" && maskinArray.length===0){maskin.classList.add("error"); valid=false;}
   if(tillsyn.value==="NOK" && tillsynfel.value===""){tillsynfel.classList.add("error"); valid=false;}
-  if(maskin.value==="NOK" && maskinfel.value===""){maskinfel.classList.add("error"); valid=false;}
   if(rengoring.value==="NOK" && rengoringKommentar.value===""){rengoringKommentar.classList.add("error"); valid=false;}
   return valid;
 }
+
+/* ----------- SUBMIT ----------- */
 
 form.addEventListener("submit", async function(e){
   e.preventDefault();
   if(!validate()) return;
 
-  let body="";
-  body+="Datum: "+datum.value+"\n\n";
-  body+="Avdelning: "+avdelning.value+"\n\n";
-  body+="Truckstatus: "+truckstatus.value+"\n";
-  truckArray.forEach(t=>{
-    body+="- "+t.id+" ("+t.fel+")\n";
-    if(t.kom) body+=""+t.kom+"\n";
-  });
-  body+="\nDaglig tillsyn: "+tillsyn.value+"\n";
-  if(tillsyn.value==="NOK") body+="Orsak: "+tillsynfel.value+"\n";
-  body+="\nMaskiner: "+maskin.value+"\n";
-  if(maskin.value==="NOK") body+="Orsak: "+maskinfel.value+"\n";
-  body+="\nRengöring: "+rengoring.value+"\n";
-  if(rengoring.value==="NOK") body+="Orsak: "+rengoringKommentar.value+"\n";
-  body+="\nDriftstörningar:\n"+drift.value+"\n";
-  body+="\nAvvikelse:\n"+avvikelse.value+"\n";
-  body+="\nÅtgärd:\n"+atgard.value;
-
   async function sendDataToWebApp(data) {
     try {
-      await fetch("https://script.google.com/macros/s/AKfycbzG6CJ1ragGA8phUBl3seQuC5W_OHX6Z4O-mATTFqFr2d8vYpdv80it8JqX5qZIn07h5Q/exec", {
+      await fetch("https://script.google.com/macros/s/AKfycbzHO3Dvej7rA9rTQwTWBZIWydA2p4vtWcYgyXZFg9oOgCkWmJL3Ta2OKWLzzrgHth-pSA/exec", {
         method: "POST",
         mode: "no-cors", 
         body: JSON.stringify(data) 
@@ -294,10 +353,10 @@ form.addEventListener("submit", async function(e){
     skift: getSkift(),
     truckstatus: truckstatus.value,
     truckar: truckArray,
+    maskin: maskin.value,
+    maskiner: maskinArray,
     tillsyn: tillsyn.value,
     tillsynfel: tillsynfel.value,
-    maskin: maskin.value,
-    maskinfel: maskinfel.value,
     rengoring: rengoring.value,
     rengoringKommentar: rengoringKommentar.value,
     drift: drift.value,
@@ -305,23 +364,21 @@ form.addEventListener("submit", async function(e){
     atgard: atgard.value
   });
 
-  let subject="Skiftrapport "+datum.value+" - "+getSkift();
-
-  let userAgent = navigator.userAgent.toLowerCase();
-  let separator = (userAgent.includes("windows") || userAgent.includes("outlook")) ? ";" : ",";
-  let emails = ["rapport.vovlo@samhall.se","volvooc@samhall.onmicrosoft.com"].join(separator);
-
-  window.location.href = "mailto:" + emails + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
-
   clearForm();
 });
+
+/* ----------- CLEAR ----------- */
 
 function clearForm(){
   form.reset();
   truckArray=[];
+  maskinArray=[];
   truckFields.innerHTML="";
+  maskinFields.innerHTML="";
   truckConfirmed.innerHTML="";
+  maskinConfirmed.innerHTML="";
   truckContainer.style.display="none";
+  maskinBox.style.display="none";
   datum.valueAsDate=new Date();
 }
 
