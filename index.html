@@ -2,11 +2,16 @@
 <html lang="sv">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Skiftrapport</title>
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
     <style>
+        /* GLOBAL FIX: Ser till att padding inte gör element bredare än 100% */
+        * {
+            box-sizing: border-box;
+        }
+
         :root {
             --primary: #2a4d69;
             --secondary: #6c757d;
@@ -28,6 +33,7 @@
             max-width: 600px;
             margin: 20px auto;
             padding: 0 15px;
+            width: 100%; /* Säkerställer att containern håller sig inom skärmen */
         }
 
         h2 { text-align: center; color: var(--primary); }
@@ -38,6 +44,7 @@
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             margin-bottom: 20px;
+            width: 100%;
         }
 
         label {
@@ -53,8 +60,8 @@
             margin-top: 5px;
             border-radius: 8px;
             border: 1px solid var(--border);
-            box-sizing: border-box;
-            font-size: 1rem;
+            font-size: 16px; /* 16px är bäst för mobil-inputs */
+            display: block;
         }
 
         textarea { min-height: 100px; resize: vertical; }
@@ -106,16 +113,22 @@
             body {
                 padding: 5px;
             }
+            .container {
+                margin: 10px auto;
+                padding: 0 5px;
+            }
             .card {
-                padding: 15px; /* Lite mindre luft inuti kortet på små skärmar */
+                padding: 15px;
             }
             h2 {
                 font-size: 1.4rem;
             }
-            input[type="date"] {
-                padding: 10px;
-                /* Tvingar webbläsaren att inte låta datumrutan expandera utanför */
-                max-width: 100%; 
+            input, select, textarea {
+                width: 100% !important;
+                max-width: 100%;
+            }
+            .button-group {
+                flex-direction: column; /* Knappar staplas på varandra på små skärmar */
             }
         }
 
@@ -173,40 +186,38 @@
             <div id="truckFields" class="list-container">
                 <select id="truckId">
                     <option value="">-- Välj Truck --</option>
-      <option>TVS-01</option>
-      <option>TVS-02</option>
-      <option>TVS-03</option>
-      <option>TVS-04</option>
-      <option>TVS-05</option>
-      <option>TVS-06</option>
-      <option>TVS-13</option>
-      <option>TVS-22</option>
-      <option>TVS-23</option>
-      <option>TVS-33</option>
-      <option>TVS-34</option>
-      <option>TPB-07</option>
-      <option>TPB-08</option>
-      <option>TPB-09</option>
-      <option>TPB-10</option>
-      <option>TPB-14</option>
-      <option>TPB-15</option>
-      <option>TPB-20</option>
-      <option>TPB-21</option>
-      <option>Extra truck</option>
-      <option>Grå Skjutsativ</option>
-
+                    <option>TVS-01</option>
+                    <option>TVS-02</option>
+                    <option>TVS-03</option>
+                    <option>TVS-04</option>
+                    <option>TVS-05</option>
+                    <option>TVS-06</option>
+                    <option>TVS-13</option>
+                    <option>TVS-22</option>
+                    <option>TVS-23</option>
+                    <option>TVS-33</option>
+                    <option>TVS-34</option>
+                    <option>TPB-07</option>
+                    <option>TPB-08</option>
+                    <option>TPB-09</option>
+                    <option>TPB-10</option>
+                    <option>TPB-14</option>
+                    <option>TPB-15</option>
+                    <option>TPB-20</option>
+                    <option>TPB-21</option>
+                    <option>Extra truck</option>
+                    <option>Grå Skjutsativ</option>
                 </select>
                 <select id="truckFel">
                     <option value="">-- Välj Feltyp --</option>
-      <option>Hydraulik/Olja</option>
-      <option>Chassi</option>
-      <option>Stativ</option>
-      <option>Batteri</option>
-      <option>Drag</option>
-      <option>Däck</option>
-      <option>Linde Connect</option>
-      <option>Övrigt</option>
-
+                    <option>Hydraulik/Olja</option>
+                    <option>Chassi</option>
+                    <option>Stativ</option>
+                    <option>Batteri</option>
+                    <option>Drag</option>
+                    <option>Däck</option>
+                    <option>Linde Connect</option>
+                    <option>Övrigt</option>
                 </select>
                 <textarea id="truckKom" placeholder="Kommentar om felet..."></textarea>
                 <button type="button" class="add-btn" onclick="addItem('truck')">➕ Lägg till i listan</button>
