@@ -6,10 +6,11 @@
     <title>Skiftrapport</title>
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
-    <style>
-        /* GLOBAL FIX: Ser till att padding inte gör element bredare än 100% */
+<style>
+        /* Tvingar alla element att räkna bredd inklusive padding */
         * {
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         :root {
@@ -24,16 +25,18 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
+            padding: 0;
             background: var(--light);
             color: #333;
             line-height: 1.5;
+            overflow-x: hidden; /* Förhindrar horisontell scroll */
         }
 
         .container {
             max-width: 600px;
             margin: 20px auto;
-            padding: 0 15px;
-            width: 100%; /* Säkerställer att containern håller sig inom skärmen */
+            padding: 0 10px;
+            width: 100%;
         }
 
         h2 { text-align: center; color: var(--primary); }
@@ -54,14 +57,16 @@
             font-size: 0.9rem;
         }
 
+        /* Standardinställning för alla fält */
         input, select, textarea {
             width: 100%;
             padding: 12px;
             margin-top: 5px;
             border-radius: 8px;
             border: 1px solid var(--border);
-            font-size: 16px; /* 16px är bäst för mobil-inputs */
+            font-size: 16px;
             display: block;
+            background-color: white;
         }
 
         textarea { min-height: 100px; resize: vertical; }
@@ -76,10 +81,7 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: opacity 0.2s;
         }
-
-        button:hover { opacity: 0.9; }
 
         .primary { background: var(--primary); color: white; }
         .secondary { background: var(--secondary); color: white; }
@@ -104,31 +106,31 @@
             border-bottom: 1px solid #ddd;
         }
 
-        .list-item:last-child { border-bottom: none; }
-
         .error { border: 2px solid var(--danger) !important; background: #fff5f5; }
 
-        /* --- MOBILANPASSNING (MEDIA QUERY) --- */
+        /* --- MOBILSPECIFIKA FIXAR --- */
         @media screen and (max-width: 480px) {
-            body {
-                padding: 5px;
-            }
             .container {
                 margin: 10px auto;
-                padding: 0 5px;
+                padding: 0 8px;
             }
+            
             .card {
                 padding: 15px;
             }
-            h2 {
-                font-size: 1.4rem;
-            }
-            input, select, textarea {
+
+            /* FIX FÖR DATUMRUTAN SOM STICKER UT */
+            input[type="date"] {
                 width: 100% !important;
-                max-width: 100%;
+                max-width: 100% !important;
+                min-width: 0 !important; /* Tar bort webbläsarens default min-bredd */
+                appearance: none; /* Rensar specialstyling */
+                -webkit-appearance: none;
+                display: inline-block; /* Kan ibland hjälpa mot overflow */
             }
+
             .button-group {
-                flex-direction: column; /* Knappar staplas på varandra på små skärmar */
+                flex-direction: column;
             }
         }
 
@@ -146,16 +148,8 @@
         .modal-content {
             background: var(--white);
             width: 95%;
-            max-width: 800px;
             border-radius: 15px;
             padding: 15px;
-            position: relative;
-        }
-
-        .close-modal {
-            margin-bottom: 10px;
-            width: auto;
-            float: right;
         }
     </style>
 </head>
