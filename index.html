@@ -128,7 +128,6 @@ button{width:100%;padding:14px;margin-top:12px;border:none;border-radius:8px;fon
 </div>
 
 <script>
-
 datum.valueAsDate=new Date();
 let truckArray=[];
 let maskinArray=[];
@@ -288,6 +287,7 @@ function renderMaskiner(){
 /* -------- SUBMIT -------- */
 form.addEventListener("submit", async function(e){
   e.preventDefault();
+
   let body="";
   body+="Datum: "+datum.value+"\n\n";
   body+="Avdelning: "+avdelning.value+"\n\n";
@@ -295,14 +295,41 @@ form.addEventListener("submit", async function(e){
   truckArray.forEach(t=>{ body+="- "+t.id+" ("+t.fel+")"; if(t.kom) body+=" - "+t.kom; body+="\n"; });
   body+="\nMaskiner: "+maskin.value+"\n";
   maskinArray.forEach(m=>{ body+="- "+m.id+" ("+m.fel+")"; if(m.kom) body+=" - "+m.kom; body+="\n"; });
+  body+="\nDaglig tillsyn: "+tillsyn.value;
+  if(tillsyn.value==="NOK") body+="\nOrsak: "+tillsynfel.value;
+  body+="\nRengöring: "+rengoring.value;
+  if(rengoring.value==="NOK") body+="\nOrsak: "+rengoringKommentar.value;
+  body+="\nÖvriga driftstörningar: "+drift.value;
+  body+="\nAvvikelse: "+avvikelse.value;
+  body+="\nÅtgärd: "+atgard.value;
 
+  // SEND TO GOOGLE SCRIPT (for NOK notification only)
+  await fetch("https://script.google.com/macros/s/AKfycbzHO3Dvej7rA9rTQwTWBZIWydA2p4vtWcYgyXZFg9oOgCkWmJL3Ta2OKWLzzrgHth-pSA/exec", {
+    method:"POST",
+    body: JSON.stringify({
+      datum: datum.value,
+      avdelning: avdelning.value,
+      skift: getSkift(),
+      truckstatus: truckstatus.value,
+      truckar: truckArray,
+      maskin: maskin.value,
+      maskiner: maskinArray,
+      tillsyn: tillsyn.value,
+      tillsynfel: tillsynfel.value,
+      rengoring: rengoring.value,
+      rengoringKommentar: rengoringKommentar.value,
+      drift: drift.value,
+      avvikelse: avvikelse.value,
+      atgard: atgard.value
+    })
+  });
+
+  // OPEN OUTLOOK MAIL TO BOTH RECIPIENTS
   let subject="Skiftrapport "+datum.value+" - "+getSkift();
-
-  let userAgent = navigator.userAgent.toLowerCase();
-  let separator = (userAgent.includes("windows") || userAgent.includes("outlook")) ? ";" : ",";
-  let emails = ["rapport.vovlo@samhall.se","volvooc@samhall.onmicrosoft.com"].join(separator);
-
-  window.location.href = "mailto:" + emails + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+  let outlookEmails = ["rapport.vovlo@samhall.se","volvooc@samhall.onmicrosoft.com"].join(";");
+  window.location.href = "mailto:" + outlookEmails
+                         + "?subject=" + encodeURIComponent(subject)
+                         + "&body=" + encodeURIComponent(body);
 
   clearForm();
 });
@@ -320,7 +347,6 @@ function clearForm(){
   maskinBox.style.display="none";
   datum.valueAsDate=new Date();
 }
-
 </script>
 
 </body>
