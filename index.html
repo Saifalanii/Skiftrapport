@@ -101,6 +101,24 @@
 
         .error { border: 2px solid var(--danger) !important; background: #fff5f5; }
 
+        /* --- MOBILANPASSNING (MEDIA QUERY) --- */
+        @media screen and (max-width: 480px) {
+            body {
+                padding: 5px;
+            }
+            .card {
+                padding: 15px; /* Lite mindre luft inuti kortet på små skärmar */
+            }
+            h2 {
+                font-size: 1.4rem;
+            }
+            input[type="date"] {
+                padding: 10px;
+                /* Tvingar webbläsaren att inte låta datumrutan expandera utanför */
+                max-width: 100%; 
+            }
+        }
+
         /* Modal */
         .modal {
             position: fixed;
