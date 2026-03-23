@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Skiftrapport v1.1.22</title>
+    <title>Skiftrapport v1.1.23</title>
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
     <link rel="manifest" href="manifest.json">
@@ -24,12 +24,10 @@
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             margin: 0; padding: 0; background: var(--teams-bg); color: var(--text-main);
-            line-height: 1.5; transition: background 0.3s, font-size 0.2s;
-            font-size: var(--base-font);
-            overscroll-behavior: none;
+            line-height: 1.5; font-size: var(--base-font);
+            overscroll-behavior: none; width: 100%; overflow-x: hidden;
         }
         .container { max-width: 500px; margin: 0 auto; padding: 12px; padding-bottom: 40px; }
-        .icon { width: 1.2em; height: 1.2em; vertical-align: middle; margin-right: 8px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         
         .header-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: var(--teams-card); padding: 10px; border-radius: 8px; border: 1px solid var(--teams-border); }
         .switch-group { display: flex; align-items: center; gap: 8px; }
@@ -40,31 +38,33 @@
         input:checked + .slider { background-color: var(--success); }
         input:checked + .slider:before { transform: translateX(18px); }
 
-        h2 { text-align: center; margin: 15px 0; font-size: var(--h2-font); display: flex; align-items: center; justify-content: center; }
+        h2 { text-align: center; margin: 15px 0; font-size: var(--h2-font); }
         
         .card { 
             background: var(--teams-card); padding: 20px; border-radius: 12px; 
             border: 1px solid var(--teams-border); box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
-            margin-bottom: 20px;
+            margin-bottom: 20px; width: 100%;
         }
 
-        label { display: block; margin-bottom: 10px; font-weight: bold; font-size: var(--label-font); }
+        label { display: block; margin-bottom: 8px; font-weight: bold; font-size: var(--label-font); }
 
+        /* Fix för att datum och input inte ska sticka ut */
         input, select, textarea {
-            width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; 
+            width: 100%; max-width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; 
             border: 1px solid var(--teams-border); font-size: var(--base-font); 
             background-color: var(--teams-card); color: var(--text-main); outline: none;
+            display: block;
         }
 
         .machine-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
         .machine-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         .machine-circle {
-            width: 65px; height: 65px; border-radius: 50%; border: 3px solid var(--teams-border);
-            overflow: hidden; background: #fff; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; padding: 5px; 
+            width: 60px; height: 60px; border-radius: 50%; border: 3px solid var(--teams-border);
+            overflow: hidden; background: #fff; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; 
         }
-        .machine-circle img { width: 100%; height: 100%; object-fit: contain; } 
-        .machine-item.active .machine-circle { border-color: var(--teams-purple); transform: scale(1.08); }
-        .machine-label { font-size: 0.7rem; font-weight: 600; text-align: center; color: var(--text-sec); }
+        .machine-circle img { width: 80%; height: 80%; object-fit: contain; } 
+        .machine-item.active .machine-circle { border-color: var(--teams-purple); transform: scale(1.05); }
+        .machine-label { font-size: 0.7rem; font-weight: 600; text-align: center; }
 
         .segmented-control { display: flex; background: var(--teams-bg); padding: 4px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--teams-border); }
         .segment-btn { flex: 1; border: none; padding: 10px; background: transparent; color: var(--text-sec); font-weight: 600; border-radius: 6px; cursor: pointer; }
@@ -79,13 +79,13 @@
 
         .hidden { display: none; }
         .list-container { margin-top: 10px; background: var(--teams-bg); padding: 12px; border-radius: 8px; border-left: 4px solid var(--teams-purple); }
-        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--teams-border); font-size: 0.9em; }
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--teams-border); }
         
         /* MODAL FIX FÖR STATISTIK */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 1000; }
-        .modal-content { background: #fff; width: 98%; height: 96vh; border-radius: 8px; padding: 5px; display: flex; flex-direction: column; }
-        .stats-wrapper { flex: 1; width: 100%; height: 100%; overflow: hidden; position: relative; }
-        iframe.stats-iframe { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
+        .modal-content { background: #fff; width: 100%; height: 100%; display: flex; flex-direction: column; }
+        .stats-wrapper { flex: 1; width: 100%; height: 100%; -webkit-overflow-scrolling: touch; }
+        iframe.stats-iframe { width: 100%; height: 100%; border: none; }
         .version-text { text-align: center; font-size: 10px; color: var(--text-sec); margin-top: 20px; opacity: 0.5; }
     </style>
 </head>
@@ -106,8 +106,7 @@
     <h2>Skiftrapport</h2>
 
     <button type="button" class="secondary" style="width: 100%; margin-bottom: 15px;" onclick="openStats(); vibrate();">
-        <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-        Visa Statistik
+        📊 Visa Statistik
     </button>
 
     <form id="reportForm" novalidate>
@@ -181,12 +180,12 @@
             <button type="submit" id="submitBtn" class="primary" style="flex:2;" onclick="vibrate(50);">Skicka Rapport</button>
         </div>
     </form>
-    <div class="version-text">v1.1.22 • Statistikvy fixad</div>
+    <div class="version-text">v1.1.23 • Full Statistikvy & Layoutfix</div>
 </div>
 
 <div id="statsModal" class="modal">
     <div class="modal-content">
-        <button class="danger" style="margin-bottom: 5px; width: 100%; height: 50px;" onclick="closeStats(); vibrate();">STÄNG STATISTIK</button>
+        <button class="danger" style="margin: 0; width: 100%; height: 60px; border-radius: 0;" onclick="closeStats(); vibrate();">STÄNG OCH GÅ TILLBAKA</button>
         <div class="stats-wrapper">
             <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRw6n_3d87vAX6DVNmEZ-JwkOYDQcB1scVLhghcY6Cxam8Oq9VEvz1xhMvF89KOsGGJWZFxdNhCE5lZ/pubhtml?widget=true&amp;headers=false"></iframe>
         </div>
