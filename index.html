@@ -415,7 +415,7 @@
         body += `\nTILLSYN: ${data.tillsyn} ${data.tillsyn_kom}\nRENGÖRING: ${data.rengoring} ${data.rengoring_kom}\n\nDRIFT: ${data.drift}\nAVVIKELSE: ${data.avvikelse}\nÅTGÄRD: ${data.atgard}`;
 
         const mail = ["rapport.vovlo@samhall.se", "volvooc@samhall.onmicrosoft.com"].join(navigator.userAgent.toLowerCase().includes("windows")?";":",");
-        window.location.href = `mailto:${mail}?subject=${encodeURIComponent("Skiftrapport "+ data.skift " "+ "data.datum)}&body=${encodeURIComponent(body)}`;
+        window.location.href = `mailto:${mail}?subject=${encodeURIComponent("Skiftrapport " + data.skift + " " + data.datum)}&body=${encodeURIComponent(body)}`;
         setTimeout(() => { btn.disabled = false; btn.innerText = "Skicka Rapport"; }, 3000);
     });
 </script>
