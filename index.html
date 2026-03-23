@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Skiftrapport v1.1.23</title>
+    <title>Skiftrapport v1.1.24</title>
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
     <link rel="manifest" href="manifest.json">
@@ -24,10 +24,12 @@
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             margin: 0; padding: 0; background: var(--teams-bg); color: var(--text-main);
-            line-height: 1.5; font-size: var(--base-font);
+            line-height: 1.5; transition: background 0.3s, font-size 0.2s;
+            font-size: var(--base-font);
             overscroll-behavior: none; width: 100%; overflow-x: hidden;
         }
         .container { max-width: 500px; margin: 0 auto; padding: 12px; padding-bottom: 40px; }
+        .icon { width: 1.2em; height: 1.2em; vertical-align: middle; margin-right: 8px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         
         .header-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: var(--teams-card); padding: 10px; border-radius: 8px; border: 1px solid var(--teams-border); }
         .switch-group { display: flex; align-items: center; gap: 8px; }
@@ -38,17 +40,16 @@
         input:checked + .slider { background-color: var(--success); }
         input:checked + .slider:before { transform: translateX(18px); }
 
-        h2 { text-align: center; margin: 15px 0; font-size: var(--h2-font); }
+        h2 { text-align: center; margin: 15px 0; font-size: var(--h2-font); display: flex; align-items: center; justify-content: center; }
         
         .card { 
             background: var(--teams-card); padding: 20px; border-radius: 12px; 
             border: 1px solid var(--teams-border); box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
-            margin-bottom: 20px; width: 100%;
+            margin-bottom: 20px; width: 100%; overflow: hidden;
         }
 
-        label { display: block; margin-bottom: 8px; font-weight: bold; font-size: var(--label-font); }
+        label { display: block; margin-bottom: 10px; font-weight: bold; font-size: var(--label-font); }
 
-        /* Fix för att datum och input inte ska sticka ut */
         input, select, textarea {
             width: 100%; max-width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; 
             border: 1px solid var(--teams-border); font-size: var(--base-font); 
@@ -59,12 +60,12 @@
         .machine-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
         .machine-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         .machine-circle {
-            width: 60px; height: 60px; border-radius: 50%; border: 3px solid var(--teams-border);
-            overflow: hidden; background: #fff; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; 
+            width: 65px; height: 65px; border-radius: 50%; border: 3px solid var(--teams-border);
+            overflow: hidden; background: #fff; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; padding: 5px; 
         }
-        .machine-circle img { width: 80%; height: 80%; object-fit: contain; } 
-        .machine-item.active .machine-circle { border-color: var(--teams-purple); transform: scale(1.05); }
-        .machine-label { font-size: 0.7rem; font-weight: 600; text-align: center; }
+        .machine-circle img { width: 100%; height: 100%; object-fit: contain; } 
+        .machine-item.active .machine-circle { border-color: var(--teams-purple); transform: scale(1.08); }
+        .machine-label { font-size: 0.7rem; font-weight: 600; text-align: center; color: var(--text-sec); }
 
         .segmented-control { display: flex; background: var(--teams-bg); padding: 4px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--teams-border); }
         .segment-btn { flex: 1; border: none; padding: 10px; background: transparent; color: var(--text-sec); font-weight: 600; border-radius: 6px; cursor: pointer; }
@@ -79,13 +80,13 @@
 
         .hidden { display: none; }
         .list-container { margin-top: 10px; background: var(--teams-bg); padding: 12px; border-radius: 8px; border-left: 4px solid var(--teams-purple); }
-        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--teams-border); }
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--teams-border); font-size: 0.9em; }
         
         /* MODAL FIX FÖR STATISTIK */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 1000; }
-        .modal-content { background: #fff; width: 100%; height: 100%; display: flex; flex-direction: column; }
-        .stats-wrapper { flex: 1; width: 100%; height: 100%; -webkit-overflow-scrolling: touch; }
-        iframe.stats-iframe { width: 100%; height: 100%; border: none; }
+        .modal-content { background: #fff; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+        .stats-wrapper { flex: 1; width: 100%; height: 100%; overflow: hidden; position: relative; }
+        iframe.stats-iframe { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
         .version-text { text-align: center; font-size: 10px; color: var(--text-sec); margin-top: 20px; opacity: 0.5; }
     </style>
 </head>
@@ -103,10 +104,14 @@
         </div>
     </div>
 
-    <h2>Skiftrapport</h2>
+    <h2>
+        <svg class="icon" viewBox="0 0 24 24" style="stroke: var(--teams-purple);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        Skiftrapport
+    </h2>
 
     <button type="button" class="secondary" style="width: 100%; margin-bottom: 15px;" onclick="openStats(); vibrate();">
-        📊 Visa Statistik
+        <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+        Visa Statistik
     </button>
 
     <form id="reportForm" novalidate>
@@ -180,14 +185,14 @@
             <button type="submit" id="submitBtn" class="primary" style="flex:2;" onclick="vibrate(50);">Skicka Rapport</button>
         </div>
     </form>
-    <div class="version-text">v1.1.23 • Full Statistikvy & Layoutfix</div>
+    <div class="version-text">v1.1.24 • Återställd med ikoner & fixar</div>
 </div>
 
 <div id="statsModal" class="modal">
     <div class="modal-content">
-        <button class="danger" style="margin: 0; width: 100%; height: 60px; border-radius: 0;" onclick="closeStats(); vibrate();">STÄNG OCH GÅ TILLBAKA</button>
+        <button class="danger" style="margin: 0; width: 100%; height: 60px; border-radius: 0;" onclick="closeStats(); vibrate();">STÄNG STATISTIK</button>
         <div class="stats-wrapper">
-            <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRw6n_3d87vAX6DVNmEZ-JwkOYDQcB1scVLhghcY6Cxam8Oq9VEvz1xhMvF89KOsGGJWZFxdNhCE5lZ/pubhtml?widget=true&amp;headers=false"></iframe>
+            <iframe class="stats-iframe" src="https://docs.google.com/spreadsheets/d/1Y0jbcHllFP-BC4h08x-mU28_9QuPBKOhcB4ue4HFUV8G7daNOsfoTUbAfDnMKmKm2-2T2NDLGDZIW/edit?usp=sharing&rm=minimal#gid=0"></iframe>
         </div>
     </div>
 </div>
@@ -203,6 +208,9 @@
             const saved = localStorage.getItem('draft_' + el.id);
             if (saved) { el.value = saved; if (el.type === 'hidden') setSegment(el.id, saved, false); }
         });
+        const sT = localStorage.getItem('draft_truckArray'); const sM = localStorage.getItem('draft_maskinArray');
+        if(sT) { truckArray = JSON.parse(sT); renderList('truck'); }
+        if(sM) { maskinArray = JSON.parse(sM); renderList('maskin'); }
     };
 
     function openStats(){ document.getElementById("statsModal").style.display = "flex"; }
@@ -231,11 +239,13 @@
             const id = document.getElementById('truckId'); const fel = document.getElementById('truckFel'); const kom = document.getElementById('truckKom');
             if (!id.value || !fel.value) return alert("Välj truck och feltyp!");
             truckArray.push({ id: id.value, fel: fel.value, kom: kom.value });
+            localStorage.setItem('draft_truckArray', JSON.stringify(truckArray));
             id.value = ""; fel.value = ""; kom.value = "";
         } else {
             const id = document.getElementById('selectedMachineName').value; const fel = document.getElementById('machineFel'); const kom = document.getElementById('machineKom');
             if (!id || !fel.value) return alert("Välj maskin och feltyp!");
             maskinArray.push({ id: id, fel: fel.value, kom: kom.value });
+            localStorage.setItem('draft_maskinArray', JSON.stringify(maskinArray));
             document.querySelectorAll('.machine-item').forEach(item => item.classList.remove('active'));
             document.getElementById('selectedMachineName').value = ""; fel.value = ""; kom.value = "";
         }
@@ -243,8 +253,8 @@
     }
 
     function removeItem(type, idx) {
-        if(type==='truck') truckArray.splice(idx, 1);
-        else maskinArray.splice(idx, 1);
+        if(type==='truck') { truckArray.splice(idx, 1); localStorage.setItem('draft_truckArray', JSON.stringify(truckArray)); }
+        else { maskinArray.splice(idx, 1); localStorage.setItem('draft_maskinArray', JSON.stringify(maskinArray)); }
         renderList(type);
     }
 
