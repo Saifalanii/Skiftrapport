@@ -7,208 +7,172 @@
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
     <style>
-        /* KRITISK: Ser till att padding aldrig gör ett element bredare än skärmen */
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
         }
 
         :root {
-            --primary: #2a4d69;
-            --secondary: #6c757d;
+            --teams-purple: #5b5fc7;
+            --teams-purple-hover: #444791;
+            --teams-bg: #e8eaed; 
+            --teams-card: #ffffff; 
+            --teams-border: #d1d1d1; 
+            --text-main: #242424;
+            --text-sec: #616161;
             --danger: #c0392b;
-            --light: #f4f6f8;
-            --white: #ffffff;
-            --border: #cccccc;
-            --text: #333333;
-            --input-bg: #ffffff;
+            --success: #27ae60;
         }
 
-        /* Mörkt läge färger */
         body.dark-mode {
-            --light: #121212;
-            --white: #1e1e1e;
-            --border: #444444;
-            --text: #e0e0e0;
-            --input-bg: #2d2d2d;
-            --primary: #4a90e2;
+            --teams-bg: #111111;
+            --teams-card: #202020;
+            --teams-border: #444444;
+            --text-main: #ffffff;
+            --text-sec: #adadad;
+            --teams-purple: #7f85f5;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             margin: 0;
             padding: 0;
-            background: var(--light);
-            color: var(--text);
+            background: var(--teams-bg);
+            color: var(--text-main);
             line-height: 1.5;
-            overflow-x: hidden; 
-            transition: background 0.3s, color 0.3s;
+            transition: background 0.3s;
         }
 
         .container {
-            max-width: 600px;
+            max-width: 500px;
             margin: 0 auto;
-            padding: 10px;
-            width: 100%;
+            padding: 12px;
         }
 
-        /* iOS Switch Style */
+        .icon {
+            width: 18px;
+            height: 18px;
+            vertical-align: middle;
+            margin-right: 8px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
         .theme-switch-wrapper {
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 10px;
+            gap: 8px;
             margin-bottom: 10px;
         }
 
         .theme-switch {
-            display: inline-block;
-            height: 24px;
-            position: relative;
-            width: 44px;
+            display: inline-block; height: 20px; position: relative; width: 38px;
         }
 
         .theme-switch input { display: none; }
 
         .slider {
-            background-color: #ccc;
-            bottom: 0;
-            cursor: pointer;
-            left: 0;
-            position: absolute;
-            right: 0;
-            top: 0;
-            transition: .4s;
-            border-radius: 34px;
+            background-color: #ccc; bottom: 0; cursor: pointer; left: 0;
+            position: absolute; right: 0; top: 0; transition: .4s; border-radius: 34px;
         }
 
         .slider:before {
-            background-color: #fff;
-            bottom: 3px;
-            content: "";
-            height: 18px;
-            left: 3px;
-            position: absolute;
-            transition: .4s;
-            width: 18px;
-            border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            background-color: #fff; bottom: 2px; content: ""; height: 16px; left: 2px;
+            position: absolute; transition: .4s; width: 16px; border-radius: 50%;
         }
 
-        input:checked + .slider { background-color: #34c759; }
-        input:checked + .slider:before { transform: translateX(20px); }
+        input:checked + .slider { background-color: var(--success); }
+        input:checked + .slider:before { transform: translateX(18px); }
 
-        .switch-label { font-size: 13px; font-weight: 500; }
+        .switch-label { font-size: 11px; font-weight: 600; text-transform: uppercase; }
 
-        h2 { text-align: center; color: var(--primary); margin: 20px 0; }
+        h2 { 
+            text-align: center; margin: 15px 0; font-size: 1.3rem;
+            display: flex; align-items: center; justify-content: center;
+        }
 
         .card {
-            background: var(--white);
+            background: var(--teams-card);
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 1px solid var(--teams-border);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08); 
             margin-bottom: 20px;
-            width: 100%;
-            display: block;
         }
 
         label {
-            display: block;
-            margin-top: 15px;
-            font-weight: bold;
-            font-size: 0.9rem;
+            display: block; margin-bottom: 6px; font-weight: bold;
+            font-size: 0.85rem; color: var(--text-main);
         }
 
         input, select, textarea {
-            width: 100%;
-            max-width: 100%;
-            padding: 12px;
-            margin-top: 5px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            font-size: 16px;
-            background-color: var(--input-bg);
-            color: var(--text);
-            display: block;
-            -webkit-appearance: none;
-            appearance: none;
+            width: 100%; padding: 10px; margin-bottom: 15px;
+            border-radius: 8px; border: 1px solid var(--teams-border);
+            font-size: 16px; background-color: var(--teams-card);
+            color: var(--text-main); outline: none;
         }
 
-        input[type="date"] {
-            min-height: 45px;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 18px;
+        .segmented-control {
+            display: flex; background: var(--teams-bg);
+            padding: 4px; border-radius: 8px; margin-bottom: 15px;
+            border: 1px solid var(--teams-border);
         }
 
-        textarea { min-height: 100px; resize: vertical; }
+        .segment-btn {
+            flex: 1; border: none; padding: 8px; background: transparent;
+            color: var(--text-sec); font-weight: 600; font-size: 0.85rem;
+            border-radius: 6px; cursor: pointer; transition: all 0.2s;
+        }
 
-        .button-group { display: flex; gap: 10px; margin-top: 15px; }
+        .segment-btn.active {
+            background: var(--teams-card);
+            color: var(--teams-purple);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .segment-btn.active.nok { color: var(--danger); }
+
+        .button-group { display: flex; gap: 10px; margin-top: 10px; }
 
         button {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: opacity 0.2s;
+            padding: 12px; border: none; border-radius: 8px;
+            font-size: 15px; font-weight: 600; cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center;
         }
 
-        button:hover { opacity: 0.9; }
-
-        .primary { background: var(--primary); color: white; }
-        .secondary { background: var(--secondary); color: white; }
+        .primary { background: var(--teams-purple); color: white; flex: 2; }
+        .secondary { background: var(--teams-card); color: var(--text-main); border: 1px solid var(--teams-border); flex: 1; }
         .danger { background: var(--danger); color: white; }
-        .add-btn { background: #27ae60; color: white; margin-top: 10px; padding: 10px; }
+        .add-btn { background: var(--success); color: white; margin-top: 5px; width: 100%; }
 
         .hidden { display: none; }
 
         .list-container {
-            margin-top: 15px;
-            background: rgba(128, 128, 128, 0.1);
-            padding: 12px;
-            border-radius: 8px;
-            border-left: 4px solid var(--primary);
+            margin-top: 10px; background: var(--teams-bg);
+            padding: 12px; border-radius: 8px; border-left: 4px solid var(--teams-purple);
         }
 
         .list-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 5px 0;
-            border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 0; border-bottom: 1px solid var(--teams-border);
+            font-size: 0.9rem;
         }
 
-        .error { border: 2px solid var(--danger) !important; background: rgba(192, 57, 43, 0.1); }
-
-        @media screen and (max-width: 480px) {
-            .container { padding: 5px; }
-            .card { padding: 15px; width: 100%; overflow: hidden; }
-            h2 { font-size: 1.4rem; }
-            .button-group { flex-direction: column; }
-            input, select, textarea { width: 100% !important; max-width: 100% !important; box-sizing: border-box; }
-        }
+        .error { border: 2px solid var(--danger) !important; }
 
         .modal {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); display: none; align-items: center;
+            justify-content: center; z-index: 1000;
         }
 
         .modal-content {
-            background: var(--white);
-            width: 95%;
-            max-width: 800px;
-            border-radius: 15px;
-            padding: 15px;
-            position: relative;
+            background: var(--teams-card); width: 95%; max-width: 800px;
+            border-radius: 12px; padding: 15px;
         }
     </style>
 </head>
@@ -217,34 +181,44 @@
 <div class="container">
     <div class="theme-switch-wrapper">
         <span class="switch-label">Mörkt läge</span>
-        <label class="theme-switch" for="darkmodeToggle">
+        <label class="theme-switch">
             <input type="checkbox" id="darkmodeToggle" onclick="toggleDarkMode()">
             <div class="slider"></div>
         </label>
     </div>
 
-    <h2>📋 Skiftrapport</h2>
-    <button class="secondary" style="margin-bottom: 15px;" onclick="openStats()">📊 Visa statistik</button>
+    <h2>
+        <svg class="icon" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+        Skiftrapport
+    </h2>
 
-    <form id="reportForm" class="card">
-        <label for="datum">Datum</label>
-        <input type="date" id="datum">
+    <button class="secondary" style="width: 100%; margin-bottom: 15px;" onclick="openStats()">
+        <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+        Visa statistik
+    </button>
 
-        <label for="avdelning">Avdelning</label>
-        <select id="avdelning">
-            <option value="">-- Välj avdelning --</option>
-            <option value="TVS">TVS</option>
-            <option value="TPB">TPB</option>
-        </select>
+    <form id="reportForm">
+        <div class="card">
+            <label for="datum">Datum</label>
+            <input type="date" id="datum">
 
-        <label for="truckstatus">Truckstatus</label>
-        <select id="truckstatus" onchange="toggleSection('truckContainer', this.value)">
-            <option value="OK">OK</option>
-            <option value="NOK">Felanmälan (NOK)</option>
-        </select>
+            <label for="avdelning">Avdelning</label>
+            <select id="avdelning">
+                <option value="">-- Välj avdelning --</option>
+                <option value="TVS">TVS</option>
+                <option value="TPB">TPB</option>
+            </select>
+        </div>
 
-        <div id="truckContainer" class="hidden">
-            <div id="truckFields" class="list-container">
+        <div class="card">
+            <label>Truckstatus</label>
+            <div class="segmented-control">
+                <button type="button" class="segment-btn active" id="btn-truck-ok" onclick="setSegment('truck', 'OK')">OK</button>
+                <button type="button" class="segment-btn" id="btn-truck-nok" onclick="setSegment('truck', 'NOK')">Felanmälan (NOK)</button>
+            </div>
+            <input type="hidden" id="truck" value="OK">
+
+            <div id="truckContainer" class="hidden">
                 <select id="truckId">
                     <option value="">-- Välj Truck --</option>
                     <option>TVS-01</option><option>TVS-02</option><option>TVS-03</option><option>TVS-04</option>
@@ -262,18 +236,19 @@
                 </select>
                 <textarea id="truckKom" placeholder="Kommentar om felet..."></textarea>
                 <button type="button" class="add-btn" onclick="addItem('truck')">➕ Lägg till i listan</button>
+                <div id="truckList" class="list-container hidden"></div>
             </div>
-            <div id="truckList" class="list-container hidden"></div>
         </div>
 
-        <label for="maskin">Maskiner & Verktyg</label>
-        <select id="maskin" onchange="toggleSection('maskinContainer', this.value)">
-            <option value="OK">OK</option>
-            <option value="NOK">Felanmälan (NOK)</option>
-        </select>
+        <div class="card">
+            <label>Maskiner & Verktyg</label>
+            <div class="segmented-control">
+                <button type="button" class="segment-btn active" id="btn-maskin-ok" onclick="setSegment('maskin', 'OK')">OK</button>
+                <button type="button" class="segment-btn" id="btn-maskin-nok" onclick="setSegment('maskin', 'NOK')">Felanmälan (NOK)</button>
+            </div>
+            <input type="hidden" id="maskin" value="OK">
 
-        <div id="maskinContainer" class="hidden">
-            <div id="maskinFields" class="list-container">
+            <div id="maskinContainer" class="hidden">
                 <select id="machineId">
                     <option value="">-- Välj Maskin --</option>
                     <option>Ergopack</option><option>Bandningsmaskin</option><option>Pallyftare</option><option>Övrigt</option>
@@ -284,123 +259,112 @@
                 </select>
                 <textarea id="machineKom" placeholder="Kommentar om felet..."></textarea>
                 <button type="button" class="add-btn" onclick="addItem('machine')">➕ Lägg till i listan</button>
+                <div id="machineList" class="list-container hidden"></div>
             </div>
-            <div id="machineList" class="list-container hidden"></div>
         </div>
 
-        <label for="tillsyn">Daglig tillsyn truckar</label>
-        <select id="tillsyn" onchange="toggleVisibility('tillsynBox', this.value)">
-            <option value="OK">OK</option>
-            <option value="NOK">NOK</option>
-        </select>
-        <div id="tillsynBox" class="hidden">
-            <textarea id="tillsynfel" placeholder="Beskriv vad som saknas i tillsynen"></textarea>
+        <div class="card">
+            <label>Daglig tillsyn truckar</label>
+            <div class="segmented-control">
+                <button type="button" class="segment-btn active" id="btn-tillsyn-ok" onclick="setSegment('tillsyn', 'OK')">OK</button>
+                <button type="button" class="segment-btn" id="btn-tillsyn-nok" onclick="setSegment('tillsyn', 'NOK')">NOK</button>
+            </div>
+            <input type="hidden" id="tillsyn" value="OK">
+            <div id="tillsynBox" class="hidden">
+                <textarea id="tillsynfel" placeholder="Beskriv vad som saknas i tillsynen"></textarea>
+            </div>
+
+            <label>Rengöring av Bandningsmaskiner</label>
+            <div class="segmented-control">
+                <button type="button" class="segment-btn active" id="btn-rengoring-ok" onclick="setSegment('rengoring', 'OK')">OK</button>
+                <button type="button" class="segment-btn" id="btn-rengoring-nok" onclick="setSegment('rengoring', 'NOK')">Ej utfört</button>
+            </div>
+            <input type="hidden" id="rengoring" value="OK">
+            <div id="rengoringBox" class="hidden">
+                <textarea id="rengoringKommentar" placeholder="Orsak till utebliven rengöring"></textarea>
+            </div>
         </div>
 
-        <label for="rengoring">Rengöring av Bandningsmaskiner</label>
-        <select id="rengoring" onchange="toggleVisibility('rengoringBox', this.value)">
-            <option value="OK">OK</option>
-            <option value="NOK">Ej utfört</option>
-        </select>
-        <div id="rengoringBox" class="hidden">
-            <textarea id="rengoringKommentar" placeholder="Orsak till utebliven rengöring"></textarea>
+        <div class="card">
+            <label>Övrigt</label>
+            <textarea id="drift" placeholder="Beskriv eventuella stopp eller problem..."></textarea>
+            <textarea id="avvikelse" placeholder="Personal, material etc..."></textarea>
+            <textarea id="atgard" placeholder="Vad gjordes för att lösa problemen?"></textarea>
         </div>
-
-        <label for="drift">Övriga driftstörningar</label>
-        <textarea id="drift" placeholder="Beskriv eventuella stopp eller problem..."></textarea>
-
-        <label for="avvikelse">Avvikelse</label>
-        <textarea id="avvikelse" placeholder="Personal, material etc..."></textarea>
-
-        <label for="atgard">Åtgärd</label>
-        <textarea id="atgard" placeholder="Vad gjordes för att lösa problemen?"></textarea>
 
         <div class="button-group">
-            <button type="submit" id="submitBtn" class="primary">Skicka Rapport</button>
             <button type="button" class="secondary" onclick="clearForm()">Rensa</button>
+            <button type="submit" id="submitBtn" class="primary">Skicka Rapport</button>
         </div>
     </form>
 </div>
 
 <div id="statsModal" class="modal">
     <div class="modal-content">
-        <button class="danger close-modal" onclick="closeStats()">Stäng</button>
-        <iframe id="statsFrame" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQY0jbcHllFP-BC4h08x-mU28_9QuPBKOhcB4ue4HFUV8G7daNOsfoTUbAfDnMKmKm2-2T2NDLGDZIW/pubhtml?widget=true&amp;headers=false" width="100%" height="500"></iframe>
+        <button class="danger" style="margin-bottom: 10px;" onclick="closeStats()">Stäng</button>
+        <iframe id="statsFrame" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQY0jbcHllFP-BC4h08x-mU28_9QuPBKOhcB4ue4HFUV8G7daNOsfoTUbAfDnMKmKm2-2T2NDLGDZIW/pubhtml?widget=true&amp;headers=false" width="100%" height="500" style="border:none;"></iframe>
     </div>
 </div>
 
 <script>
-    // --- Mörkt läge logik ---
-    function toggleDarkMode() {
-        const isChecked = document.getElementById('darkmodeToggle').checked;
-        if (isChecked) {
-            document.body.classList.add('dark-mode');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.body.classList.remove('dark-mode');
-            localStorage.setItem('theme', 'light');
-        }
-    }
-
-    // Initialisering
     let truckArray = [];
     let machineArray = [];
 
     window.onload = function() {
         document.getElementById('datum').valueAsDate = new Date();
-        
-        // Ladda tema
         if (localStorage.getItem('theme') === 'dark') {
             document.body.classList.add('dark-mode');
             document.getElementById('darkmodeToggle').checked = true;
         }
     };
 
-    // --- Hjälpfunktioner ---
-    function toggleVisibility(id, val) {
-        document.getElementById(id).style.display = (val === "NOK") ? "block" : "none";
+    function toggleDarkMode() {
+        const isChecked = document.getElementById('darkmodeToggle').checked;
+        document.body.classList.toggle('dark-mode', isChecked);
+        localStorage.setItem('theme', isChecked ? 'dark' : 'light');
+    }
+
+    function setSegment(type, val) {
+        const okBtn = document.getElementById(`btn-${type}-ok`);
+        const nokBtn = document.getElementById(`btn-${type}-nok`);
+        // Hittar det dolda fältet för status (id="truck", id="maskin" osv)
+        document.getElementById(type).value = val;
+
+        if (val === 'OK') {
+            okBtn.classList.add('active'); nokBtn.classList.remove('active', 'nok');
+            if(type === 'truck') toggleSection('truckContainer', 'OK');
+            if(type === 'maskin') toggleSection('maskinContainer', 'OK');
+            if(type === 'tillsyn') document.getElementById('tillsynBox').classList.add('hidden');
+            if(type === 'rengoring') document.getElementById('rengoringBox').classList.add('hidden');
+        } else {
+            nokBtn.classList.add('active', 'nok'); okBtn.classList.remove('active');
+            if(type === 'truck') toggleSection('truckContainer', 'NOK');
+            if(type === 'maskin') toggleSection('maskinContainer', 'NOK');
+            if(type === 'tillsyn') document.getElementById('tillsynBox').classList.remove('hidden');
+            if(type === 'rengoring') document.getElementById('rengoringBox').classList.remove('hidden');
+        }
     }
 
     function toggleSection(containerId, val) {
         const container = document.getElementById(containerId);
         if (val === "NOK") {
-            container.style.display = "block";
+            container.classList.remove('hidden');
         } else {
-            container.style.display = "none";
+            container.classList.add('hidden');
             if(containerId === 'truckContainer') { truckArray = []; renderList('truck'); }
             if(containerId === 'maskinContainer') { machineArray = []; renderList('machine'); }
         }
-    }
-
-    function openStats(){
-        let f = document.getElementById("statsFrame");
-        f.src = f.src.split("&t=")[0] + "&t=" + new Date().getTime();
-        document.getElementById("statsModal").style.display = "flex";
-    }
-
-    function closeStats(){
-        document.getElementById("statsModal").style.display = "none";
     }
 
     function addItem(type) {
         const idEl = document.getElementById(type === 'truck' ? 'truckId' : 'machineId');
         const felEl = document.getElementById(type === 'truck' ? 'truckFel' : 'machineFel');
         const komEl = document.getElementById(type === 'truck' ? 'truckKom' : 'machineKom');
-
-        if (!idEl.value || !felEl.value) {
-            idEl.classList.add('error');
-            felEl.classList.add('error');
-            alert("Vänligen välj både enhet och feltyp.");
-            return;
-        }
-
-        idEl.classList.remove('error');
-        felEl.classList.remove('error');
-
+        if (!idEl.value || !felEl.value) return alert("Välj både enhet och feltyp.");
+        
         const item = { id: idEl.value, fel: felEl.value, kom: komEl.value };
         if (type === 'truck') truckArray.push(item);
         else machineArray.push(item);
-
         idEl.value = ""; felEl.value = ""; komEl.value = "";
         renderList(type);
     }
@@ -419,7 +383,7 @@
         listDiv.innerHTML = arr.map((item, index) => `
             <div class="list-item">
                 <span><strong>${item.id}</strong>: ${item.fel} ${item.kom ? `(${item.kom})` : ''}</span>
-                <button type="button" style="width:auto; padding:5px 10px; font-size:12px;" class="danger" onclick="removeItem('${type}', ${index})">Ta bort</button>
+                <button type="button" style="width:auto; padding:4px 8px; font-size:12px;" class="danger" onclick="removeItem('${type}', ${index})">Ta bort</button>
             </div>
         `).join('');
     }
@@ -433,49 +397,27 @@
         return "Okänt skift";
     }
 
-    function validateForm() {
-        let isValid = true;
-        const avdelning = document.getElementById('avdelning');
-        if (!avdelning.value) { avdelning.classList.add('error'); isValid = false; }
-        else { avdelning.classList.remove('error'); }
-        if (document.getElementById('truckstatus').value === "NOK" && truckArray.length === 0) {
-            alert("Du har valt NOK på truckar men inte lagt till några fel i listan.");
-            isValid = false;
-        }
-        if (document.getElementById('maskin').value === "NOK" && machineArray.length === 0) {
-            alert("Du har valt NOK på Maskiner & Verktyg men inte lagt till några fel i listan.");
-            isValid = false;
-        }
-        return isValid;
-    }
+    function openStats(){ document.getElementById("statsModal").style.display = "flex"; }
+    function closeStats(){ document.getElementById("statsModal").style.display = "none"; }
 
-    function clearForm() {
-        if(confirm("Vill du verkligen rensa hela formuläret?")) {
-            document.getElementById('reportForm').reset();
-            truckArray = []; machineArray = [];
-            renderList('truck'); renderList('machine');
-            toggleSection('truckContainer', 'OK'); toggleSection('maskinContainer', 'OK');
-            document.getElementById('datum').valueAsDate = new Date();
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = false;
-            submitBtn.innerText = "Skicka Rapport";
-        }
-    }
+    function clearForm() { if(confirm("Vill du verkligen rensa hela formuläret?")) location.reload(); }
 
     document.getElementById('reportForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        if (!validateForm()) return;
+        const avdelning = document.getElementById('avdelning');
+        if (!avdelning.value) { avdelning.classList.add('error'); return alert("Välj avdelning!"); }
+
+        if (document.getElementById('truck').value === "NOK" && truckArray.length === 0) return alert("Lägg till truckfel i listan!");
+        if (document.getElementById('maskin').value === "NOK" && machineArray.length === 0) return alert("Lägg till maskinfel i listan!");
 
         const submitBtn = document.getElementById('submitBtn');
-        if (submitBtn.disabled) return; 
-        submitBtn.disabled = true;
-        submitBtn.innerText = "Skickar...";
+        submitBtn.disabled = true; submitBtn.innerText = "Skickar...";
 
         const formData = {
             datum: document.getElementById('datum').value,
             avdelning: document.getElementById('avdelning').value,
             skift: getSkift(),
-            truckstatus: document.getElementById('truckstatus').value,
+            truckstatus: document.getElementById('truck').value,
             truckar: truckArray,
             maskin: document.getElementById('maskin').value,
             maskiner: machineArray,
@@ -490,32 +432,24 @@
 
         try {
             await fetch("https://script.google.com/macros/s/AKfycbx6pDfJb_p89d4Me6FOVcjTr6rz-_kfThHanWGja5hvSPO3OW_UA8wmdk-F6Rt9Q-J-UA/exec", {
-                method: "POST",
-                mode: "no-cors",
-                body: JSON.stringify(formData)
+                method: "POST", mode: "no-cors", body: JSON.stringify(formData)
             });
-        } catch (err) { console.error("Fel vid Sheets-överföring:", err); }
+        } catch (err) { console.error(err); }
 
-        let mailBody = `SKIFTRAPPORT - ${formData.datum}\n`;
-        mailBody += `Skift: ${formData.skift}\nAvdelning: ${formData.avdelning}\n\n`;
+        let mailBody = `SKIFTRAPPORT - ${formData.datum}\nSkift: ${formData.skift}\nAvdelning: ${formData.avdelning}\n\n`;
         mailBody += `Truckstatus: ${formData.truckstatus}\n`;
         truckArray.forEach(t => mailBody += `- ${t.id}: ${t.fel} (${t.kom})\n`);
         mailBody += `\nMaskiner: ${formData.maskin}\n`;
         machineArray.forEach(m => mailBody += `- ${m.id}: ${m.fel} (${m.kom})\n`);
-        mailBody += `\nÖvrigt:\n- Tillsyn: ${formData.tillsyn}\n- Rengöring: ${formData.rengoring}\n`;
         mailBody += `\nDriftstörningar:\n${formData.drift}\n\nAvvikelser:\n${formData.avvikelse}\n\nÅtgärder:\n${formData.atgard}`;
 
-        const subject = `Skiftrapport ${formData.datum} - ${formData.skift}`;
         const isWindows = navigator.userAgent.toLowerCase().includes("windows");
         const separator = isWindows ? ";" : ",";
         const emails = ["rapport.vovlo@samhall.se", "volvooc@samhall.onmicrosoft.com"].join(separator);
+        
+        window.location.href = `mailto:${emails}?subject=${encodeURIComponent("Skiftrapport " + formData.datum)}&body=${encodeURIComponent(mailBody)}`;
 
-        window.location.href = `mailto:${emails}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(mailBody)}`;
-
-        setTimeout(() => {
-            submitBtn.disabled = false;
-            submitBtn.innerText = "Skicka Rapport";
-        }, 3000);
+        setTimeout(() => { submitBtn.disabled = false; submitBtn.innerText = "Skicka Rapport"; }, 3000);
     });
 </script>
 
