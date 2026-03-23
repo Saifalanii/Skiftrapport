@@ -27,7 +27,7 @@
             margin: 0; padding: 0; background: var(--teams-bg); color: var(--text-main);
             line-height: 1.5; transition: background 0.3s, font-size 0.2s;
             font-size: var(--base-font);
-            overscroll-behavior: none; /* Förhindrar pull-to-refresh */
+            overscroll-behavior: none;
         }
         .container { max-width: 500px; margin: 0 auto; padding: 12px; padding-bottom: 40px; }
         .icon { width: 1.2em; height: 1.2em; vertical-align: middle; margin-right: 8px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -60,6 +60,14 @@
         }
         input:focus, select:focus, textarea:focus { border-color: var(--teams-purple); }
 
+        /* FIX FÖR DATUMFÄLT PÅ MOBIL */
+        input[type="date"] {
+            appearance: none;
+            -webkit-appearance: none;
+            min-height: 1.2em;
+            display: block;
+        }
+
         .machine-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
         .machine-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         .machine-circle {
@@ -74,7 +82,7 @@
 
         .segmented-control { display: flex; background: var(--teams-bg); padding: 4px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--teams-border); }
         .segment-btn { flex: 1; border: none; padding: 10px; background: transparent; color: var(--text-sec); font-weight: 600; font-size: 0.9em; border-radius: 6px; cursor: pointer; transition: 0.2s; }
-        .segment-btn.active { background: var(--teams-card); color: var(--teams-purple); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .segment-btn.active { background: var(--teams-card); color: var(--text-main); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .segment-btn.active.nok { color: var(--danger); }
 
         button { padding: 12px; border: none; border-radius: 8px; font-size: 0.95em; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: opacity 0.2s, transform 0.1s; }
@@ -235,14 +243,13 @@
 <div id="statsModal" class="modal">
     <div class="modal-content">
         <button class="danger" style="margin-bottom: 10px;" onclick="closeStats(); vibrate();">Stäng</button>
-        <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQY0jbcHllFP-BC4h08x-mU28_9QuPBKOhcB4ue4HFUV8G7daNOsfoTUbAfDnMKmKm2-2T2NDLGDZIW/pubhtml?widget=true&amp;headers=false" width="100%" height="100%" style="border:none; border-radius: 8px;"></iframe>
+        <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRw6n_3d87vAX6DVNmEZ-JwkOYDQcB1scVLhghcY6Cxam8Oq9VEvz1xhMvF89KOsGGJWZFxdNhCE5lZ/pubhtml?gid=414212083&amp;single=true&amp;widget=true&amp;headers=false"></iframe>
     </div>
 </div>
 
 <script>
     let truckArray = []; let maskinArray = [];
 
-    // Enkel funktion för att vibrera mobilen (haptisk feedback)
     function vibrate(ms = 20) {
         if (navigator.vibrate) navigator.vibrate(ms);
     }
@@ -283,7 +290,6 @@
         const okBtn = document.getElementById(`btn-${type}-ok`); const nokBtn = document.getElementById(`btn-${type}-nok`);
         const box = document.getElementById(type + (type==='truck'||type==='maskin'?'Container':(type==='tillsyn'||type==='rengoring'?'Box':'')));
         
-        // Ta bort varningsfärg om man byter till OK
         if (val === 'OK') {
             document.getElementById(`card-${type}`)?.classList.remove('error-attention');
             okBtn.classList.add('active'); nokBtn.classList.remove('active', 'nok'); 
@@ -323,7 +329,6 @@
             fel.value = ""; kom.value = "";
             document.getElementById('card-maskin').classList.remove('error-attention');
         }
-        // Stäng tangentbord för bättre fokus på mobilen
         document.activeElement.blur();
         renderList(type);
     }
@@ -351,22 +356,16 @@
         e.preventDefault();
         
         let hasError = false;
-        
-        // Återställ varningar
         document.querySelectorAll('.card').forEach(c => c.classList.remove('error-attention'));
 
-        // Validering för Truckar
         if(document.getElementById('truck').value !== 'OK' && truckArray.length === 0) {
             document.getElementById('card-truck').classList.add('error-attention');
             hasError = true;
         }
-        
-        // Validering för Maskiner
         if(document.getElementById('maskin').value !== 'OK' && maskinArray.length === 0) {
             document.getElementById('card-maskin').classList.add('error-attention');
             hasError = true;
         }
-
         if (!this.checkValidity()) {
             document.getElementById('card-person').classList.add('error-attention');
             hasError = true;
@@ -396,7 +395,18 @@
             atgard: document.getElementById('atgard').value
         };
 
-        try { await fetch("https://script.google.com/macros/s/AKfycbwA1WxeZkJhRsWZ62g-9sEFNhMiVEqHygszbWPFXQ0BLCSVObgtt4e2arG848BJLgW0/exec", { method: "POST", body: JSON.stringify(data) }); } catch (err) {}
+        try { 
+            const response = await fetch("https://script.google.com/macros/s/AKfycbwA1WxeZkJhRsWZ62g-9sEFNhMiVEqHygszbWPFXQ0BLCSVObgtt4e2arG848BJLgW0/exec", { 
+                method: "POST", 
+                body: JSON.stringify(data) 
+            });
+            const result = await response.json();
+            if (result.status !== "ok") {
+                console.warn("Google API error:", result.message);
+            }
+        } catch (err) {
+            console.error("Fetch failed:", err);
+        }
 
         let body = `SKIFTRAPPORT - ${data.datum}\nAvdelning: ${data.avdelning}\nSkift: ${data.skift}\nRapportör: ${data.signatur}\n\nTRUCKAR:\n`;
         if(truckArray.length>0) truckArray.forEach(t=>body+=`- ${t.id}: ${t.fel} (${t.kom})\n`); else body+="Inga anmärkningar.\n";
