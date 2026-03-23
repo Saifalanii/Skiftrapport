@@ -20,6 +20,18 @@
             --light: #f4f6f8;
             --white: #ffffff;
             --border: #cccccc;
+            --text: #333333;
+            --input-bg: #ffffff;
+        }
+
+        /* Mörkt läge färger */
+        body.dark-mode {
+            --light: #121212;
+            --white: #1e1e1e;
+            --border: #444444;
+            --text: #e0e0e0;
+            --input-bg: #2d2d2d;
+            --primary: #4a90e2;
         }
 
         body {
@@ -27,10 +39,10 @@
             margin: 0;
             padding: 0;
             background: var(--light);
-            color: #333;
+            color: var(--text);
             line-height: 1.5;
-            /* Förhindrar att hela sidan kan skrollas i sidled */
             overflow-x: hidden; 
+            transition: background 0.3s, color 0.3s;
         }
 
         .container {
@@ -39,6 +51,54 @@
             padding: 10px;
             width: 100%;
         }
+
+        /* iOS Switch Style */
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .theme-switch {
+            display: inline-block;
+            height: 24px;
+            position: relative;
+            width: 44px;
+        }
+
+        .theme-switch input { display: none; }
+
+        .slider {
+            background-color: #ccc;
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            background-color: #fff;
+            bottom: 3px;
+            content: "";
+            height: 18px;
+            left: 3px;
+            position: absolute;
+            transition: .4s;
+            width: 18px;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        input:checked + .slider { background-color: #34c759; }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        .switch-label { font-size: 13px; font-weight: 500; }
 
         h2 { text-align: center; color: var(--primary); margin: 20px 0; }
 
@@ -59,23 +119,21 @@
             font-size: 0.9rem;
         }
 
-        /* FIX FÖR INPUTS - Särskilt för iOS/iPhone */
         input, select, textarea {
             width: 100%;
-            max-width: 100%; /* Tvingar den att stanna i containern */
+            max-width: 100%;
             padding: 12px;
             margin-top: 5px;
             border-radius: 8px;
             border: 1px solid var(--border);
-            font-size: 16px; /* Förhindrar zoom vid klick */
-            background-color: #fff;
+            font-size: 16px;
+            background-color: var(--input-bg);
+            color: var(--text);
             display: block;
-            /* Rensar iPhones förinställda grafik */
             -webkit-appearance: none;
             appearance: none;
         }
 
-        /* Specifik fix för datumrutan */
         input[type="date"] {
             min-height: 45px;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
@@ -110,7 +168,7 @@
 
         .list-container {
             margin-top: 15px;
-            background: #eef3f7;
+            background: rgba(128, 128, 128, 0.1);
             padding: 12px;
             border-radius: 8px;
             border-left: 4px solid var(--primary);
@@ -121,40 +179,23 @@
             justify-content: space-between;
             align-items: center;
             padding: 5px 0;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid var(--border);
         }
 
-        .error { border: 2px solid var(--danger) !important; background: #fff5f5; }
+        .error { border: 2px solid var(--danger) !important; background: rgba(192, 57, 43, 0.1); }
 
-        /* --- MOBILANPASSNING (MEDIA QUERY) --- */
         @media screen and (max-width: 480px) {
-            .container {
-                padding: 5px;
-            }
-            .card {
-                padding: 15px;
-                width: 100%;
-                overflow: hidden; /* Extra säkerhet */
-            }
-            h2 {
-                font-size: 1.4rem;
-            }
-            .button-group {
-                flex-direction: column;
-            }
-            /* Tvingar alla fält att lyda på iPhone */
-            input, select, textarea {
-                width: 100% !important;
-                max-width: 100% !important;
-                box-sizing: border-box;
-            }
+            .container { padding: 5px; }
+            .card { padding: 15px; width: 100%; overflow: hidden; }
+            h2 { font-size: 1.4rem; }
+            .button-group { flex-direction: column; }
+            input, select, textarea { width: 100% !important; max-width: 100% !important; box-sizing: border-box; }
         }
 
-        /* Modal */
         .modal {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.8);
             display: none;
             align-items: center;
             justify-content: center;
@@ -174,6 +215,14 @@
 <body>
 
 <div class="container">
+    <div class="theme-switch-wrapper">
+        <span class="switch-label">Mörkt läge</span>
+        <label class="theme-switch" for="darkmodeToggle">
+            <input type="checkbox" id="darkmodeToggle" onclick="toggleDarkMode()">
+            <div class="slider"></div>
+        </label>
+    </div>
+
     <h2>📋 Skiftrapport</h2>
     <button class="secondary" style="margin-bottom: 15px;" onclick="openStats()">📊 Visa statistik</button>
 
@@ -198,38 +247,18 @@
             <div id="truckFields" class="list-container">
                 <select id="truckId">
                     <option value="">-- Välj Truck --</option>
-                    <option>TVS-01</option>
-                    <option>TVS-02</option>
-                    <option>TVS-03</option>
-                    <option>TVS-04</option>
-                    <option>TVS-05</option>
-                    <option>TVS-06</option>
-                    <option>TVS-13</option>
-                    <option>TVS-22</option>
-                    <option>TVS-23</option>
-                    <option>TVS-33</option>
-                    <option>TVS-34</option>
-                    <option>TPB-07</option>
-                    <option>TPB-08</option>
-                    <option>TPB-09</option>
-                    <option>TPB-10</option>
-                    <option>TPB-14</option>
-                    <option>TPB-15</option>
-                    <option>TPB-20</option>
-                    <option>TPB-21</option>
-                    <option>Extra truck</option>
+                    <option>TVS-01</option><option>TVS-02</option><option>TVS-03</option><option>TVS-04</option>
+                    <option>TVS-05</option><option>TVS-06</option><option>TVS-13</option><option>TVS-22</option>
+                    <option>TVS-23</option><option>TVS-33</option><option>TVS-34</option><option>TPB-07</option>
+                    <option>TPB-08</option><option>TPB-09</option><option>TPB-10</option><option>TPB-14</option>
+                    <option>TPB-15</option><option>TPB-20</option><option>TPB-21</option><option>Extra truck</option>
                     <option>Grå Skjutsativ</option>
                 </select>
                 <select id="truckFel">
                     <option value="">-- Välj Feltyp --</option>
-                    <option>Hydraulik/Olja</option>
-                    <option>Chassi</option>
-                    <option>Stativ</option>
-                    <option>Batteri</option>
-                    <option>Drag</option>
-                    <option>Däck</option>
-                    <option>Linde Connect</option>
-                    <option>Övrigt</option>
+                    <option>Hydraulik/Olja</option><option>Chassi</option><option>Stativ</option>
+                    <option>Batteri</option><option>Drag</option><option>Däck</option>
+                    <option>Linde Connect</option><option>Övrigt</option>
                 </select>
                 <textarea id="truckKom" placeholder="Kommentar om felet..."></textarea>
                 <button type="button" class="add-btn" onclick="addItem('truck')">➕ Lägg till i listan</button>
@@ -301,10 +330,31 @@
 </div>
 
 <script>
+    // --- Mörkt läge logik ---
+    function toggleDarkMode() {
+        const isChecked = document.getElementById('darkmodeToggle').checked;
+        if (isChecked) {
+            document.body.classList.add('dark-mode');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.body.classList.remove('dark-mode');
+            localStorage.setItem('theme', 'light');
+        }
+    }
+
     // Initialisering
-    document.getElementById('datum').valueAsDate = new Date();
     let truckArray = [];
     let machineArray = [];
+
+    window.onload = function() {
+        document.getElementById('datum').valueAsDate = new Date();
+        
+        // Ladda tema
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('darkmodeToggle').checked = true;
+        }
+    };
 
     // --- Hjälpfunktioner ---
     function toggleVisibility(id, val) {
@@ -332,7 +382,6 @@
         document.getElementById("statsModal").style.display = "none";
     }
 
-    // --- Hantera Listor (Truck/Maskin) ---
     function addItem(type) {
         const idEl = document.getElementById(type === 'truck' ? 'truckId' : 'machineId');
         const felEl = document.getElementById(type === 'truck' ? 'truckFel' : 'machineFel');
@@ -349,12 +398,8 @@
         felEl.classList.remove('error');
 
         const item = { id: idEl.value, fel: felEl.value, kom: komEl.value };
-        
-        if (type === 'truck') {
-            truckArray.push(item);
-        } else {
-            machineArray.push(item);
-        }
+        if (type === 'truck') truckArray.push(item);
+        else machineArray.push(item);
 
         idEl.value = ""; felEl.value = ""; komEl.value = "";
         renderList(type);
@@ -369,12 +414,7 @@
     function renderList(type) {
         const listDiv = document.getElementById(type === 'truck' ? 'truckList' : 'machineList');
         const arr = (type === 'truck') ? truckArray : machineArray;
-        
-        if (arr.length === 0) {
-            listDiv.classList.add('hidden');
-            return;
-        }
-
+        if (arr.length === 0) { listDiv.classList.add('hidden'); return; }
         listDiv.classList.remove('hidden');
         listDiv.innerHTML = arr.map((item, index) => `
             <div class="list-item">
@@ -384,7 +424,6 @@
         `).join('');
     }
 
-    // --- Logik för Skift ---
     function getSkift() {
         const now = new Date();
         const mins = now.getHours() * 60 + now.getMinutes();
@@ -394,54 +433,39 @@
         return "Okänt skift";
     }
 
-    // --- Validering & Rensa ---
     function validateForm() {
         let isValid = true;
         const avdelning = document.getElementById('avdelning');
-        
-        if (!avdelning.value) {
-            avdelning.classList.add('error');
-            isValid = false;
-        } else {
-            avdelning.classList.remove('error');
-        }
-
+        if (!avdelning.value) { avdelning.classList.add('error'); isValid = false; }
+        else { avdelning.classList.remove('error'); }
         if (document.getElementById('truckstatus').value === "NOK" && truckArray.length === 0) {
             alert("Du har valt NOK på truckar men inte lagt till några fel i listan.");
             isValid = false;
         }
-
-                if (document.getElementById('maskin').value === "NOK" && machineArray.length === 0) {
+        if (document.getElementById('maskin').value === "NOK" && machineArray.length === 0) {
             alert("Du har valt NOK på Maskiner & Verktyg men inte lagt till några fel i listan.");
             isValid = false;
         }
-
         return isValid;
     }
 
     function clearForm() {
         if(confirm("Vill du verkligen rensa hela formuläret?")) {
             document.getElementById('reportForm').reset();
-            truckArray = [];
-            machineArray = [];
-            renderList('truck');
-            renderList('machine');
-            toggleSection('truckContainer', 'OK');
-            toggleSection('maskinContainer', 'OK');
+            truckArray = []; machineArray = [];
+            renderList('truck'); renderList('machine');
+            toggleSection('truckContainer', 'OK'); toggleSection('maskinContainer', 'OK');
             document.getElementById('datum').valueAsDate = new Date();
-            // Återställ knapp om den var inaktiverad
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = false;
             submitBtn.innerText = "Skicka Rapport";
         }
     }
 
-    // --- Submit ---
     document.getElementById('reportForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         if (!validateForm()) return;
 
-        // --- SPÄRR FÖR DUBBEL DATA ---
         const submitBtn = document.getElementById('submitBtn');
         if (submitBtn.disabled) return; 
         submitBtn.disabled = true;
@@ -464,26 +488,20 @@
             atgard: document.getElementById('atgard').value
         };
 
-        // Skicka till Google Sheets (Script)
         try {
-            await fetch("https://script.google.com/macros/s/AKfycbxkFZDn-d2IAV9DWn0o3tvB0ifHnkoVbKASrvdKKdWAlR2xXbfls35B0rn9glGDsLSsMg/exec", {
+            await fetch("https://script.google.com/macros/s/AKfycbx6pDfJb_p89d4Me6FOVcjTr6rz-_kfThHanWGja5hvSPO3OW_UA8wmdk-F6Rt9Q-J-UA/exec", {
                 method: "POST",
                 mode: "no-cors",
                 body: JSON.stringify(formData)
             });
-        } catch (err) {
-            console.error("Fel vid Sheets-överföring:", err);
-        }
+        } catch (err) { console.error("Fel vid Sheets-överföring:", err); }
 
-        // Förbered Mailto
         let mailBody = `SKIFTRAPPORT - ${formData.datum}\n`;
         mailBody += `Skift: ${formData.skift}\nAvdelning: ${formData.avdelning}\n\n`;
         mailBody += `Truckstatus: ${formData.truckstatus}\n`;
         truckArray.forEach(t => mailBody += `- ${t.id}: ${t.fel} (${t.kom})\n`);
-        
         mailBody += `\nMaskiner: ${formData.maskin}\n`;
         machineArray.forEach(m => mailBody += `- ${m.id}: ${m.fel} (${m.kom})\n`);
-        
         mailBody += `\nÖvrigt:\n- Tillsyn: ${formData.tillsyn}\n- Rengöring: ${formData.rengoring}\n`;
         mailBody += `\nDriftstörningar:\n${formData.drift}\n\nAvvikelser:\n${formData.avvikelse}\n\nÅtgärder:\n${formData.atgard}`;
 
@@ -494,7 +512,6 @@
 
         window.location.href = `mailto:${emails}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(mailBody)}`;
 
-        // Återställ knappen efter 3 sekunder ifall de behöver ändra något
         setTimeout(() => {
             submitBtn.disabled = false;
             submitBtn.innerText = "Skicka Rapport";
