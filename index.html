@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Skiftrapport</title>
-    <link rel="icon" type="image/png" href="icon.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
     <style>
         * {
             box-sizing: border-box;
@@ -14,7 +12,6 @@
 
         :root {
             --teams-purple: #5b5fc7;
-            --teams-purple-hover: #444791;
             --teams-bg: #e8eaed; 
             --teams-card: #ffffff; 
             --teams-border: #d1d1d1; 
@@ -41,14 +38,14 @@
             color: var(--text-main);
             line-height: 1.5;
             transition: background 0.3s;
-            overflow-x: hidden; /* Förhindrar horisontell scroll */
+            overflow-x: hidden;
         }
 
         .container {
             width: 100%;
             max-width: 500px;
             margin: 0 auto;
-            padding: 15px; /* Ökad padding för andningsrum */
+            padding: 10px;
         }
 
         .icon {
@@ -90,8 +87,6 @@
         input:checked + .slider { background-color: var(--success); }
         input:checked + .slider:before { transform: translateX(18px); }
 
-        .switch-label { font-size: 11px; font-weight: 600; text-transform: uppercase; }
-
         h2 { 
             text-align: center; margin: 15px 0; font-size: 1.3rem;
             display: flex; align-items: center; justify-content: center;
@@ -104,7 +99,7 @@
             border: 1px solid var(--teams-border);
             box-shadow: 0 4px 10px rgba(0,0,0,0.08); 
             margin-bottom: 16px;
-            width: 100%; /* Säkerställ att kortet inte går utanför */
+            width: 100%;
         }
 
         label {
@@ -112,20 +107,24 @@
             font-size: 0.85rem; color: var(--text-main);
         }
 
-        /* Fix för iPhone breddproblem på input/select/textarea */
         input, select, textarea {
             width: 100%; 
-            max-width: 100%;
             padding: 12px; 
             margin-bottom: 15px;
             border-radius: 8px; 
             border: 1px solid var(--teams-border);
-            font-size: 16px; /* Förhindrar auto-zoom på iPhone */
+            font-size: 16px;
             background-color: var(--teams-card);
             color: var(--text-main); 
             outline: none;
-            -webkit-appearance: none; /* Tar bort Safaris standard-styling */
+            -webkit-appearance: none;
             display: block;
+        }
+
+        /* Röd markering för obligatoriska fält */
+        .error-border {
+            border: 2px solid var(--danger) !important;
+            background-color: rgba(192, 57, 43, 0.05);
         }
 
         .segmented-control {
@@ -138,7 +137,7 @@
         .segment-btn {
             flex: 1; border: none; padding: 10px 5px; background: transparent;
             color: var(--text-sec); font-weight: 600; font-size: 0.8rem;
-            border-radius: 6px; cursor: pointer; transition: all 0.2s;
+            border-radius: 6px; cursor: pointer;
         }
 
         .segment-btn.active {
@@ -149,21 +148,32 @@
 
         .segment-btn.active.nok { color: var(--danger); }
 
-        /* Fix för knapp-gruppen */
+        /* FIX FÖR KNAPPAR SOM STICKER UT */
         .button-group { 
             display: flex; 
             gap: 10px; 
             margin-top: 10px;
             width: 100%;
+            padding: 0 2px;
         }
 
         button {
-            padding: 14px; border: none; border-radius: 8px;
-            font-size: 15px; font-weight: 600; cursor: pointer;
-            display: inline-flex; align-items: center; justify-content: center;
+            padding: 14px 5px; 
+            border: none; 
+            border-radius: 8px;
+            font-size: 15px; 
+            font-weight: 600; 
+            cursor: pointer;
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center;
+            min-width: 0; /* Tillåter knappen att krympa på iPhone */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
-        .primary { background: var(--teams-purple); color: white; flex: 1; }
+        .primary { background: var(--teams-purple); color: white; flex: 2; }
         .secondary { background: var(--teams-card); color: var(--text-main); border: 1px solid var(--teams-border); flex: 1; }
         .danger { background: var(--danger); color: white; }
         .add-btn { background: var(--success); color: white; margin-top: 5px; width: 100%; }
@@ -268,7 +278,7 @@
             <div id="maskinContainer" class="hidden">
                 <select id="machineId">
                     <option value="">-- Välj Maskin --</option>
-                    <option>Ergopack</option><option>Bandningsmaskin</option><option>Pallyftare</option><option>Övrigt</option>
+                    <option>Ergopack</option><option>Bandningsmaskin</option><option>Movexx</option><option>Pallyftare</option><option>Övrigt</option>
                 </select>
                 <select id="machineFel">
                     <option value="">-- Välj Feltyp --</option>
@@ -376,7 +386,15 @@
         const idEl = document.getElementById(type === 'truck' ? 'truckId' : 'machineId');
         const felEl = document.getElementById(type === 'truck' ? 'truckFel' : 'machineFel');
         const komEl = document.getElementById(type === 'truck' ? 'truckKom' : 'machineKom');
-        if (!idEl.value || !felEl.value) return alert("Välj både enhet och feltyp.");
+        
+        idEl.classList.remove('error-border');
+        felEl.classList.remove('error-border');
+
+        if (!idEl.value || !felEl.value) {
+            if(!idEl.value) idEl.classList.add('error-border');
+            if(!felEl.value) felEl.classList.add('error-border');
+            return alert("Välj både enhet och feltyp.");
+        }
         
         const item = { id: idEl.value, fel: felEl.value, kom: komEl.value };
         if (type === 'truck') truckArray.push(item);
@@ -398,7 +416,7 @@
         listDiv.classList.remove('hidden');
         listDiv.innerHTML = arr.map((item, index) => `
             <div class="list-item">
-                <span><strong>${item.id}</strong>: ${item.fel} ${item.kom ? `(${item.kom})` : ''}</span>
+                <span><strong>${item.id}</strong>: ${item.fel}</span>
                 <button type="button" style="width:auto; padding:4px 8px; font-size:12px;" class="danger" onclick="removeItem('${type}', ${index})">Ta bort</button>
             </div>
         `).join('');
@@ -416,12 +434,23 @@
     function openStats(){ document.getElementById("statsModal").style.display = "flex"; }
     function closeStats(){ document.getElementById("statsModal").style.display = "none"; }
 
-    function clearForm() { if(confirm("Vill du verkligen rensa hela formuläret?")) location.reload(); }
+    function clearForm() { if(confirm("Rensa formuläret?")) location.reload(); }
 
     document.getElementById('reportForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const avdelning = document.getElementById('avdelning');
-        if (!avdelning.value) return alert("Välj avdelning!");
+        avdelning.classList.remove('error-border');
+
+        if (!avdelning.value) { 
+            avdelning.classList.add('error-border');
+            alert("Du måste välja avdelning!");
+            return;
+        }
+
+        if (document.getElementById('truck').value === "NOK" && truckArray.length === 0) {
+            document.getElementById('truckId').classList.add('error-border');
+            return alert("Du har valt NOK på truckar men inte lagt till något fel i listan!");
+        }
 
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.disabled = true; submitBtn.innerText = "Skickar...";
@@ -449,12 +478,9 @@
             });
         } catch (err) { console.error(err); }
 
-        let mailBody = `SKIFTRAPPORT - ${formData.datum}\nSkift: ${formData.skift}\nAvdelning: ${formData.avdelning}\n\n`;
-        mailBody += `Truckstatus: ${formData.truckstatus}\n`;
-        truckArray.forEach(t => mailBody += `- ${t.id}: ${t.fel} (${t.kom})\n`);
-        mailBody += `\nMaskiner: ${formData.maskin}\n`;
-        machineArray.forEach(m => mailBody += `- ${m.id}: ${m.fel} (${m.kom})\n`);
-        mailBody += `\nDriftstörningar:\n${formData.drift}\n\nAvvikelser:\n${formData.avvikelse}\n\nÅtgärder:\n${formData.atgard}`;
+        let mailBody = `SKIFTRAPPORT - ${formData.datum}\nSkift: ${formData.skift}\nAvdelning: ${formData.avdelning}\n\nTruckstatus: ${formData.truckstatus}\n`;
+        truckArray.forEach(t => mailBody += `- ${t.id}: ${t.fel}\n`);
+        mailBody += `\nDriftstörningar:\n${formData.drift}`;
 
         const isWindows = navigator.userAgent.toLowerCase().includes("windows");
         const separator = isWindows ? ";" : ",";
