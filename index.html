@@ -237,13 +237,13 @@
             <button type="submit" id="submitBtn" class="primary" style="flex:2;" onclick="vibrate(50);">Skicka Rapport</button>
         </div>
     </form>
-    <div class="version-text">v1.1.19 • App-känsla & Vibration</div>
+    <div class="version-text">v1.1.19</div>
 </div>
 
 <div id="statsModal" class="modal">
     <div class="modal-content">
         <button class="danger" style="margin-bottom: 10px;" onclick="closeStats(); vibrate();">Stäng</button>
-        <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQY0jbcHllFP-BC4h08x-mU28_9QuPBKOhcB4ue4HFUV8G7daNOsfoTUbAfDnMKmKm2-2T2NDLGDZIW/pubhtml?widget=true&amp;headers=false" width="100%" height="100%" style="border:none; border-radius: 8px;"></iframe>
+        <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRw6n_3d87vAX6DVNmEZ-JwkOYDQcB1scVLhghcY6Cxam8Oq9VEvz1xhMvF89KOsGGJWZFxdNhCE5lZ/pubhtml?widget=true&amp;headers=false" width="100%" height="100%" style="border:none; border-radius: 8px;"></iframe>
     </div>
 </div>
 
@@ -415,7 +415,7 @@
         body += `\nTILLSYN: ${data.tillsyn} ${data.tillsyn_kom}\nRENGÖRING: ${data.rengoring} ${data.rengoring_kom}\n\nDRIFT: ${data.drift}\nAVVIKELSE: ${data.avvikelse}\nÅTGÄRD: ${data.atgard}`;
 
         const mail = ["rapport.vovlo@samhall.se", "volvooc@samhall.onmicrosoft.com"].join(navigator.userAgent.toLowerCase().includes("windows")?";":",");
-        window.location.href = `mailto:${mail}?subject=${encodeURIComponent("Skiftrapport "+data.datum)}&body=${encodeURIComponent(body)}`;
+        window.location.href = `mailto:${mail}?subject=${encodeURIComponent("Skiftrapport "+ data.skift + "data.datum)}&body=${encodeURIComponent(body)}`;
         setTimeout(() => { btn.disabled = false; btn.innerText = "Skicka Rapport"; }, 3000);
     });
 </script>
