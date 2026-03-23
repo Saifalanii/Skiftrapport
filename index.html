@@ -10,153 +10,40 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     
     <style>
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        :root {
-            --teams-purple: #5b5fc7;
-            --teams-bg: #e8eaed; 
-            --teams-card: #ffffff; 
-            --teams-border: #d1d1d1; 
-            --text-main: #242424;
-            --text-sec: #616161;
-            --danger: #c0392b;
-            --success: #27ae60;
-        }
-
-        body.dark-mode {
-            --teams-bg: #111111;
-            --teams-card: #202020;
-            --teams-border: #444444;
-            --text-main: #ffffff;
-            --text-sec: #adadad;
-            --teams-purple: #7f85f5;
-        }
-
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: var(--teams-bg);
-            color: var(--text-main);
-            line-height: 1.5;
-            transition: background 0.3s;
-            overflow-x: hidden;
-            padding-top: env(safe-area-inset-top);
-        }
-
-        .container {
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 10px 15px 100px 15px;
-        }
-
-        .icon {
-            width: 18px; height: 18px;
-            vertical-align: middle; margin-right: 8px;
-            fill: none; stroke: currentColor; stroke-width: 2;
-            stroke-linecap: round; stroke-linejoin: round;
-        }
-
-        .theme-switch-wrapper {
-            display: flex; align-items: center; justify-content: flex-end;
-            gap: 8px; margin-bottom: 10px;
-        }
-
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        :root { --teams-purple: #5b5fc7; --teams-bg: #e8eaed; --teams-card: #ffffff; --teams-border: #d1d1d1; --text-main: #242424; --text-sec: #616161; --danger: #c0392b; --success: #27ae60; }
+        body.dark-mode { --teams-bg: #111111; --teams-card: #202020; --teams-border: #444444; --text-main: #ffffff; --text-sec: #adadad; --teams-purple: #7f85f5; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; margin: 0; padding: 0; background: var(--teams-bg); color: var(--text-main); line-height: 1.5; transition: background 0.3s; overflow-x: hidden; padding-top: env(safe-area-inset-top); }
+        .container { width: 100%; max-width: 500px; margin: 0 auto; padding: 10px 15px 100px 15px; }
+        .icon { width: 18px; height: 18px; vertical-align: middle; margin-right: 8px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .theme-switch-wrapper { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-bottom: 10px; }
         .theme-switch { display: inline-block; height: 20px; position: relative; width: 38px; }
         .theme-switch input { display: none; }
-        .slider {
-            background-color: #ccc; bottom: 0; cursor: pointer; left: 0;
-            position: absolute; right: 0; top: 0; transition: .4s; border-radius: 34px;
-        }
-        .slider:before {
-            background-color: #fff; bottom: 2px; content: ""; height: 16px; left: 2px;
-            position: absolute; transition: .4s; width: 16px; border-radius: 50%;
-        }
+        .slider { background-color: #ccc; bottom: 0; cursor: pointer; left: 0; position: absolute; right: 0; top: 0; transition: .4s; border-radius: 34px; }
+        .slider:before { background-color: #fff; bottom: 2px; content: ""; height: 16px; left: 2px; position: absolute; transition: .4s; width: 16px; border-radius: 50%; }
         input:checked + .slider { background-color: var(--success); }
         input:checked + .slider:before { transform: translateX(18px); }
-
         h2 { text-align: center; margin: 15px 0; font-size: 1.3rem; display: flex; align-items: center; justify-content: center; }
-
-        .card {
-            background: var(--teams-card);
-            padding: 16px; border-radius: 12px;
-            border: 1px solid var(--teams-border);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08); 
-            margin-bottom: 16px; width: 100%;
-        }
-
+        .card { background: var(--teams-card); padding: 16px; border-radius: 12px; border: 1px solid var(--teams-border); box-shadow: 0 4px 10px rgba(0,0,0,0.08); margin-bottom: 16px; width: 100%; }
         label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 0.85rem; }
-
-        input, select, textarea {
-            width: 100%; padding: 12px; margin-bottom: 15px;
-            border-radius: 8px; border: 1px solid var(--teams-border);
-            font-size: 16px; background-color: var(--teams-card);
-            color: var(--text-main); outline: none; -webkit-appearance: none;
-        }
-
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid var(--teams-border); font-size: 16px; background-color: var(--teams-card); color: var(--text-main); outline: none; -webkit-appearance: none; }
         .error-border { border: 2px solid var(--danger) !important; background-color: rgba(192, 57, 43, 0.05); }
-
-        .segmented-control {
-            display: flex; background: var(--teams-bg);
-            padding: 4px; border-radius: 8px; margin-bottom: 15px;
-            border: 1px solid var(--teams-border);
-        }
-
-        .segment-btn {
-            flex: 1; border: none; padding: 10px 5px; background: transparent;
-            color: var(--text-sec); font-weight: 600; font-size: 0.8rem;
-            border-radius: 6px; cursor: pointer;
-        }
-
+        .segmented-control { display: flex; background: var(--teams-bg); padding: 4px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--teams-border); }
+        .segment-btn { flex: 1; border: none; padding: 10px 5px; background: transparent; color: var(--text-sec); font-weight: 600; font-size: 0.8rem; border-radius: 6px; cursor: pointer; }
         .segment-btn.active { background: var(--teams-card); color: var(--teams-purple); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .segment-btn.active.nok { color: var(--danger); }
-
-        .button-group { 
-            display: flex; 
-            flex-wrap: wrap;
-            gap: 10px; 
-            margin-top: 10px;
-            width: 100%;
-        }
-
-        button {
-            padding: 14px 10px; border: none; border-radius: 8px;
-            font-size: 15px; font-weight: 600; cursor: pointer;
-            display: inline-flex; align-items: center; justify-content: center;
-            min-width: 120px;
-        }
-
+        .button-group { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; width: 100%; }
+        button { padding: 14px 10px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; min-width: 120px; }
         .primary { background: var(--teams-purple); color: white; flex: 1 1 200px; }
         .secondary { background: var(--teams-card); color: var(--text-main); border: 1px solid var(--teams-border); flex: 1 1 100px; }
         .add-btn { background: var(--success); color: white; margin-top: 5px; width: 100%; min-width: 100%; }
         .danger { background: var(--danger); color: white; }
-
         .hidden { display: none; }
-
-        .list-container {
-            margin-top: 10px; background: var(--teams-bg);
-            padding: 12px; border-radius: 8px; border-left: 4px solid var(--teams-purple);
-        }
-
-        .list-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 8px 0; border-bottom: 1px solid var(--teams-border); font-size: 0.9rem;
-        }
-
-        .modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); display: none; align-items: center;
-            justify-content: center; z-index: 1000;
-        }
-
-        .modal-content {
-            background: var(--teams-card); width: 95%; max-width: 800px;
-            border-radius: 12px; padding: 15px;
-        }
+        .list-container { margin-top: 10px; background: var(--teams-bg); padding: 12px; border-radius: 8px; border-left: 4px solid var(--teams-purple); }
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--teams-border); font-size: 0.9rem; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: var(--teams-card); width: 95%; max-width: 800px; border-radius: 12px; padding: 15px; }
+        .save-status { font-size: 0.7rem; color: var(--text-sec); text-align: center; margin-bottom: 10px; min-height: 1em; }
     </style>
 </head>
 <body>
@@ -182,6 +69,9 @@
 
     <form id="reportForm">
         <div class="card">
+            <label for="signatur">Rapportör (Namn)</label>
+            <input type="text" id="signatur" placeholder="Ditt namn">
+
             <label for="datum">Datum</label>
             <input type="date" id="datum">
 
@@ -275,6 +165,8 @@
             <textarea id="atgard" placeholder="Vad gjordes för att lösa problemen?"></textarea>
         </div>
 
+        <div id="saveMsg" class="save-status"></div>
+
         <div class="button-group">
             <button type="button" class="secondary" onclick="clearForm()">Rensa</button>
             <button type="submit" id="submitBtn" class="primary">Skicka Rapport</button>
@@ -292,20 +184,14 @@
 <script>
     let truckArray = [];
     let machineArray = [];
-
-    // --- AUTO-SAVE LOGIK ---
-    const fieldIds = ['avdelning', 'truck', 'maskin', 'tillsyn', 'tillsynfel', 'rengoring', 'rengoringKommentar', 'drift', 'avvikelse', 'atgard'];
+    const fieldIds = ['signatur', 'avdelning', 'truck', 'maskin', 'tillsyn', 'tillsynfel', 'rengoring', 'rengoringKommentar', 'drift', 'avvikelse', 'atgard'];
 
     function saveToDraft() {
-        const draft = {
-            truckArray,
-            machineArray,
-            fields: {}
-        };
-        fieldIds.forEach(id => {
-            draft.fields[id] = document.getElementById(id).value;
-        });
+        const draft = { truckArray, machineArray, fields: {} };
+        fieldIds.forEach(id => { draft.fields[id] = document.getElementById(id).value; });
         localStorage.setItem('reportDraft', JSON.stringify(draft));
+        const now = new Date();
+        document.getElementById('saveMsg').innerText = "Utkast sparat lokalt: " + now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
     }
 
     function loadDraft() {
@@ -314,15 +200,11 @@
             const draft = JSON.parse(saved);
             truckArray = draft.truckArray || [];
             machineArray = draft.machineArray || [];
-            
             Object.keys(draft.fields).forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
                     el.value = draft.fields[id];
-                    // Uppdatera utseendet på OK/NOK knappar baserat på sparat värde
-                    if(['truck', 'maskin', 'tillsyn', 'rengoring'].includes(id)) {
-                        setSegment(id, el.value, false); // false för att inte spara igen under laddning
-                    }
+                    if(['truck', 'maskin', 'tillsyn', 'rengoring'].includes(id)) setSegment(id, el.value, false);
                 }
             });
             renderList('truck');
@@ -332,116 +214,89 @@
 
     window.onload = function() {
         document.getElementById('datum').valueAsDate = new Date();
-        if (localStorage.getItem('theme') === 'dark') {
-            document.body.classList.add('dark-mode');
-            document.getElementById('darkmodeToggle').checked = true;
-        }
-        
+        if (localStorage.getItem('theme') === 'dark') { document.body.classList.add('dark-mode'); document.getElementById('darkmodeToggle').checked = true; }
         loadDraft();
-
-        // Lägg till lyssnare på alla textfält för auto-save
-        fieldIds.forEach(id => {
-            document.getElementById(id).addEventListener('input', saveToDraft);
-        });
+        fieldIds.forEach(id => { document.getElementById(id).addEventListener('input', saveToDraft); });
     };
 
-    function toggleDarkMode() {
-        const isChecked = document.getElementById('darkmodeToggle').checked;
-        document.body.classList.toggle('dark-mode', isChecked);
-        localStorage.setItem('theme', isChecked ? 'dark' : 'light');
-    }
+    function toggleDarkMode() { const isChecked = document.getElementById('darkmodeToggle').checked; document.body.classList.toggle('dark-mode', isChecked); localStorage.setItem('theme', isChecked ? 'dark' : 'light'); }
 
     function setSegment(type, val, shouldSave = true) {
         const okBtn = document.getElementById(`btn-${type}-ok`);
         const nokBtn = document.getElementById(`btn-${type}-nok`);
         document.getElementById(type).value = val;
-        
+        const container = document.getElementById(type + (['truck', 'maskin'].includes(type) ? 'Container' : 'Box'));
         if (val === 'OK') {
             okBtn.classList.add('active'); nokBtn.classList.remove('active', 'nok');
-            if(type === 'truck') toggleSection('truckContainer', 'OK');
-            if(type === 'maskin') toggleSection('maskinContainer', 'OK');
-            if(type === 'tillsyn') document.getElementById('tillsynBox').classList.add('hidden');
-            if(type === 'rengoring') document.getElementById('rengoringBox').classList.add('hidden');
+            container.classList.add('hidden');
         } else {
             nokBtn.classList.add('active', 'nok'); okBtn.classList.remove('active');
-            if(type === 'truck') toggleSection('truckContainer', 'NOK');
-            if(type === 'maskin') toggleSection('maskinContainer', 'NOK');
-            if(type === 'tillsyn') document.getElementById('tillsynBox').classList.remove('hidden');
-            if(type === 'rengoring') document.getElementById('rengoringBox').classList.remove('hidden');
+            container.classList.remove('hidden');
         }
         if(shouldSave) saveToDraft();
-    }
-
-    function toggleSection(id, val) {
-        const el = document.getElementById(id);
-        if (val === "NOK") el.classList.remove('hidden');
-        else { 
-            el.classList.add('hidden'); 
-        }
     }
 
     function addItem(type) {
         const idEl = document.getElementById(type === 'truck' ? 'truckId' : 'machineId');
         const felEl = document.getElementById(type === 'truck' ? 'truckFel' : 'machineFel');
         const komEl = document.getElementById(type === 'truck' ? 'truckKom' : 'machineKom');
-        idEl.classList.remove('error-border'); felEl.classList.remove('error-border');
-        if (!idEl.value || !felEl.value) {
-            if(!idEl.value) idEl.classList.add('error-border');
-            if(!felEl.value) felEl.classList.add('error-border');
-            return alert("Välj både enhet och feltyp.");
-        }
+        if (!idEl.value || !felEl.value) return alert("Välj både enhet och feltyp.");
         const item = { id: idEl.value, fel: felEl.value, kom: komEl.value };
         if (type === 'truck') truckArray.push(item); else machineArray.push(item);
         idEl.value = ""; felEl.value = ""; komEl.value = ""; 
-        renderList(type);
-        saveToDraft();
+        renderList(type); saveToDraft();
     }
 
-    function removeItem(type, index) { 
-        if (type === 'truck') truckArray.splice(index, 1); 
-        else machineArray.splice(index, 1); 
-        renderList(type);
-        saveToDraft();
-    }
+    function removeItem(type, index) { if (type === 'truck') truckArray.splice(index, 1); else machineArray.splice(index, 1); renderList(type); saveToDraft(); }
 
     function renderList(type) {
         const listDiv = document.getElementById(type === 'truck' ? 'truckList' : 'machineList');
         const arr = (type === 'truck') ? truckArray : machineArray;
         if (arr.length === 0) { listDiv.classList.add('hidden'); return; }
         listDiv.classList.remove('hidden');
-        listDiv.innerHTML = arr.map((item, index) => `<div class="list-item"><span><strong>${item.id}</strong>: ${item.fel}</span><button type="button" style="width:auto; padding:4px 8px; font-size:12px; min-width:auto;" class="danger" onclick="removeItem('${type}', ${index})">Ta bort</button></div>`).join('');
+        listDiv.innerHTML = arr.map((item, index) => `<div class="list-item"><span><strong>${item.id}</strong>: ${item.fel}</span><button type="button" class="danger" style="width:auto; padding:4px 8px; min-width:auto;" onclick="removeItem('${type}', ${index})">Ta bort</button></div>`).join('');
     }
 
-    function getSkift() {
-        const now = new Date(); const mins = now.getHours() * 60 + now.getMinutes();
-        if (mins >= 350 && mins <= 480) return "Nattskift";
-        if (mins >= 840 && mins <= 1020) return "Dagskift";
-        if (mins >= 1320 || mins <= 120) return "Kvällsskift";
-        return "Okänt skift";
-    }
-
+    function getSkift() { const now = new Date(); const mins = now.getHours() * 60 + now.getMinutes(); if (mins >= 350 && mins <= 480) return "Nattskift"; if (mins >= 840 && mins <= 1020) return "Dagskift"; if (mins >= 1320 || mins <= 120) return "Kvällsskift"; return "Okänt skift"; }
     function openStats(){ document.getElementById("statsModal").style.display = "flex"; }
     function closeStats(){ document.getElementById("statsModal").style.display = "none"; }
-    
+
     function clearForm() { 
-        if(confirm("Rensa formuläret? Detta raderar även sparade utkast.")) {
-            localStorage.removeItem('reportDraft');
-            location.reload();
-        }
+        if(confirm("Vill du rensa rapporten? (Ditt namn ligger kvar)")) {
+            // Spara undan namnet
+            const currentName = document.getElementById('signatur').value;
+            // Töm arrays
+            truckArray = [];
+            machineArray = [];
+            // Töm alla fält utom signatur
+            fieldIds.forEach(id => {
+                if(id !== 'signatur') {
+                    const el = document.getElementById(id);
+                    if(el.tagName === "SELECT") el.selectedIndex = 0;
+                    else if(id === 'truck' || id === 'maskin' || id === 'tillsyn' || id === 'rengoring') setSegment(id, 'OK', false);
+                    else el.value = "";
+                }
+            });
+            // Uppdatera listorna visuellt
+            renderList('truck');
+            renderList('machine');
+            // Spara det "rensade" utkastet (med namnet kvar)
+            saveToDraft();
+            // Sätt datum till idag igen
+            document.getElementById('datum').valueAsDate = new Date();
+        } 
     }
 
     document.getElementById('reportForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const avdelning = document.getElementById('avdelning');
-        avdelning.classList.remove('error-border');
-        if (!avdelning.value) { avdelning.classList.add('error-border'); return alert("Du måste välja avdelning!"); }
-        if (document.getElementById('truck').value === "NOK" && truckArray.length === 0) { document.getElementById('truckId').classList.add('error-border'); return alert("Lägg till truckfel!"); }
-
+        const sign = document.getElementById('signatur');
+        if (!sign.value) { sign.classList.add('error-border'); return alert("Skriv ditt namn!"); }
+        
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.disabled = true; submitBtn.innerText = "Skickar...";
 
         const formData = {
-            datum: document.getElementById('datum').value, avdelning: document.getElementById('avdelning').value,
+            signatur: sign.value, datum: document.getElementById('datum').value, avdelning: document.getElementById('avdelning').value,
             skift: getSkift(), truckstatus: document.getElementById('truck').value, truckar: truckArray,
             maskin: document.getElementById('maskin').value, maskiner: machineArray,
             tillsyn: document.getElementById('tillsyn').value, tillsynfel: document.getElementById('tillsynfel').value,
@@ -450,18 +305,23 @@
         };
 
         try { 
-            await fetch("https://script.google.com/macros/s/AKfycbx6pDfJb_p89d4Me6FOVcjTr6rz-_kfThHanWGja5hvSPO3OW_UA8wmdk-F6Rt9Q-J-UA/exec", { method: "POST", mode: "no-cors", body: JSON.stringify(formData) }); 
-            // Töm utkastet när rapporten skickats
-            localStorage.removeItem('reportDraft');
-        } catch (err) {}
+            // Glöm inte att byta URL här när du flyttat kalkylbladet!
+            await fetch("https://script.google.com/macros/s/AKfycbxaYnGQ7JXTntbGZ84HdadijNIcLI6rhzsMgQxMHjDmBI6iXMj688z4swBjgxI5tERI/exec", { method: "POST", mode: "no-cors", body: JSON.stringify(formData) }); 
+            // Vi rensar INTE namnet från localStorage ens vid skicka
+            const draft = JSON.parse(localStorage.getItem('reportDraft'));
+            const cleanDraft = { truckArray: [], machineArray: [], fields: { signatur: formData.signatur } };
+            localStorage.setItem('reportDraft', JSON.stringify(cleanDraft));
+            alert("Rapport skickad och utkast rensat (namn sparat).");
+            location.reload();
+        } catch (err) {
+            alert("Kunde inte skicka till Google. Kontrollera nätet.");
+        }
 
-        let mailBody = `SKIFTRAPPORT - ${formData.datum}\nSkift: ${formData.skift}\nAvdelning: ${formData.avdelning}\n\nTruckstatus: ${formData.truckstatus}\n`;
+        let mailBody = `SKIFTRAPPORT - ${formData.datum}\nRapportör: ${formData.signatur}\nAvdelning: ${formData.avdelning}\n\nTruckstatus: ${formData.truckstatus}\n`;
         truckArray.forEach(t => mailBody += `- ${t.id}: ${t.fel}\n`);
-        mailBody += `\nDriftstörningar:\n${formData.drift}`;
-
-        const isWindows = navigator.userAgent.toLowerCase().includes("windows");
-        const emails = ["rapport.vovlo@samhall.se", "volvooc@samhall.onmicrosoft.com"].join(isWindows ? ";" : ",");
-        window.location.href = `mailto:${emails}?subject=${encodeURIComponent("Skiftrapport " + formData.datum)}&body=${encodeURIComponent(mailBody)}`;
+        
+        const emails = ["rapport.vovlo@samhall.se", "volvooc@samhall.onmicrosoft.com"].join(",");
+        window.location.href = `mailto:${emails}?subject=${encodeURIComponent("Skiftrapport " + formData.datum + " - " + formData.signatur)}&body=${encodeURIComponent(mailBody)}`;
 
         setTimeout(() => { submitBtn.disabled = false; submitBtn.innerText = "Skicka Rapport"; }, 3000);
     });
