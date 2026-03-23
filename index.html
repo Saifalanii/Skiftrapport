@@ -41,12 +41,14 @@
             color: var(--text-main);
             line-height: 1.5;
             transition: background 0.3s;
+            overflow-x: hidden; /* Förhindrar horisontell scroll */
         }
 
         .container {
+            width: 100%;
             max-width: 500px;
             margin: 0 auto;
-            padding: 12px;
+            padding: 15px; /* Ökad padding för andningsrum */
         }
 
         .icon {
@@ -97,11 +99,12 @@
 
         .card {
             background: var(--teams-card);
-            padding: 20px;
+            padding: 16px;
             border-radius: 12px;
             border: 1px solid var(--teams-border);
             box-shadow: 0 4px 10px rgba(0,0,0,0.08); 
-            margin-bottom: 20px;
+            margin-bottom: 16px;
+            width: 100%; /* Säkerställ att kortet inte går utanför */
         }
 
         label {
@@ -109,22 +112,32 @@
             font-size: 0.85rem; color: var(--text-main);
         }
 
+        /* Fix för iPhone breddproblem på input/select/textarea */
         input, select, textarea {
-            width: 100%; padding: 10px; margin-bottom: 15px;
-            border-radius: 8px; border: 1px solid var(--teams-border);
-            font-size: 16px; background-color: var(--teams-card);
-            color: var(--text-main); outline: none;
+            width: 100%; 
+            max-width: 100%;
+            padding: 12px; 
+            margin-bottom: 15px;
+            border-radius: 8px; 
+            border: 1px solid var(--teams-border);
+            font-size: 16px; /* Förhindrar auto-zoom på iPhone */
+            background-color: var(--teams-card);
+            color: var(--text-main); 
+            outline: none;
+            -webkit-appearance: none; /* Tar bort Safaris standard-styling */
+            display: block;
         }
 
         .segmented-control {
             display: flex; background: var(--teams-bg);
             padding: 4px; border-radius: 8px; margin-bottom: 15px;
             border: 1px solid var(--teams-border);
+            width: 100%;
         }
 
         .segment-btn {
-            flex: 1; border: none; padding: 8px; background: transparent;
-            color: var(--text-sec); font-weight: 600; font-size: 0.85rem;
+            flex: 1; border: none; padding: 10px 5px; background: transparent;
+            color: var(--text-sec); font-weight: 600; font-size: 0.8rem;
             border-radius: 6px; cursor: pointer; transition: all 0.2s;
         }
 
@@ -136,15 +149,21 @@
 
         .segment-btn.active.nok { color: var(--danger); }
 
-        .button-group { display: flex; gap: 10px; margin-top: 10px; }
+        /* Fix för knapp-gruppen */
+        .button-group { 
+            display: flex; 
+            gap: 10px; 
+            margin-top: 10px;
+            width: 100%;
+        }
 
         button {
-            padding: 12px; border: none; border-radius: 8px;
+            padding: 14px; border: none; border-radius: 8px;
             font-size: 15px; font-weight: 600; cursor: pointer;
             display: inline-flex; align-items: center; justify-content: center;
         }
 
-        .primary { background: var(--teams-purple); color: white; flex: 2; }
+        .primary { background: var(--teams-purple); color: white; flex: 1; }
         .secondary { background: var(--teams-card); color: var(--text-main); border: 1px solid var(--teams-border); flex: 1; }
         .danger { background: var(--danger); color: white; }
         .add-btn { background: var(--success); color: white; margin-top: 5px; width: 100%; }
@@ -161,8 +180,6 @@
             padding: 8px 0; border-bottom: 1px solid var(--teams-border);
             font-size: 0.9rem;
         }
-
-        .error { border: 2px solid var(--danger) !important; }
 
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -327,7 +344,6 @@
     function setSegment(type, val) {
         const okBtn = document.getElementById(`btn-${type}-ok`);
         const nokBtn = document.getElementById(`btn-${type}-nok`);
-        // Hittar det dolda fältet för status (id="truck", id="maskin" osv)
         document.getElementById(type).value = val;
 
         if (val === 'OK') {
@@ -405,10 +421,7 @@
     document.getElementById('reportForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const avdelning = document.getElementById('avdelning');
-        if (!avdelning.value) { avdelning.classList.add('error'); return alert("Välj avdelning!"); }
-
-        if (document.getElementById('truck').value === "NOK" && truckArray.length === 0) return alert("Lägg till truckfel i listan!");
-        if (document.getElementById('maskin').value === "NOK" && machineArray.length === 0) return alert("Lägg till maskinfel i listan!");
+        if (!avdelning.value) return alert("Välj avdelning!");
 
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.disabled = true; submitBtn.innerText = "Skickar...";
