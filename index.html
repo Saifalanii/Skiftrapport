@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Skiftrapport v1.1.21</title>
+    <title>Skiftrapport v1.1.22</title>
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
     <link rel="manifest" href="manifest.json">
@@ -17,7 +17,6 @@
             --teams-card: #ffffff; --teams-border: #d1d1d1; --text-main: #242424;
             --text-sec: #616161; --danger: #c0392b; --success: #27ae60;
             --base-font: 16px; --label-font: 0.85rem; --h2-font: 1.3rem;
-            --error-glow: 0 0 15px rgba(192, 57, 43, 0.4);
         }
         body.large-text { --base-font: 20px; --label-font: 1.1rem; --h2-font: 1.6rem; }
         body.dark-mode { --teams-bg: #111111; --teams-card: #202020; --teams-border: #444444; --text-main: #ffffff; --text-sec: #adadad; --teams-purple: #7f85f5; }
@@ -46,7 +45,7 @@
         .card { 
             background: var(--teams-card); padding: 20px; border-radius: 12px; 
             border: 1px solid var(--teams-border); box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
-            margin-bottom: 20px; transition: transform 0.2s, box-shadow 0.3s, border-color 0.3s;
+            margin-bottom: 20px;
         }
 
         label { display: block; margin-bottom: 10px; font-weight: bold; font-size: var(--label-font); }
@@ -82,11 +81,11 @@
         .list-container { margin-top: 10px; background: var(--teams-bg); padding: 12px; border-radius: 8px; border-left: 4px solid var(--teams-purple); }
         .list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--teams-border); font-size: 0.9em; }
         
-        /* MODAL FIX FÖR ATT SE FLIKAR */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 1000; }
-        .modal-content { background: #fff; width: 98%; height: 95vh; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; overflow: hidden; }
-        .stats-wrapper { flex: 1; width: 100%; height: 100%; border-radius: 4px; overflow: hidden; -webkit-overflow-scrolling: touch; }
-        iframe.stats-iframe { width: 100%; height: 100%; border: none; }
+        /* MODAL FIX FÖR STATISTIK */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: #fff; width: 98%; height: 96vh; border-radius: 8px; padding: 5px; display: flex; flex-direction: column; }
+        .stats-wrapper { flex: 1; width: 100%; height: 100%; overflow: hidden; position: relative; }
+        iframe.stats-iframe { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
         .version-text { text-align: center; font-size: 10px; color: var(--text-sec); margin-top: 20px; opacity: 0.5; }
     </style>
 </head>
@@ -108,7 +107,7 @@
 
     <button type="button" class="secondary" style="width: 100%; margin-bottom: 15px;" onclick="openStats(); vibrate();">
         <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-        Visa arkiv & flikar
+        Visa Statistik
     </button>
 
     <form id="reportForm" novalidate>
@@ -182,12 +181,12 @@
             <button type="submit" id="submitBtn" class="primary" style="flex:2;" onclick="vibrate(50);">Skicka Rapport</button>
         </div>
     </form>
-    <div class="version-text">v1.1.21 </div>
+    <div class="version-text">v1.1.22 • Statistikvy fixad</div>
 </div>
 
 <div id="statsModal" class="modal">
     <div class="modal-content">
-        <button class="danger" style="margin-bottom: 10px; width: 100%; min-height: 45px;" onclick="closeStats(); vibrate();">STÄNG ARKIVET</button>
+        <button class="danger" style="margin-bottom: 5px; width: 100%; height: 50px;" onclick="closeStats(); vibrate();">STÄNG STATISTIK</button>
         <div class="stats-wrapper">
             <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRw6n_3d87vAX6DVNmEZ-JwkOYDQcB1scVLhghcY6Cxam8Oq9VEvz1xhMvF89KOsGGJWZFxdNhCE5lZ/pubhtml?widget=true&amp;headers=false"></iframe>
         </div>
@@ -205,9 +204,6 @@
             const saved = localStorage.getItem('draft_' + el.id);
             if (saved) { el.value = saved; if (el.type === 'hidden') setSegment(el.id, saved, false); }
         });
-        const sT = localStorage.getItem('draft_truckArray'); const sM = localStorage.getItem('draft_maskinArray');
-        if(sT) { truckArray = JSON.parse(sT); renderList('truck'); }
-        if(sM) { maskinArray = JSON.parse(sM); renderList('maskin'); }
     };
 
     function openStats(){ document.getElementById("statsModal").style.display = "flex"; }
@@ -236,13 +232,11 @@
             const id = document.getElementById('truckId'); const fel = document.getElementById('truckFel'); const kom = document.getElementById('truckKom');
             if (!id.value || !fel.value) return alert("Välj truck och feltyp!");
             truckArray.push({ id: id.value, fel: fel.value, kom: kom.value });
-            localStorage.setItem('draft_truckArray', JSON.stringify(truckArray));
             id.value = ""; fel.value = ""; kom.value = "";
         } else {
             const id = document.getElementById('selectedMachineName').value; const fel = document.getElementById('machineFel'); const kom = document.getElementById('machineKom');
             if (!id || !fel.value) return alert("Välj maskin och feltyp!");
             maskinArray.push({ id: id, fel: fel.value, kom: kom.value });
-            localStorage.setItem('draft_maskinArray', JSON.stringify(maskinArray));
             document.querySelectorAll('.machine-item').forEach(item => item.classList.remove('active'));
             document.getElementById('selectedMachineName').value = ""; fel.value = ""; kom.value = "";
         }
@@ -250,8 +244,8 @@
     }
 
     function removeItem(type, idx) {
-        if(type==='truck') { truckArray.splice(idx, 1); localStorage.setItem('draft_truckArray', JSON.stringify(truckArray)); }
-        else { maskinArray.splice(idx, 1); localStorage.setItem('draft_maskinArray', JSON.stringify(maskinArray)); }
+        if(type==='truck') truckArray.splice(idx, 1);
+        else maskinArray.splice(idx, 1);
         renderList(type);
     }
 
@@ -278,7 +272,6 @@
 
         try { await fetch("https://script.google.com/macros/s/AKfycbwA1WxeZkJhRsWZ62g-9sEFNhMiVEqHygszbWPFXQ0BLCSVObgtt4e2arG848BJLgW0/exec", { method: "POST", body: JSON.stringify(data) }); } catch (err) {}
         
-        // Mail-generering (samma som tidigare)
         let body = `SKIFTRAPPORT - ${data.datum}\nAvdelning: ${data.avdelning}\nRapportör: ${data.signatur}\n\nTRUCKAR:\n`;
         truckArray.forEach(t=>body+=`- ${t.id}: ${t.fel}\n`);
         body += `\nINFO: ${data.drift}`;
