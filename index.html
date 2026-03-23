@@ -44,7 +44,6 @@
             line-height: 1.5;
             transition: background 0.3s;
             overflow-x: hidden;
-            /* Stöd för iPhones rundade hörn (Safe Area) */
             padding-top: env(safe-area-inset-top);
         }
 
@@ -52,7 +51,7 @@
             width: 100%;
             max-width: 500px;
             margin: 0 auto;
-            padding: 10px 15px 100px 15px; /* 100px i botten för extra scroll-utrymme */
+            padding: 10px 15px 100px 15px;
         }
 
         .icon {
@@ -116,10 +115,9 @@
         .segment-btn.active { background: var(--teams-card); color: var(--teams-purple); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .segment-btn.active.nok { color: var(--danger); }
 
-        /* UPPDATERAD KNAPP-GRUPP */
         .button-group { 
             display: flex; 
-            flex-wrap: wrap; /* Tillåter knapparna att hoppa ner om det är för trångt */
+            flex-wrap: wrap;
             gap: 10px; 
             margin-top: 10px;
             width: 100%;
@@ -129,7 +127,7 @@
             padding: 14px 10px; border: none; border-radius: 8px;
             font-size: 15px; font-weight: 600; cursor: pointer;
             display: inline-flex; align-items: center; justify-content: center;
-            min-width: 120px; /* Säkrar att de inte blir för små */
+            min-width: 120px;
         }
 
         .primary { background: var(--teams-purple); color: white; flex: 1 1 200px; }
@@ -295,12 +293,56 @@
     let truckArray = [];
     let machineArray = [];
 
+    // --- AUTO-SAVE LOGIK ---
+    const fieldIds = ['avdelning', 'truck', 'maskin', 'tillsyn', 'tillsynfel', 'rengoring', 'rengoringKommentar', 'drift', 'avvikelse', 'atgard'];
+
+    function saveToDraft() {
+        const draft = {
+            truckArray,
+            machineArray,
+            fields: {}
+        };
+        fieldIds.forEach(id => {
+            draft.fields[id] = document.getElementById(id).value;
+        });
+        localStorage.setItem('reportDraft', JSON.stringify(draft));
+    }
+
+    function loadDraft() {
+        const saved = localStorage.getItem('reportDraft');
+        if (saved) {
+            const draft = JSON.parse(saved);
+            truckArray = draft.truckArray || [];
+            machineArray = draft.machineArray || [];
+            
+            Object.keys(draft.fields).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.value = draft.fields[id];
+                    // Uppdatera utseendet på OK/NOK knappar baserat på sparat värde
+                    if(['truck', 'maskin', 'tillsyn', 'rengoring'].includes(id)) {
+                        setSegment(id, el.value, false); // false för att inte spara igen under laddning
+                    }
+                }
+            });
+            renderList('truck');
+            renderList('machine');
+        }
+    }
+
     window.onload = function() {
         document.getElementById('datum').valueAsDate = new Date();
         if (localStorage.getItem('theme') === 'dark') {
             document.body.classList.add('dark-mode');
             document.getElementById('darkmodeToggle').checked = true;
         }
+        
+        loadDraft();
+
+        // Lägg till lyssnare på alla textfält för auto-save
+        fieldIds.forEach(id => {
+            document.getElementById(id).addEventListener('input', saveToDraft);
+        });
     };
 
     function toggleDarkMode() {
@@ -309,10 +351,11 @@
         localStorage.setItem('theme', isChecked ? 'dark' : 'light');
     }
 
-    function setSegment(type, val) {
+    function setSegment(type, val, shouldSave = true) {
         const okBtn = document.getElementById(`btn-${type}-ok`);
         const nokBtn = document.getElementById(`btn-${type}-nok`);
         document.getElementById(type).value = val;
+        
         if (val === 'OK') {
             okBtn.classList.add('active'); nokBtn.classList.remove('active', 'nok');
             if(type === 'truck') toggleSection('truckContainer', 'OK');
@@ -326,12 +369,15 @@
             if(type === 'tillsyn') document.getElementById('tillsynBox').classList.remove('hidden');
             if(type === 'rengoring') document.getElementById('rengoringBox').classList.remove('hidden');
         }
+        if(shouldSave) saveToDraft();
     }
 
     function toggleSection(id, val) {
         const el = document.getElementById(id);
         if (val === "NOK") el.classList.remove('hidden');
-        else { el.classList.add('hidden'); if(id === 'truckContainer') truckArray = []; if(id === 'maskinContainer') machineArray = []; renderList(id === 'truckContainer' ? 'truck' : 'machine'); }
+        else { 
+            el.classList.add('hidden'); 
+        }
     }
 
     function addItem(type) {
@@ -346,10 +392,17 @@
         }
         const item = { id: idEl.value, fel: felEl.value, kom: komEl.value };
         if (type === 'truck') truckArray.push(item); else machineArray.push(item);
-        idEl.value = ""; felEl.value = ""; komEl.value = ""; renderList(type);
+        idEl.value = ""; felEl.value = ""; komEl.value = ""; 
+        renderList(type);
+        saveToDraft();
     }
 
-    function removeItem(type, index) { if (type === 'truck') truckArray.splice(index, 1); else machineArray.splice(index, 1); renderList(type); }
+    function removeItem(type, index) { 
+        if (type === 'truck') truckArray.splice(index, 1); 
+        else machineArray.splice(index, 1); 
+        renderList(type);
+        saveToDraft();
+    }
 
     function renderList(type) {
         const listDiv = document.getElementById(type === 'truck' ? 'truckList' : 'machineList');
@@ -369,7 +422,13 @@
 
     function openStats(){ document.getElementById("statsModal").style.display = "flex"; }
     function closeStats(){ document.getElementById("statsModal").style.display = "none"; }
-    function clearForm() { if(confirm("Rensa formuläret?")) location.reload(); }
+    
+    function clearForm() { 
+        if(confirm("Rensa formuläret? Detta raderar även sparade utkast.")) {
+            localStorage.removeItem('reportDraft');
+            location.reload();
+        }
+    }
 
     document.getElementById('reportForm').addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -390,7 +449,11 @@
             drift: document.getElementById('drift').value, avvikelse: document.getElementById('avvikelse').value, atgard: document.getElementById('atgard').value
         };
 
-        try { await fetch("https://script.google.com/macros/s/AKfycbx6pDfJb_p89d4Me6FOVcjTr6rz-_kfThHanWGja5hvSPO3OW_UA8wmdk-F6Rt9Q-J-UA/exec", { method: "POST", mode: "no-cors", body: JSON.stringify(formData) }); } catch (err) {}
+        try { 
+            await fetch("https://script.google.com/macros/s/AKfycbx6pDfJb_p89d4Me6FOVcjTr6rz-_kfThHanWGja5hvSPO3OW_UA8wmdk-F6Rt9Q-J-UA/exec", { method: "POST", mode: "no-cors", body: JSON.stringify(formData) }); 
+            // Töm utkastet när rapporten skickats
+            localStorage.removeItem('reportDraft');
+        } catch (err) {}
 
         let mailBody = `SKIFTRAPPORT - ${formData.datum}\nSkift: ${formData.skift}\nAvdelning: ${formData.avdelning}\n\nTruckstatus: ${formData.truckstatus}\n`;
         truckArray.forEach(t => mailBody += `- ${t.id}: ${t.fel}\n`);
