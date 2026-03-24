@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Skiftrapport</title>
+    
     <link rel="icon" type="image/png" href="icon.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
-    <link rel="manifest" href="manifest.json">
+    <link rel="shortcut icon" href="icon.png"> <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
+    <meta name="mobile-web-app-capable" content="yes"> <link rel="manifest" href="manifest.json">
+    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
@@ -108,11 +110,11 @@
     <div class="header-controls">
         <div class="switch-group">
             <span style="font-size: 11px; font-weight: 600;">Stor text</span>
-            <label class="theme-switch"><input type="checkbox" id="largeTextToggle" onclick="toggleLargeText(); vibrate();"><div class="slider"></div></label>
+            <label class="theme-switch"><input type="checkbox" id="largeTextToggle" onclick="toggleLargeText(); vibrate(30);"><div class="slider"></div></label>
         </div>
         <div class="switch-group">
             <span style="font-size: 11px; font-weight: 600;">Mörkt läge</span>
-            <label class="theme-switch"><input type="checkbox" id="darkmodeToggle" onclick="toggleDarkMode(); vibrate();"><div class="slider"></div></label>
+            <label class="theme-switch"><input type="checkbox" id="darkmodeToggle" onclick="toggleDarkMode(); vibrate(30);"><div class="slider"></div></label>
         </div>
     </div>
 
@@ -121,7 +123,7 @@
         Skiftrapport
     </h2>
 
-    <button class="secondary" style="width: 100%; margin-bottom: 15px;" onclick="openStats(); vibrate();">
+    <button class="secondary" style="width: 100%; margin-bottom: 15px;" onclick="openStats(); vibrate(30);">
         <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
         Visa statistik
     </button>
@@ -135,16 +137,18 @@
             <label>Avdelning *</label>
             <select id="avdelning" required class="save-data">
                 <option value="">-- Välj avdelning --</option>
-                <option value="TVS">TVS</option>
-                <option value="TPB">TPB</option>
+                <option value="TVS-Inne">TVS-Inne</option>
+                <option value="TVS-Ute">TVS-Ute</option>
+                <option value="TPB-Inne">TPB-Inne</option>
+                <option value="TPB-Ute">TPB-Ute</option>
             </select>
         </div>
 
         <div class="card" id="card-truck">
             <label>Truckstatus</label>
             <div class="segmented-control">
-                <button type="button" class="segment-btn active" id="btn-truck-ok" onclick="setSegment('truck', 'OK'); vibrate();">OK</button>
-                <button type="button" class="segment-btn" id="btn-truck-nok" onclick="setSegment('truck', 'NOK'); vibrate();">Felanmälan (NOK)</button>
+                <button type="button" class="segment-btn active" id="btn-truck-ok" onclick="setSegment('truck', 'OK'); vibrate(30);">OK</button>
+                <button type="button" class="segment-btn" id="btn-truck-nok" onclick="setSegment('truck', 'NOK'); vibrate(30);">Felanmälan (NOK)</button>
             </div>
             <input type="hidden" id="truck" value="OK" class="save-data">
             <div id="truckContainer" class="hidden">
@@ -157,7 +161,7 @@
                     <option>Hydraulik/Olja</option><option>Chassi</option><option>Stativ</option><option>Batteri</option><option>Drag</option><option>Däck</option><option>Linde Connect</option><option>Övrigt</option>
                 </select>
                 <textarea id="truckKom" placeholder="Kommentar..."></textarea>
-                <button type="button" class="add-btn" onclick="addItem('truck'); vibrate();">➕ Lägg till i listan</button>
+                <button type="button" class="add-btn" onclick="addItem('truck'); vibrate(30);">➕ Lägg till i listan</button>
                 <div id="truckList" class="list-container hidden"></div>
             </div>
         </div>
@@ -165,30 +169,30 @@
         <div class="card" id="card-maskin">
             <label>Maskiner & Verktyg</label>
             <div class="segmented-control">
-                <button type="button" class="segment-btn active" id="btn-maskin-ok" onclick="setSegment('maskin', 'OK'); vibrate();">OK</button>
-                <button type="button" class="segment-btn" id="btn-maskin-nok" onclick="setSegment('maskin', 'Felanmälan (NOK)'); vibrate();">Felanmälan (NOK)</button>
+                <button type="button" class="segment-btn active" id="btn-maskin-ok" onclick="setSegment('maskin', 'OK'); vibrate(30);">OK</button>
+                <button type="button" class="segment-btn" id="btn-maskin-nok" onclick="setSegment('maskin', 'Felanmälan (NOK)'); vibrate(30);">Felanmälan (NOK)</button>
             </div>
             <input type="hidden" id="maskin" value="OK" class="save-data">
             <div id="maskinContainer" class="hidden">
                 <label>Välj:</label>
                 <div class="machine-grid">
-                    <div class="machine-item" onclick="selectMachine('Ergopack', this); vibrate();">
+                    <div class="machine-item" onclick="selectMachine('Ergopack', this); vibrate(30);">
                         <div class="machine-circle"><img src="ergopack.png" alt="Ergo"></div>
                         <div class="machine-label">Ergopack</div>
                     </div>
-                    <div class="machine-item" onclick="selectMachine('Bandmaskin', this); vibrate();">
+                    <div class="machine-item" onclick="selectMachine('Bandmaskin', this); vibrate(30);">
                         <div class="machine-circle"><img src="bandning.png" alt="Band"></div>
                         <div class="machine-label">Bandmaskin</div>
                     </div>
-                    <div class="machine-item" onclick="selectMachine('Movexx', this); vibrate();">
+                    <div class="machine-item" onclick="selectMachine('Movexx', this); vibrate(30);">
                         <div class="machine-circle"><img src="Movexx.png" alt="Pall"></div>
                         <div class="machine-label">Movexx</div>
                     </div>
-                    <div class="machine-item" onclick="selectMachine('Pallyftare', this); vibrate();">
+                    <div class="machine-item" onclick="selectMachine('Pallyftare', this); vibrate(30);">
                         <div class="machine-circle"><img src="pallyft.png" alt="drag"></div>
                         <div class="machine-label">Pallyftare</div>
                     </div>
-                    <div class="machine-item" onclick="selectMachine('Övrigt', this); vibrate();">
+                    <div class="machine-item" onclick="selectMachine('Övrigt', this); vibrate(30);">
                         <div class="machine-circle"><img src="ovrigt.png" alt="Ovr"></div>
                         <div class="machine-label">Övrigt</div>
                     </div>
@@ -208,7 +212,7 @@
                     <option>Mekaniskt</option><option>Elektriskt</option><option>Lokal</option><option>Annat</option>
                 </select>
                 <textarea id="machineKom" placeholder="Kommentar..."></textarea>
-                <button type="button" class="add-btn" onclick="addItem('maskin'); vibrate();">➕ Lägg till i listan</button>
+                <button type="button" class="add-btn" onclick="addItem('maskin'); vibrate(30);">➕ Lägg till i listan</button>
                 <div id="maskinList" class="list-container hidden"></div>
             </div>
         </div>
@@ -217,16 +221,16 @@
             <label>Tillsyn & Rengöring</label>
             <label style="font-weight: normal; font-size: 0.8em;">Daglig tillsyn truckar</label>
             <div class="segmented-control">
-                <button type="button" class="segment-btn active" id="btn-tillsyn-ok" onclick="setSegment('tillsyn', 'OK'); vibrate();">OK</button>
-                <button type="button" class="segment-btn" id="btn-tillsyn-nok" onclick="setSegment('tillsyn', 'NOK'); vibrate();">NOK</button>
+                <button type="button" class="segment-btn active" id="btn-tillsyn-ok" onclick="setSegment('tillsyn', 'OK'); vibrate(30);">OK</button>
+                <button type="button" class="segment-btn" id="btn-tillsyn-nok" onclick="setSegment('tillsyn', 'NOK'); vibrate(30);">NOK</button>
             </div>
             <input type="hidden" id="tillsyn" value="OK" class="save-data">
             <div id="tillsynBox" class="hidden"><textarea id="tillsynfel" placeholder="Orsak?" class="save-data"></textarea></div>
 
             <label style="font-weight: normal; font-size: 0.8em;">Rengöring Bandningsmaskiner</label>
             <div class="segmented-control">
-                <button type="button" class="segment-btn active" id="btn-rengoring-ok" onclick="setSegment('rengoring', 'OK'); vibrate();">OK</button>
-                <button type="button" class="segment-btn" id="btn-rengoring-nok" onclick="setSegment('rengoring', 'Ej utfört'); vibrate();">Ej utfört</button>
+                <button type="button" class="segment-btn active" id="btn-rengoring-ok" onclick="setSegment('rengoring', 'OK'); vibrate(30);">OK</button>
+                <button type="button" class="segment-btn" id="btn-rengoring-nok" onclick="setSegment('rengoring', 'Ej utfört'); vibrate(30);">Ej utfört</button>
             </div>
             <input type="hidden" id="rengoring" value="OK" class="save-data">
             <div id="rengoringBox" class="hidden"><textarea id="rengoringKommentar" placeholder="Orsak?" class="save-data"></textarea></div>
@@ -240,16 +244,16 @@
         </div>
 
         <div class="button-group" style="display: flex; gap: 10px;">
-            <button type="button" class="secondary" onclick="clearForm(); vibrate();" style="flex:1;">Rensa</button>
-            <button type="submit" id="submitBtn" class="primary" style="flex:2;" onclick="vibrate(50);">Skicka Rapport</button>
+            <button type="button" class="secondary" onclick="clearForm(); vibrate(40);" style="flex:1;">Rensa</button>
+            <button type="submit" id="submitBtn" class="primary" style="flex:2;" onclick="vibrate(60);">Skicka Rapport</button>
         </div>
     </form>
-    <div class="version-text">v1.1.20</div>
+    <div class="version-text">v1.1.21</div>
 </div>
 
 <div id="statsModal" class="modal">
     <div class="modal-content">
-        <button class="danger" style="margin-bottom: 10px;" onclick="closeStats(); vibrate();">Stäng</button>
+        <button class="danger" style="margin-bottom: 10px;" onclick="closeStats(); vibrate(30);">Stäng</button>
         <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRw6n_3d87vAX6DVNmEZ-JwkOYDQcB1scVLhghcY6Cxam8Oq9VEvz1xhMvF89KOsGGJWZFxdNhCE5lZ/pubhtml?widget=true&amp;headers=false" width="100%" height="100%" style="border:none; border-radius: 8px;"></iframe>
     </div>
 </div>
@@ -257,7 +261,6 @@
 <script>
     let truckArray = []; let maskinArray = [];
 
-    // Definitioner av ID:n för varje maskin
     const machineIds = {
         'Ergopack': ['Ergopack 1', 'Ergopack 2', 'Ergopack 3', 'Ergopack 4', 'Ergopack 5'],
         'Bandmaskin': ['Bandmaskin 1', 'Bandmaskin 2', 'Bandmaskin 3', 'Bandmaskin 4', 'Bandmaskin 5', 'Bandmaskin 6', 'Bandmaskin 7'],
@@ -266,8 +269,11 @@
         'Övrigt': ['Övrigt maskin/verktyg']
     };
 
-    function vibrate(ms = 20) {
-        if (navigator.vibrate) navigator.vibrate(ms);
+    // Förbättrad vibrationsfunktion
+    function vibrate(ms = 40) {
+        if ('vibrate' in navigator) {
+            navigator.vibrate(ms);
+        }
     }
 
     window.onload = function() {
@@ -329,8 +335,6 @@
         } else {
             element.classList.add('active');
             document.getElementById('selectedMachineName').value = name;
-            
-            // Fyll dropdown med rätt ID-nummer
             subSelect.innerHTML = '<option value="">-- Välj ID --</option>';
             if (machineIds[name]) {
                 machineIds[name].forEach(id => {
@@ -359,17 +363,9 @@
             const subId = document.getElementById('machineSubId').value;
             const fel = document.getElementById('machineFel'); 
             const kom = document.getElementById('machineKom');
-            
-            if (!name || !subId || !fel.value) { 
-                vibrate([50, 50, 50]); 
-                return alert("Välj maskin, ID/Nummer och feltyp!"); 
-            }
-            
-            // Här sparas det specifika namnet (t.ex. "Ergopack 1") istället för bara kategorin
+            if (!name || !subId || !fel.value) { vibrate([50, 50, 50]); return alert("Välj maskin, ID/Nummer och feltyp!"); }
             maskinArray.push({ id: subId, fel: fel.value, kom: kom.value });
             localStorage.setItem('draft_maskinArray', JSON.stringify(maskinArray));
-            
-            // Återställ fält
             document.querySelectorAll('.machine-item').forEach(item => item.classList.remove('active'));
             document.getElementById('selectedMachineName').value = "";
             document.getElementById('machineSubIdContainer').classList.add('hidden');
@@ -394,14 +390,17 @@
         div.innerHTML = arr.map((t, i) => `<div class="list-item"><span><strong>${t.id}</strong>: ${t.fel}</span><button type="button" class="danger" style="width:auto; padding:4px 8px;" onclick="removeItem('${type}', ${i})">Ta bort</button></div>`).join('');
     }
 
-    function getSkift() { const h = new Date().getHours(); return (h>=6&&h<14)?"Dagskift":(h>=14&&h<22)?"Kvällsskift":"Nattskift"; }
+    function getSkift() { 
+        const h = new Date().getHours(); 
+        return (h>=10&&h<16)?"Dagskift":(h>=17||h<2)?"Kvällsskift":"Nattskift"; 
+    }
+    
     function clearForm() { if(confirm("Rensa allt?")) { localStorage.clear(); location.reload(); } }
     function openStats(){ document.getElementById("statsModal").style.display = "flex"; }
     function closeStats(){ document.getElementById("statsModal").style.display = "none"; }
 
     document.getElementById('reportForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        
         let hasError = false;
         document.querySelectorAll('.card').forEach(c => c.classList.remove('error-attention'));
 
@@ -443,17 +442,11 @@
         };
 
         try { 
-            const response = await fetch("https://script.google.com/macros/s/AKfycbw47eow7cxtMhwFp0zmRlTmpeVScLfQ9ooGie5OU8c0-vVbCcEsPGnq6aeUQIAQUuBj/exec", { 
+            await fetch("https://script.google.com/macros/s/AKfycbw47eow7cxtMhwFp0zmRlTmpeVScLfQ9ooGie5OU8c0-vVbCcEsPGnq6aeUQIAQUuBj/exec", { 
                 method: "POST", 
                 body: JSON.stringify(data) 
             });
-            const result = await response.json();
-            if (result.status !== "ok") {
-                console.warn("Google API error:", result.message);
-            }
-        } catch (err) {
-            console.error("Fetch failed:", err);
-        }
+        } catch (err) { console.error(err); }
 
         let body = `SKIFTRAPPORT - ${data.datum}\nAvdelning: ${data.avdelning}\nSkift: ${data.skift}\nRapportör: ${data.signatur}\n\nTRUCKAR:\n`;
         if(truckArray.length>0) truckArray.forEach(t=>body+=`- ${t.id}: ${t.fel} (${t.kom})\n`); else body+="Inga anmärkningar.\n";
