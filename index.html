@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Skiftrapport v1.1.19</title>
+    <title>Skiftrapport v1.1.20</title>
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
     <link rel="manifest" href="manifest.json">
@@ -60,7 +60,6 @@
         }
         input:focus, select:focus, textarea:focus { border-color: var(--teams-purple); }
 
-        /* FIX FÖR DATUMFÄLT PÅ MOBIL */
         input[type="date"] {
             appearance: none;
             -webkit-appearance: none;
@@ -194,6 +193,14 @@
                         <div class="machine-label">Övrigt</div>
                     </div>
                 </div>
+
+                <div id="machineSubIdContainer" class="hidden">
+                    <label id="subIdLabel">Välj ID/Nummer:</label>
+                    <select id="machineSubId">
+                        <option value="">-- Välj ID --</option>
+                    </select>
+                </div>
+                
                 <input type="hidden" id="selectedMachineName" value="">
                 
                 <select id="machineFel">
@@ -237,7 +244,7 @@
             <button type="submit" id="submitBtn" class="primary" style="flex:2;" onclick="vibrate(50);">Skicka Rapport</button>
         </div>
     </form>
-    <div class="version-text">v1.1.19</div>
+    <div class="version-text">v1.1.20</div>
 </div>
 
 <div id="statsModal" class="modal">
@@ -249,6 +256,15 @@
 
 <script>
     let truckArray = []; let maskinArray = [];
+
+    // Definitioner av ID:n för varje maskin
+    const machineIds = {
+        'Ergopack': ['Ergopack 1', 'Ergopack 2', 'Ergopack 3', 'Ergopack 4'],
+        'Bandmaskin': ['Bandmaskin 1', 'Bandmaskin 2', 'Bandmaskin 3', 'Bandmaskin 4', 'Bandmaskin 5', 'Bandmaskin 6', 'Bandmaskin 7'],
+        'Movexx': ['Movexx 1', 'Movexx 2', 'Movexx 3', 'Movexx 4'],
+        'Pallyftare': ['Pallyftare 1', 'Pallyftare 2', 'Pallyftare 3', 'Pallyftare 4', 'Pallyftare 5', 'Pallyftare 6', 'Pallyftare 7', 'Pallyftare 8', 'Pallyftare 9', 'Pallyftare 10'],
+        'Övrigt': ['Övrigt maskin/verktyg']
+    };
 
     function vibrate(ms = 20) {
         if (navigator.vibrate) navigator.vibrate(ms);
@@ -303,11 +319,30 @@
     function selectMachine(name, element) {
         const alreadyActive = element.classList.contains('active');
         document.querySelectorAll('.machine-item').forEach(item => item.classList.remove('active'));
+        
+        const subContainer = document.getElementById('machineSubIdContainer');
+        const subSelect = document.getElementById('machineSubId');
+
         if (alreadyActive) {
             document.getElementById('selectedMachineName').value = "";
+            subContainer.classList.add('hidden');
         } else {
             element.classList.add('active');
             document.getElementById('selectedMachineName').value = name;
+            
+            // Fyll dropdown med rätt ID-nummer
+            subSelect.innerHTML = '<option value="">-- Välj ID --</option>';
+            if (machineIds[name]) {
+                machineIds[name].forEach(id => {
+                    const opt = document.createElement('option');
+                    opt.value = id;
+                    opt.textContent = id;
+                    subSelect.appendChild(opt);
+                });
+                subContainer.classList.remove('hidden');
+            } else {
+                subContainer.classList.add('hidden');
+            }
         }
     }
 
@@ -320,12 +355,24 @@
             id.value = ""; fel.value = ""; kom.value = "";
             document.getElementById('card-truck').classList.remove('error-attention');
         } else {
-            const id = document.getElementById('selectedMachineName').value; const fel = document.getElementById('machineFel'); const kom = document.getElementById('machineKom');
-            if (!id || !fel.value) { vibrate([50, 50, 50]); return alert("Välj maskin (klicka på bilden) och feltyp!"); }
-            maskinArray.push({ id: id, fel: fel.value, kom: kom.value });
+            const name = document.getElementById('selectedMachineName').value;
+            const subId = document.getElementById('machineSubId').value;
+            const fel = document.getElementById('machineFel'); 
+            const kom = document.getElementById('machineKom');
+            
+            if (!name || !subId || !fel.value) { 
+                vibrate([50, 50, 50]); 
+                return alert("Välj maskin, ID/Nummer och feltyp!"); 
+            }
+            
+            // Här sparas det specifika namnet (t.ex. "Ergopack 1") istället för bara kategorin
+            maskinArray.push({ id: subId, fel: fel.value, kom: kom.value });
             localStorage.setItem('draft_maskinArray', JSON.stringify(maskinArray));
+            
+            // Återställ fält
             document.querySelectorAll('.machine-item').forEach(item => item.classList.remove('active'));
             document.getElementById('selectedMachineName').value = "";
+            document.getElementById('machineSubIdContainer').classList.add('hidden');
             fel.value = ""; kom.value = "";
             document.getElementById('card-maskin').classList.remove('error-attention');
         }
