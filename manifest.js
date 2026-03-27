@@ -2,7 +2,7 @@
   "name": "Skiftrapport Volvo Samhall",
   "short_name": "Rapport",
   "description": "Digital skiftrapport för TVS och TPB",
-  "start_url": "./index.html",
+  "start_url": "index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#111111",
@@ -12,13 +12,13 @@
       "src": "icon.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "icon.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
