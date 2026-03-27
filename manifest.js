@@ -12,6 +12,7 @@
       "src": "icon (1).png",
       "sizes": "512x512",
       "type": "image/png"
+      "purpose": "any maskable"
     }
   ],
   "start_url": ".",
