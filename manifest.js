@@ -9,7 +9,7 @@
       "purpose": "any maskable"
     },
     {
-      "src": "icon.png",
+      "src": "icon (1).png",
       "sizes": "512x512",
       "type": "image/png"
     }
