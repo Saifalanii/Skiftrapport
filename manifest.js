@@ -1,17 +1,18 @@
 {
   "short_name": "Rapport",
   "name": "Skiftrapport Samhall",
-  "icons": [
+ "icons": [
   {
-    "src": "icon.png",
+    "src": "https://saifalanii.github.io/Skiftrapport/icon.png",
     "sizes": "192x192",
-    "type": "image/png"
+    "type": "image/png",
+    "purpose": "any"
   },
   {
-    "src": "icon.png",
+    "src": "https://saifalanii.github.io/Skiftrapport/icon.png",
     "sizes": "512x512",
-    "type": "image/png",
-    "purpose": "any maskable"
+    "type": "image/png"
+  }
     }
   ],
   "start_url": ".",
