@@ -38,6 +38,7 @@
             overscroll-behavior: none;
         }
         
+        /* FIX FÖR IOS STATUSBAR */
         .container { 
             max-width: 500px; 
             margin: 0 auto; 
@@ -76,6 +77,13 @@
         }
         input:focus, select:focus, textarea:focus { border-color: var(--teams-purple); }
 
+        input[type="date"] {
+            appearance: none;
+            -webkit-appearance: none;
+            min-height: 1.2em;
+            display: block;
+        }
+
         .machine-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
         .machine-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         .machine-circle {
@@ -109,11 +117,6 @@
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000; }
         .modal-content { background: var(--teams-card); width: 95%; max-width: 800px; border-radius: 12px; padding: 15px; height: 90vh; display: flex; flex-direction: column; }
         .version-text { text-align: center; font-size: 10px; color: var(--text-sec); margin-top: 20px; opacity: 0.5; }
-
-        /* EXPRESS STYLES */
-        #expressList { flex-grow: 1; overflow-y: auto; margin-top: 10px; }
-        .express-item { background: var(--teams-bg); padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid var(--warning); position: relative; }
-        .express-done-btn { background: var(--success); color: white; width: auto; padding: 6px 12px; position: absolute; right: 10px; top: 10px; font-size: 0.8em; }
     </style>
 </head>
 <body>
@@ -135,15 +138,10 @@
         Skiftrapport
     </h2>
 
-    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-        <button class="secondary" style="flex:1;" onclick="openStats(); vibrate(30);">
-            <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-            Statistik
-        </button>
-        <button class="primary" style="flex:1; background: #2c3e50;" onclick="openExpress(); vibrate(30);">
-            🚀 Express-Vy
-        </button>
-    </div>
+    <button class="secondary" style="width: 100%; margin-bottom: 15px;" onclick="openStats(); vibrate(30);">
+        <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+        Visa statistik
+    </button>
 
     <form id="reportForm" novalidate>
         <div class="card" id="card-person">
@@ -275,20 +273,7 @@
     </div>
 </div>
 
-<div id="expressModal" class="modal">
-    <div class="modal-content">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>Öppna Fel (Express)</h3>
-            <button class="danger" style="width:40px;" onclick="closeExpress(); vibrate(30);">X</button>
-        </div>
-        <div id="expressList">Laddar...</div>
-    </div>
-</div>
-
 <script>
-    // --- KONFIGURATION ---
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyoxN5Eyh_1uYjORfsWpSSn2RpS9k6zrt97iv70LHpOy0PJ1DcFVqXaE7evsQdPNllW/exec";
-
     let truckArray = []; let maskinArray = [];
 
     const machineIds = {
@@ -338,15 +323,21 @@
     function setSegment(type, val, save = true) {
         document.getElementById(type).value = val;
         if(save) localStorage.setItem('draft_' + type, val);
-        const okBtn = document.getElementById(`btn-${type}-ok`); const nokBtn = document.getElementById(`btn-${type}-nok`);
-        const box = document.getElementById(type + (type==='truck'||type==='maskin'?'Container':(type==='tillsyn'||type==='rengoring'?'Box':'')));
+        const okBtn = document.getElementById(`btn-${type}-ok`); 
+        const nokBtn = document.getElementById(`btn-${type}-nok`);
+        
+        // HÄR VAR FELET: Vi definierar box-ID mer exakt
+        let boxId = type === 'truck' || type === 'maskin' ? type + 'Container' : type + 'Box';
+        const box = document.getElementById(boxId);
         
         if (val === 'OK') {
             document.getElementById(`card-${type}`)?.classList.remove('error-attention');
-            okBtn.classList.add('active'); nokBtn.classList.remove('active', 'nok'); 
+            if(okBtn) okBtn.classList.add('active'); 
+            if(nokBtn) nokBtn.classList.remove('active', 'nok'); 
             if(box) box.classList.add('hidden'); 
         } else { 
-            nokBtn.classList.add('active', 'nok'); okBtn.classList.remove('active'); 
+            if(nokBtn) nokBtn.classList.add('active', 'nok'); 
+            if(okBtn) okBtn.classList.remove('active'); 
             if(box) box.classList.remove('hidden'); 
         }
     }
@@ -428,50 +419,6 @@
     function openStats(){ document.getElementById("statsModal").style.display = "flex"; }
     function closeStats(){ document.getElementById("statsModal").style.display = "none"; }
 
-    // --- EXPRESS LOGIK ---
-    async function openExpress() {
-        document.getElementById("expressModal").style.display = "flex";
-        const listDiv = document.getElementById("expressList");
-        listDiv.innerHTML = "Hämtar öppna ärenden...";
-        
-        try {
-            const res = await fetch(SCRIPT_URL);
-            const issues = await res.json();
-            
-            if (issues.length === 0) {
-                listDiv.innerHTML = "<p style='text-align:center;'>Inga öppna fel! 🎉</p>";
-                return;
-            }
-
-            listDiv.innerHTML = issues.map(item => `
-                <div class="express-item">
-                    <button class="express-done-btn" onclick="markAsDone('${item.type}', ${item.row}, '${item.id}')">KLAR</button>
-                    <b>${item.id}</b><br>
-                    <small>${item.fel}</small>
-                </div>
-            `).join('');
-        } catch (err) {
-            listDiv.innerHTML = "Kunde inte ladda data.";
-        }
-    }
-
-    function closeExpress() { document.getElementById("expressModal").style.display = "none"; }
-
-    async function markAsDone(type, row, id) {
-        const sign = document.getElementById("signatur").value;
-        if (!sign) return alert("Fyll i din signatur först!");
-        if (!confirm("Markera " + id + " som klar?")) return;
-
-        await fetch(https://script.google.com/macros/s/AKfycbyoxN5Eyh_1uYjORfsWpSSn2RpS9k6zrt97iv70LHpOy0PJ1DcFVqXaE7evsQdPNllW/exec, {
-            method: "POST",
-            mode: "no-cors",
-            body: JSON.stringify({ action: "updateStatus", type: type, row: row, signatur: sign })
-        });
-        
-        vibrate(100);
-        openExpress(); 
-    }
-
     document.getElementById('reportForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         let hasError = false;
@@ -515,7 +462,7 @@
         };
 
         try { 
-            await fetch(SCRIPT_URL, { 
+            await fetch("https://script.google.com/macros/s/AKfycbyoxN5Eyh_1uYjORfsWpSSn2RpS9k6zrt97iv70LHpOy0PJ1DcFVqXaE7evsQdPNllW/exec", { 
                 method: "POST", 
                 body: JSON.stringify(data) 
             });
