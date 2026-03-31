@@ -505,8 +505,8 @@
 
     function getSkift() { 
         const h = new Date().getHours(); 
-        if (h >= 6 && h < 14) return "Dagskift";
-        if (h >= 14 && h < 22) return "Kvällsskift";
+        if (h >= 6 && h < 16) return "Dagskift";
+        if (h >= 18 && h < 02) return "Kvällsskift";
         return "Nattskift"; 
     }
     
