@@ -443,7 +443,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'Bandmaskin': ['Bandmaskin 1', 'Bandmaskin 2', 'Bandmaskin 3', 'Bandmaskin 4', 'Bandmaskin 5', 'Bandmaskin 6', 'Bandmaskin 7', 'Bandmaskin 8', 'Bandmaskin 9'],
         'Movexx': ['Movexx 1', 'Movexx 2', 'Movexx 3', 'Movexx 4'],
         'Pallyftare': ['Pallyftare 1', 'Pallyftare 2', 'Pallyftare 3', 'Pallyftare 4', 'Pallyftare 5', 'Pallyftare 6', 'Pallyftare 7', 'Pallyftare 8', 'Pallyftare 9', 'Pallyftare 10', 'Pallyftare 11', 'Pallyftare 12'],
-        'Laddare': ['Truckladdare', 'Movexx laddare', 'Bandmaskinsladdare', 'Pallyftsladdare', 'Övriga laddare']
+        'Laddare': ['Truckladdare', 'Movexx laddare', 'Bandmaskin laddare', 'Pallyftare laddare', 'Övrigt laddare']
     };
 
     // --- OFFLINE-DETEKTION ---
@@ -519,7 +519,17 @@ document.addEventListener('DOMContentLoaded', () => {
             okBtn?.classList.add('active'); 
             okBtn?.classList.remove('nok');
             nokBtn?.classList.remove('active', 'nok'); 
-            if (box) box.classList.add('hidden'); 
+            if (box) box.classList.add('hidden');
+            // Töm listan och localStorage om man byter tillbaka till OK
+            if (type === 'truck') {
+                truckArray = [];
+                localStorage.removeItem('draft_truckArray');
+                renderList('truck');
+            } else if (type === 'maskin') {
+                maskinArray = [];
+                localStorage.removeItem('draft_maskinArray');
+                renderList('maskin');
+            }
         } else { 
             nokBtn?.classList.add('active', 'nok'); 
             okBtn?.classList.remove('active', 'nok'); 
