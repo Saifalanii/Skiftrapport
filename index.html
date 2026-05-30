@@ -144,7 +144,7 @@
         }
         input:focus, select:focus, textarea:focus { border-color: var(--teams-purple); }
 
-        .machine-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
+        .machine-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
         .machine-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         .machine-circle {
             width: 65px; height: 65px; border-radius: 50%; border: 3px solid var(--teams-border);
@@ -343,6 +343,10 @@
                         <div class="machine-circle"><img src="pallyft.png" alt="drag"></div>
                         <div class="machine-label">Pallyftare</div>
                     </div>
+                    <div class="machine-item" onclick="selectMachine('Laddare', this); vibrate(30);">
+                        <div class="machine-circle"><img src="laddare.png" alt="Laddare"></div>
+                        <div class="machine-label">Laddare</div>
+                    </div>
                     <div class="machine-item" onclick="selectMachine('Övrigt', this); vibrate(30);">
                         <div class="machine-circle"><img src="ovrigt.png" alt="Ovr"></div>
                         <div class="machine-label">Övrigt</div>
@@ -438,7 +442,8 @@ document.addEventListener('DOMContentLoaded', () => {
         'Ergopack': ['Ergopack 1', 'Ergopack 2', 'Ergopack 3', 'Ergopack 4', 'Ergopack 5', 'Ergopack 6'],
         'Bandmaskin': ['Bandmaskin 1', 'Bandmaskin 2', 'Bandmaskin 3', 'Bandmaskin 4', 'Bandmaskin 5', 'Bandmaskin 6', 'Bandmaskin 7', 'Bandmaskin 8', 'Bandmaskin 9'],
         'Movexx': ['Movexx 1', 'Movexx 2', 'Movexx 3', 'Movexx 4'],
-        'Pallyftare': ['Pallyftare 1', 'Pallyftare 2', 'Pallyftare 3', 'Pallyftare 4', 'Pallyftare 5', 'Pallyftare 6', 'Pallyftare 7', 'Pallyftare 8', 'Pallyftare 9', 'Pallyftare 10', 'Pallyftare 11', 'Pallyftare 12']
+        'Pallyftare': ['Pallyftare 1', 'Pallyftare 2', 'Pallyftare 3', 'Pallyftare 4', 'Pallyftare 5', 'Pallyftare 6', 'Pallyftare 7', 'Pallyftare 8', 'Pallyftare 9', 'Pallyftare 10', 'Pallyftare 11', 'Pallyftare 12'],
+        'Laddare': ['Truckladdare', 'Movexx laddare', 'Bandmaskinsladdare', 'Pallyftsladdare', 'Övriga laddare']
     };
 
     // --- OFFLINE-DETEKTION ---
