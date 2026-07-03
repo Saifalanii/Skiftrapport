@@ -459,7 +459,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // FIX 1 (syntaxfel): Korrekt array med citationstecken och kommatecken
     const machineIds = {
         'Ergopack': ['Ergopack 1', 'Ergopack 2', 'Ergopack 3', 'Ergopack 4', 'Ergopack 5', 'Ergopack 6'],
-        'Bandmaskin': ['Bandmaskin 1', 'Bandmaskin 2', 'Bandmaskin 3', 'Bandmaskin 4', 'Bandmaskin 5', 'Bandmaskin 6', 'Bandmaskin 7', 'Bandmaskin 8', 'Bandmaskin 9', 'Bandmaskin 10', 'Bandmaskin 11'],
+        'Bandmaskin': ['Bandmaskin 1', 'Bandmaskin 2', 'Bandmaskin 3', 'Bandmaskin 4', 'Bandmaskin 5', 'Bandmaskin 6', 'Bandmaskin 7', 'Bandmaskin 8', 'Bandmaskin 9', 'Bandmaskin 10', 'Bandmaskin 11', 'Bandmaskin 12'],
         'Movexx': ['Movexx 1', 'Movexx 2', 'Movexx 3', 'Movexx 4'],
         'Pallyftare': ['Pallyftare 1', 'Pallyftare 2', 'Pallyftare 3', 'Pallyftare 4', 'Pallyftare 5', 'Pallyftare 6', 'Pallyftare 7', 'Pallyftare 8', 'Pallyftare 9', 'Pallyftare 10', 'Pallyftare 11', 'Pallyftare 12'],
         'Laddare': ['Truckladdare', 'Movexx laddare', 'Bandmaskin laddare', 'Pallyftare laddare', 'Övrigt laddare']
@@ -660,7 +660,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), 90000);
 
-            const response = await fetch("https://script.google.com/macros/s/AKfycbwEDiriXTAhhK9U-fjAog-Lr5M2RDx3xrDp4pNFrX4y9aBvC_dPVaJqZPkTftLeArY/exec", {
+            const response = await fetch("https://script.google.com/macros/s/AKfycbxF1VRYvePpkp9LSUxUxBstN1x2DqEZuVxHzFMiXHC9GEMo53xEPyRcB64PT7rLNa_U/exec", {
                 method: "POST",
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify({ action: "askAI", maskin: maskin, problem: problem }),
