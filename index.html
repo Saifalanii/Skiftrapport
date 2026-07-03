@@ -661,7 +661,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), 30000);
 
-            const response = await fetch("https://script.google.com/macros/s/AKfycbyaYHrv4f7CQydwK76rYhAuPPFRtxIWUv0K4kHt7VkxUf29rDwqCQI4qRtqq0hMx4El/exec", {
+            const response = await fetch("https://script.google.com/macros/s/AKfycbwJoiYmnZC4FZET8rp7inqytgwhzdNzOtOavE4edjxvXAWDcPUJWkKt-fpvEmk03nGA/exec", {
                 method: "POST",
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify({ action: "askAI", maskin: maskin, problem: problem }),
