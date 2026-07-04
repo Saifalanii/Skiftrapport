@@ -221,24 +221,28 @@
         .list-container { margin-top: 10px; background: var(--teams-bg); padding: 12px; border-radius: 8px; border-left: 4px solid var(--teams-purple); }
         .list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--teams-border); font-size: 0.9em; animation: fadeIn 0.25s ease; }
         
-        /* BOTTOM SHEET (ersätter fullscreen-modal) – draggbar panel förankrad i botten,
-           standardmönstret 2026 för sekundärt innehåll som stats/inställningar/förhandsvisningar. */
+        /* BOTTOM SHEET (ersätter fullscreen-modal) – draggbar panel förankrad i botten på mobil.
+           standardmönstret 2026 för sekundärt innehåll som stats/inställningar/förhandsvisningar.
+           På desktop (media query nedan) blir samma element istället en centrerad dialogruta -
+           en bottom sheet är ett mobilmönster och ser bara smalt/malplacerat ut på bred skärm. */
         .sheet-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.45);
-            display: none;
             z-index: 1000;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
             opacity: 0;
-            transition: opacity 0.25s ease;
+            visibility: hidden;
+            transition: opacity 0.25s ease, visibility 0.25s ease;
         }
-        .sheet-overlay.visible { display: block; opacity: 1; }
+        .sheet-overlay.visible { opacity: 1; visibility: visible; }
         .bottom-sheet {
-            position: fixed;
-            left: 0; right: 0; bottom: 0;
+            position: relative;
+            width: 100%;
+            max-width: 500px;
             background: var(--teams-card);
             border-radius: 20px 20px 0 0;
-            max-width: 500px;
-            margin: 0 auto;
             height: 85vh;
             display: flex;
             flex-direction: column;
@@ -246,6 +250,7 @@
             transform: translateY(100%);
             transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
             box-shadow: 0 -8px 30px rgba(0,0,0,0.2);
+            overscroll-behavior: contain;
         }
         .sheet-overlay.visible .bottom-sheet { transform: translateY(0); }
         .sheet-handle {
@@ -270,8 +275,27 @@
             width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
             color: var(--text-sec); cursor: pointer; padding: 0;
         }
-        .sheet-body { flex: 1; overflow: hidden; }
+        .sheet-body { flex: 1; overflow: hidden; overscroll-behavior: contain; }
         .sheet-body iframe { width: 100%; height: 100%; border: none; border-radius: 8px; }
+
+        /* DESKTOP: samma markup, men presenteras som en centrerad dialog istället för
+           en bottom sheet - dra-i-handtaget hör hemma på mobil, inte med musen på PC. */
+        @media (min-width: 700px) {
+            .sheet-overlay { align-items: center; }
+            .bottom-sheet {
+                width: 90%;
+                max-width: 1000px;
+                height: 80vh;
+                border-radius: 16px;
+                transform: translateY(16px) scale(0.98);
+                opacity: 0;
+                transition: transform 0.25s ease, opacity 0.25s ease;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            }
+            .sheet-overlay.visible .bottom-sheet { transform: translateY(0) scale(1); opacity: 1; }
+            .sheet-handle { display: none; }
+            .sheet-header { cursor: default; }
+        }
 
         /* CONFIRMATION SCREEN */
         .confirm-screen {
@@ -563,7 +587,7 @@
         <!-- Nätverksfeedback -->
         <div class="fetch-status" id="fetchStatus"></div>
     </form>
-    <div class="version-text">v1.5.0</div>
+    <div class="version-text">v1.5.2</div>
 </div>
 
 <!-- Stats bottom sheet -->
@@ -852,17 +876,29 @@ document.addEventListener('DOMContentLoaded', () => {
         } 
     };
 
+    // Body scroll lock: förhindrar att sidan bakom bottom sheeten scrollar med
+    // när man drar uppåt på mobil (klassiskt "scroll-through"-problem med overlays).
+    let scrollLockY = 0;
+    function lockBodyScroll() {
+        scrollLockY = window.scrollY;
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${scrollLockY}px`;
+        document.body.style.width = '100%';
+    }
+    function unlockBodyScroll() {
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        window.scrollTo(0, scrollLockY);
+    }
+
     window.openStats = () => {
-        const overlay = document.getElementById("statsOverlay");
-        overlay.style.display = "block";
-        // Nästa frame så transitionen faktiskt triggas (annars hoppar den direkt till "visible")
-        requestAnimationFrame(() => overlay.classList.add("visible"));
+        document.getElementById("statsOverlay").classList.add("visible");
+        lockBodyScroll();
     };
     window.closeStats = () => {
-        const overlay = document.getElementById("statsOverlay");
-        overlay.classList.remove("visible");
-        // Vänta ut transitionen innan display:none, annars hoppar den ur synk direkt
-        setTimeout(() => { overlay.style.display = "none"; }, 300);
+        document.getElementById("statsOverlay").classList.remove("visible");
+        unlockBodyScroll();
     };
 
     // --- AI FELSÖKNINGSHJÄLP ---
@@ -1033,6 +1069,9 @@ document.addEventListener('DOMContentLoaded', () => {
         function getY(e) { return e.touches ? e.touches[0].clientY : e.clientY; }
 
         function onStart(e) {
+            // På desktop (>=700px) är sheeten en centrerad dialog, inte en bottom sheet -
+            // dra-i-handtaget-gesten hör bara hemma på mobil (matchar media query-brytpunkten).
+            if (window.innerWidth >= 700) return;
             dragging = true;
             startY = getY(e);
             sheet.style.transition = 'none';
