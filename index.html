@@ -28,6 +28,8 @@
             --pastel-red: #ffffff;
             --pastel-green-text: #1e4620;
             --pastel-red-text: #721c24;
+            --pastel-yellow: #fdf1c7;
+            --pastel-yellow-text: #7a5b00;
         }
         body.large-text { --base-font: 20px; --label-font: 1.1rem; --h2-font: 1.6rem; }
         body.dark-mode { 
@@ -35,6 +37,7 @@
             --text-main: #ffffff; --text-sec: #adadad; --teams-purple: #7f85f5;
             --pastel-green: #2d4a2d; --pastel-red: #4d1f1f;
             --pastel-green-text: #a8e6cf; --pastel-red-text: #ff8b94;
+            --pastel-yellow: #4a3d1f; --pastel-yellow-text: #ffe08a;
         }
         
         body {
@@ -143,6 +146,39 @@
             -webkit-appearance: none;
         }
         input:focus, select:focus, textarea:focus { border-color: var(--teams-purple); }
+
+        /* STATUS VID RAPPORTERING: Klar / Service / Ur drift */
+        .status-label {
+            font-weight: normal;
+            font-size: 0.8em;
+            margin-top: 5px;
+        }
+        .status-segment .segment-btn.active.status-klar {
+            background: var(--pastel-green);
+            color: var(--pastel-green-text);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status-segment .segment-btn.active.status-service {
+            background: var(--pastel-yellow);
+            color: var(--pastel-yellow-text);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status-segment .segment-btn.active.status-urdrift {
+            background: var(--pastel-red);
+            color: var(--danger);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status-badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 6px;
+            margin-right: 6px;
+        }
+        .status-badge.badge-klar { background: var(--pastel-green); color: var(--pastel-green-text); }
+        .status-badge.badge-service { background: var(--pastel-yellow); color: var(--pastel-yellow-text); }
+        .status-badge.badge-urdrift { background: var(--pastel-red); color: var(--danger); }
 
         .machine-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
         .machine-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
@@ -262,7 +298,7 @@
         Skiftrapport
     </h2>
 
-    <!-- FIX 3: Skift visas för användaren -->
+    <!-- Skift visas för användaren -->
     <div class="skift-badge">
         <div class="skift-pill" id="skiftPill">⏱ Beräknar skift...</div>
     </div>
@@ -306,12 +342,19 @@
             <div id="truckContainer" class="hidden">
                 <select id="truckId">
                     <option value="">-- Välj Truck --</option>
-                    <option>TVS-01</option><option>TVS-02</option><option>TVS-03</option><option>TVS-04</option><option>TVS-05</option><option>TVS-06</option><option>TVS-13</option><option>TVS-22</option><option>TVS-23</option><option>TVS-33</option><option>TVS-34</option><option>TPB-07</option><option>TPB-08</option><option>TPB-09</option><option>TPB-10</option><option>TPB-14</option><option>TPB-15</option><option>TPB-20</option><option>TPB-21</option><option>TVS-11</option><option>Grå Skjutsativ</option>
+                    <option>TVS-01</option><option>TVS-02</option><option>TVS-03</option><option>TVS-04</option><option>TVS-05</option><option>TVS-06</option><option>TVS-13</option><option>TVS-22</option><option>TVS-23</option><option>TVS-28</option><option>TVS-33</option><option>TVS-34</option><option>TPB-07</option><option>TPB-08</option><option>TPB-09</option><option>TPB-10</option><option>TPB-14</option><option>TPB-15</option><option>TPB-20</option><option>TPB-21</option><option>TVS-11</option><option>Grå Skjutsativ</option>
                 </select>
                 <select id="truckFel">
                     <option value="">-- Feltyp --</option>
                     <option>Hydraulik/Olja</option><option>Chassi</option><option>Stativ</option><option>Batteri</option><option>Drag</option><option>Däck</option><option>Linde Connect</option><option>Belysning</option><option>Felkod</option><option>Övrigt</option>
                 </select>
+                <label class="status-label">Status</label>
+                <div class="segmented-control status-segment" id="truckStatusControl">
+                    <button type="button" class="segment-btn" data-status="Klar" onclick="setItemStatus('truck', 'Klar'); vibrate(20);">Klar</button>
+                    <button type="button" class="segment-btn" data-status="Service" onclick="setItemStatus('truck', 'Service'); vibrate(20);">Service</button>
+                    <button type="button" class="segment-btn" data-status="Ur drift" onclick="setItemStatus('truck', 'Ur drift'); vibrate(20);">Ur drift</button>
+                </div>
+                <input type="hidden" id="truckStatus" value="">
                 <textarea id="truckKom" placeholder="Kommentar..."></textarea>
                 <button type="button" class="add-btn" onclick="addItem('truck'); vibrate(30);">✚ Lägg till i listan</button>
                 <div id="truckList" class="list-container hidden"></div>
@@ -322,7 +365,6 @@
             <div class="error-msg">⚠︎ Du har valt NOK – Lägg till minst en maskin i listan!</div>
             <label>Maskiner & Verktyg</label>
             <div class="segmented-control">
-                <!-- FIX 1: Konsekvent värde "NOK" istället för "Felanmälan (NOK)" -->
                 <button type="button" class="segment-btn active" id="btn-maskin-ok" onclick="setSegment('maskin', 'OK'); vibrate(30);">OK</button>
                 <button type="button" class="segment-btn" id="btn-maskin-nok" onclick="setSegment('maskin', 'NOK'); vibrate(30);">Felanmälan (NOK)</button>
             </div>
@@ -369,6 +411,13 @@
                     <option value="">-- Feltyp --</option>
                     <option>Mekaniskt</option><option>Elektriskt</option><option>Felkod</option><option>Annat</option>
                 </select>
+                <label class="status-label">Status</label>
+                <div class="segmented-control status-segment" id="maskinStatusControl">
+                    <button type="button" class="segment-btn" data-status="Klar" onclick="setItemStatus('maskin', 'Klar'); vibrate(20);">Klar</button>
+                    <button type="button" class="segment-btn" data-status="Service" onclick="setItemStatus('maskin', 'Service'); vibrate(20);">Service</button>
+                    <button type="button" class="segment-btn" data-status="Ur drift" onclick="setItemStatus('maskin', 'Ur drift'); vibrate(20);">Ur drift</button>
+                </div>
+                <input type="hidden" id="maskinStatus" value="">
                 <textarea id="machineKom" placeholder="Kommentar..."></textarea>
                 <button type="button" class="add-btn" onclick="addItem('maskin'); vibrate(30);">✚ Lägg till i listan</button>
                 <div id="maskinList" class="list-container hidden"></div>
@@ -406,6 +455,7 @@
             <label>AI Felsökningshjälp</label>
             <select id="aiMaskin">
                 <option value="">-- Välj maskin --</option>
+                <option value="Ergopack">Truck</option>
                 <option value="Ergopack">Ergopack</option>
                 <option value="Bandmaskin">Bandmaskin</option>
                 <option value="Movexx">Movexx</option>
@@ -422,10 +472,10 @@
             <button type="submit" id="submitBtn" class="primary" style="flex:2;" onclick="vibrate(60);">Skicka Rapport</button>
         </div>
 
-        <!-- FIX: Nätverksfeedback -->
+        <!-- Nätverksfeedback -->
         <div class="fetch-status" id="fetchStatus"></div>
     </form>
-    <div class="version-text">v1.1.29</div>
+    <div class="version-text">v1.3.0</div>
 </div>
 
 <!-- Stats modal -->
@@ -436,7 +486,7 @@
     </div>
 </div>
 
-<!-- FIX: Bekräftelseskärm -->
+<!-- Bekräftelseskärm -->
 <div class="confirm-screen" id="confirmScreen">
     <div class="confirm-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -456,7 +506,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let truckArray = []; 
     let maskinArray = [];
 
-    // FIX 1 (syntaxfel): Korrekt array med citationstecken och kommatecken
     const machineIds = {
         'Ergopack': ['Ergopack 1', 'Ergopack 2', 'Ergopack 3', 'Ergopack 4', 'Ergopack 5', 'Ergopack 6'],
         'Bandmaskin': ['Bandmaskin 1', 'Bandmaskin 2', 'Bandmaskin 3', 'Bandmaskin 4', 'Bandmaskin 5', 'Bandmaskin 6', 'Bandmaskin 7', 'Bandmaskin 8', 'Bandmaskin 9', 'Bandmaskin 10', 'Bandmaskin 11', 'Bandmaskin 12'],
@@ -514,7 +563,41 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('fontSize', isChecked ? 'large' : 'normal');
     };
 
-    // FIX 2: setSegment hanterar nu tillsyn/rengoring-boxar korrekt vid draft-laddning
+    // Sätter status (Klar/Service/Ur drift) för truck- eller maskinavvikelsen som
+    // håller på att läggas till. Uppdaterar även kommentar-placeholder: "Klar"
+    // ber om vad som gjordes, övriga statusar ber om vanlig kommentar.
+    window.setItemStatus = (type, status) => {
+        const hiddenId = type === 'truck' ? 'truckStatus' : 'maskinStatus';
+        const controlId = type === 'truck' ? 'truckStatusControl' : 'maskinStatusControl';
+        const komId = type === 'truck' ? 'truckKom' : 'machineKom';
+
+        document.getElementById(hiddenId).value = status;
+
+        document.querySelectorAll('#' + controlId + ' .segment-btn').forEach(btn => {
+            btn.classList.remove('active', 'status-klar', 'status-service', 'status-urdrift');
+        });
+        const activeBtn = document.querySelector('#' + controlId + ' .segment-btn[data-status="' + status + '"]');
+        if (activeBtn) {
+            activeBtn.classList.add('active');
+            if (status === 'Klar') activeBtn.classList.add('status-klar');
+            else if (status === 'Service') activeBtn.classList.add('status-service');
+            else activeBtn.classList.add('status-urdrift');
+        }
+
+        const kom = document.getElementById(komId);
+        if (kom) kom.placeholder = status === 'Klar' ? "Vad gjordes för att åtgärda? *" : "Kommentar...";
+    };
+
+    // Nollställer statusknapparna efter att en post lagts till i listan.
+    window.resetItemStatus = (type) => {
+        const hiddenId = type === 'truck' ? 'truckStatus' : 'maskinStatus';
+        const controlId = type === 'truck' ? 'truckStatusControl' : 'maskinStatusControl';
+        document.getElementById(hiddenId).value = "";
+        document.querySelectorAll('#' + controlId + ' .segment-btn').forEach(btn => {
+            btn.classList.remove('active', 'status-klar', 'status-service', 'status-urdrift');
+        });
+    };
+
     window.setSegment = (type, val, save = true) => {
         const inputEl = document.getElementById(type);
         if (!inputEl) return;
@@ -524,7 +607,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const okBtn = document.getElementById(`btn-${type}-ok`); 
         const nokBtn = document.getElementById(`btn-${type}-nok`);
 
-        // Välj rätt container-ID beroende på typ
         let boxId;
         if (type === 'truck' || type === 'maskin') {
             boxId = type + 'Container';
@@ -539,7 +621,6 @@ document.addEventListener('DOMContentLoaded', () => {
             okBtn?.classList.remove('nok');
             nokBtn?.classList.remove('active', 'nok'); 
             if (box) box.classList.add('hidden');
-            // Töm listan och localStorage om man byter tillbaka till OK
             if (type === 'truck') {
                 truckArray = [];
                 localStorage.removeItem('draft_truckArray');
@@ -556,7 +637,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // FIX 4: selectMachine rensar aktiv markering korrekt
     window.selectMachine = (name, element) => {
         document.querySelectorAll('.machine-item').forEach(item => item.classList.remove('active'));
         const subContainer = document.getElementById('machineSubIdContainer');
@@ -566,7 +646,6 @@ document.addEventListener('DOMContentLoaded', () => {
         element.classList.add('active');
         document.getElementById('selectedMachineName').value = name;
 
-        // Återställ sub-ID och feltyp när ny maskin väljs
         subSelect.innerHTML = '<option value="">-- Välj ID --</option>';
         felSelect.innerHTML = '<option value="">-- Feltyp --</option><option>Mekaniskt</option><option>Elektriskt</option>' + (name === 'Övrigt' ? '<option>Lokal</option>' : '') + '<option>Annat</option>';
 
@@ -587,20 +666,32 @@ document.addEventListener('DOMContentLoaded', () => {
             const id = document.getElementById('truckId'); 
             const fel = document.getElementById('truckFel'); 
             const kom = document.getElementById('truckKom');
+            const statusVal = document.getElementById('truckStatus').value;
             if (!id.value || !fel.value) { alert("Välj truck och feltyp!"); return; }
-            truckArray.push({ id: id.value, fel: fel.value, kom: kom.value });
+            if (!statusVal) { alert("Välj status: Klar, Service eller Ur drift!"); return; }
+            if (statusVal === 'Klar' && !kom.value.trim()) { alert("Beskriv vad som gjordes för att åtgärda!"); return; }
+
+            truckArray.push({ id: id.value, fel: fel.value, kom: kom.value, status: statusVal });
             localStorage.setItem('draft_truckArray', JSON.stringify(truckArray));
-            id.value = ""; fel.value = ""; kom.value = "";
+
+            id.value = ""; fel.value = ""; kom.value = ""; kom.placeholder = "Kommentar...";
+            resetItemStatus('truck');
             document.getElementById('card-truck').classList.remove('error-attention');
         } else {
             const name = document.getElementById('selectedMachineName').value;
             const subId = document.getElementById('machineSubId').value;
             const fel = document.getElementById('machineFel'); 
             const kom = document.getElementById('machineKom');
+            const statusVal = document.getElementById('maskinStatus').value;
             if (!name || (name !== 'Övrigt' && !subId) || !fel.value) { alert("Välj maskin och feltyp!"); return; }
-            maskinArray.push({ id: (name === 'Övrigt' ? 'Övrigt' : subId), fel: fel.value, kom: kom.value });
+            if (!statusVal) { alert("Välj status: Klar, Service eller Ur drift!"); return; }
+            if (statusVal === 'Klar' && !kom.value.trim()) { alert("Beskriv vad som gjordes för att åtgärda!"); return; }
+
+            maskinArray.push({ id: (name === 'Övrigt' ? 'Övrigt' : subId), fel: fel.value, kom: kom.value, status: statusVal });
             localStorage.setItem('draft_maskinArray', JSON.stringify(maskinArray));
-            fel.value = ""; kom.value = "";
+
+            fel.value = ""; kom.value = ""; kom.placeholder = "Kommentar...";
+            resetItemStatus('maskin');
             document.getElementById('card-maskin').classList.remove('error-attention');
         }
         renderList(type);
@@ -618,13 +709,19 @@ document.addEventListener('DOMContentLoaded', () => {
         renderList(type);
     };
 
+    function statusBadgeClass(status) {
+        if (status === 'Klar') return 'badge-klar';
+        if (status === 'Service') return 'badge-service';
+        return 'badge-urdrift';
+    }
+
     function renderList(type) {
         const div = document.getElementById(type + 'List'); 
         const arr = (type === 'truck' ? truckArray : maskinArray);
         if (!div) return;
         if (arr.length === 0) { div.classList.add('hidden'); return; }
         div.classList.remove('hidden');
-        div.innerHTML = arr.map((t, i) => `<div class="list-item"><span><strong>${t.id}</strong>: ${t.fel}</span><button type="button" class="danger" style="width:auto; padding:4px 8px;" onclick="removeItem('${type}', ${i})">Ta bort</button></div>`).join('');
+        div.innerHTML = arr.map((t, i) => `<div class="list-item"><span><span class="status-badge ${statusBadgeClass(t.status)}">${t.status}</span><strong>${t.id}</strong>: ${t.fel}</span><button type="button" class="danger" style="width:auto; padding:4px 8px;" onclick="removeItem('${type}', ${i})">Ta bort</button></div>`).join('');
     }
 
     window.clearForm = () => { 
@@ -706,16 +803,20 @@ document.addEventListener('DOMContentLoaded', () => {
             return `<span class="confirm-badge ${isOk ? 'badge-ok' : 'badge-nok'}">${val}</span>`;
         }
 
+        function itemLabel(item) {
+            return `${item.id} (${item.status})`;
+        }
+
         let html = `
             <div class="confirm-row"><strong>Rapportör</strong><span>${data.signatur}</span></div>
             <div class="confirm-row"><strong>Truckstatus</strong>${badge(data.truckstatus)}</div>
         `;
         if (truckArr.length > 0) {
-            html += `<div class="confirm-row"><strong>Truckar</strong><span>${truckArr.map(t => t.id).join(', ')}</span></div>`;
+            html += `<div class="confirm-row"><strong>Truckar</strong><span>${truckArr.map(itemLabel).join(', ')}</span></div>`;
         }
         html += `<div class="confirm-row"><strong>Maskiner</strong>${badge(maskinArr.length > 0 ? 'NOK' : 'OK')}</div>`;
         if (maskinArr.length > 0) {
-            html += `<div class="confirm-row"><strong>Maskiner</strong><span>${maskinArr.map(m => m.id).join(', ')}</span></div>`;
+            html += `<div class="confirm-row"><strong>Maskiner</strong><span>${maskinArr.map(itemLabel).join(', ')}</span></div>`;
         }
         html += `
             <div class="confirm-row"><strong>Tillsyn</strong>${badge(data.tillsyn)}</div>
@@ -730,7 +831,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.startNewReport = () => {
         document.getElementById('confirmScreen').classList.remove('visible');
-        // Rensa draft utom namn och avdelning
         const keepKeys = ['draft_signatur', 'draft_avdelning'];
         Object.keys(localStorage).forEach(key => {
             if (key.startsWith('draft_') && !keepKeys.includes(key)) {
@@ -749,7 +849,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const el = document.getElementById(key);
                 if (el) {
                     if (el.type === 'hidden') {
-                        // FIX 2: Anropa setSegment med save=false för att öppna rätt container
                         window.setSegment(key, val, false);
                     } else {
                         el.value = val;
@@ -796,7 +895,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let firstErrorElement = null;
 
         const isTruckNok = document.getElementById('truck').value !== 'OK';
-        // FIX 3: maskin kollar nu konsekvent mot 'OK'
         const isMaskinNok = document.getElementById('maskin').value !== 'OK';
 
         document.querySelectorAll('.card').forEach(c => c.classList.remove('error-attention'));
@@ -839,7 +937,6 @@ document.addEventListener('DOMContentLoaded', () => {
             datum: document.getElementById('datum').value,
             avdelning: document.getElementById('avdelning').value,
             skift: currentSkift,
-            // FIX 3: maskinArray töms om maskin är OK (konsekvent med truck-logiken)
             harAvvikelse: (isTruckNok || isMaskinNok || document.getElementById('tillsyn').value === 'NOK'),
             truckstatus: document.getElementById('truck').value,
             truckar: isTruckNok ? truckArray : [],
@@ -853,7 +950,7 @@ document.addEventListener('DOMContentLoaded', () => {
             atgard: document.getElementById('atgard').value
         };
 
-        // FIX: Nätverksfeedback med timeout
+        // Nätverksfeedback med timeout
         fetchStatus.textContent = '📡 Skickar till Google Sheets...';
         fetchStatus.className = 'fetch-status sending';
 
@@ -861,7 +958,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), 10000);
             
-            await fetch("https://script.google.com/macros/s/AKfycbwe61FQHnWhKQ7X-KfYEZD-QQbciJ9cOJ1EnVmCEIpD8K-5PTxipEsbcK8DjPkeD9-G/exec", { 
+            await fetch("https://script.google.com/macros/s/AKfycbzwryC3MR126rTGf2cxxbMZL3HU1_4Tig7YWP9sNA2Mz4j1J5jS2yVq6fgdAr02X7cT/exec", { 
                 method: "POST", 
                 mode: "no-cors", 
                 body: JSON.stringify(data),
@@ -890,12 +987,12 @@ document.addEventListener('DOMContentLoaded', () => {
         mailBody += `Avdelning: ${data.avdelning}\n\n`;
         mailBody += `TRUCKSTATUS: ${data.truckstatus}\n`;
         if (truckArray.length > 0) {
-            truckArray.forEach(t => mailBody += `- ${t.id}: ${t.fel} (${t.kom})\n`);
+            truckArray.forEach(t => mailBody += `- ${t.id}: ${t.fel} [${t.status}] (${t.kom})\n`);
         }
         mailBody += `\n`;
         mailBody += `MASKINER & VERKTYG: ${maskinArray.length > 0 ? 'Felanmälan' : 'OK'}\n`;
         if (maskinArray.length > 0) {
-            maskinArray.forEach(m => mailBody += `- ${m.id}: ${m.fel} (${m.kom})\n`);
+            maskinArray.forEach(m => mailBody += `- ${m.id}: ${m.fel} [${m.status}] (${m.kom})\n`);
         }
         mailBody += `\n`;
         mailBody += `TILLSYN TRUCKAR: ${data.tillsyn}\n`;
