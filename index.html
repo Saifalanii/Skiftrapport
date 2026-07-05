@@ -61,7 +61,6 @@
 
         .icon { width: 1.2em; height: 1.2em; vertical-align: middle; margin-right: 8px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         
-        /* OFFLINE BANNEr */
         .offline-banner {
             display: none;
             background: #e67e22;
@@ -87,7 +86,6 @@
 
         h2 { text-align: center; margin: 15px 0; font-size: var(--h2-font); display: flex; align-items: center; justify-content: center; }
         
-        /* SKIFT BADGE */
         .skift-badge {
             display: flex;
             align-items: center;
@@ -147,7 +145,6 @@
         }
         input:focus, select:focus, textarea:focus { border-color: var(--teams-purple); }
 
-        /* STATUS VID RAPPORTERING: Klar / Service / Ur drift */
         .status-label {
             font-weight: normal;
             font-size: 0.8em;
@@ -221,7 +218,6 @@
         .list-container { margin-top: 10px; background: var(--teams-bg); padding: 12px; border-radius: 8px; border-left: 4px solid var(--teams-purple); }
         .list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--teams-border); font-size: 0.9em; animation: fadeIn 0.25s ease; }
         
-        /* BOTTOM SHEET */
         .sheet-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.45);
@@ -275,7 +271,6 @@
         .sheet-body { flex: 1; overflow: hidden; overscroll-behavior: contain; }
         .sheet-body iframe { width: 100%; height: 100%; border: none; border-radius: 8px; }
 
-        /* MOBIL KORT-VY */
         .stats-tabs {
             display: flex; gap: 8px; margin-bottom: 10px; flex-shrink: 0;
             overflow-x: auto; -webkit-overflow-scrolling: touch;
@@ -286,6 +281,26 @@
             color: var(--text-sec); font-size: 0.8rem; font-weight: 600; cursor: pointer;
         }
         .stats-tab.active { background: var(--teams-purple); color: white; border-color: var(--teams-purple); }
+
+        .stats-search {
+            width: 100%; padding: 10px 12px; margin-bottom: 10px;
+            border-radius: 10px; border: 1px solid var(--teams-border);
+            background: var(--teams-bg); color: var(--text-main);
+            font-size: 0.85rem; flex-shrink: 0;
+        }
+        .stats-filter-row {
+            display: flex; gap: 6px; margin-bottom: 10px; flex-shrink: 0;
+            overflow-x: auto; -webkit-overflow-scrolling: touch;
+        }
+        .stats-filter-chip {
+            flex-shrink: 0; padding: 6px 12px; border-radius: 20px;
+            border: 1px solid var(--teams-border); background: transparent;
+            color: var(--text-sec); font-size: 0.75rem; font-weight: 600; cursor: pointer;
+        }
+        .stats-filter-chip.active[data-filter="ALL"] { background: var(--teams-purple); color: white; border-color: var(--teams-purple); }
+        .stats-filter-chip.active[data-filter="KLAR"] { background: var(--pastel-green); color: var(--pastel-green-text); border-color: var(--pastel-green); }
+        .stats-filter-chip.active[data-filter="SERVICE"] { background: var(--pastel-yellow); color: var(--pastel-yellow-text); border-color: var(--pastel-yellow); }
+        .stats-filter-chip.active[data-filter="UR DRIFT"] { background: var(--pastel-red); color: var(--danger); border-color: var(--pastel-red); }
         .stats-cards { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
         .stats-card {
             background: var(--teams-bg); border: 1px solid var(--teams-border); border-radius: 12px;
@@ -302,7 +317,6 @@
         .stats-field-value.freetext { text-align: left; flex: 1; white-space: pre-wrap; }
         .stats-loading, .stats-empty { text-align: center; color: var(--text-sec); padding: 30px 10px; font-size: 0.9rem; }
 
-        /* DESKTOP */
         @media (min-width: 700px) {
             .sheet-overlay { align-items: center; }
             .bottom-sheet {
@@ -328,7 +342,6 @@
             .stats-card { margin-bottom: 0; }
         }
 
-        /* CONFIRMATION SCREEN */
         .confirm-screen {
             display: none;
             position: fixed;
@@ -358,7 +371,6 @@
         .badge-nok { background: #fde8e8; color: var(--danger); }
         .confirm-new-btn { background: var(--teams-purple); color: white; width: 100%; padding: 16px; font-size: 1rem; border-radius: 12px; border: none; cursor: pointer; font-weight: 700; margin-top: 10px; }
 
-        /* FETCH STATUS */
         .fetch-status {
             text-align: center;
             font-size: 0.8rem;
@@ -376,7 +388,6 @@
         .top-button-row { display: flex; gap: 10px; margin-bottom: 15px; }
         .top-button-row button { flex: 1; font-size: 0.85em; padding: 10px 5px; }
 
-        /* AI SVARSRUTA */
         #aiAnswer {
             white-space: pre-wrap; line-height: 1.5; font-size: 0.9rem;
             background: rgba(91, 95, 199, 0.08);
@@ -415,7 +426,6 @@
 </head>
 <body>
 
-<!-- Offline banner -->
 <div class="offline-banner" id="offlineBanner">⚠️ Ingen internetanslutning – rapporten kan inte skickas</div>
 
 <div class="container">
@@ -435,7 +445,6 @@
         Skiftrapport
     </h2>
 
-    <!-- Skift visas för användaren -->
     <div class="skift-badge">
         <div class="skift-pill" id="skiftPill">⏱ Beräknar skift...</div>
     </div>
@@ -591,7 +600,6 @@
             <textarea id="atgard" placeholder="Åtgärder..." class="save-data"></textarea>
         </div>
 
-        <!-- AI FELSÖKNINGSHJÄLP -->
         <div class="card" id="card-ai">
             <label>AI Felsökningshjälp</label>
             <select id="aiMaskin">
@@ -612,13 +620,11 @@
             <button type="submit" id="submitBtn" class="primary" style="flex:2;" onclick="vibrate(60);">Skicka Rapport</button>
         </div>
 
-        <!-- Nätverksfeedback -->
         <div class="fetch-status" id="fetchStatus"></div>
     </form>
-    <div class="version-text">v1.7.0</div>
+    <div class="version-text">v1.8.0</div>
 </div>
 
-<!-- Stats bottom sheet -->
 <div id="statsOverlay" class="sheet-overlay" onclick="if(event.target === this) closeStats();">
     <div class="bottom-sheet">
         <div class="sheet-handle"></div>
@@ -626,20 +632,24 @@
             <h3>Status</h3>
             <button class="sheet-close-btn" onclick="closeStats(); vibrate(30);" aria-label="Stäng">✕</button>
         </div>
-        <input type="text" id="statusSearch" placeholder="Sök / filtrera status..." onkeyup="filterStatus()" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 1px solid var(--teams-border); background: var(--teams-card); color: var(--text-main); font-size: 16px;">
-        <div class="stats-tabs hidden" id="statsTabs">
+        <div class="stats-tabs" id="statsTabs">
             <button type="button" class="stats-tab active" data-sheet="Skiftrapport" onclick="switchStatsSheet('Skiftrapport'); vibrate(20);">Rapporter</button>
             <button type="button" class="stats-tab" data-sheet="Truckavvikelse" onclick="switchStatsSheet('Truckavvikelse'); vibrate(20);">Truckar</button>
             <button type="button" class="stats-tab" data-sheet="Maskiner" onclick="switchStatsSheet('Maskiner'); vibrate(20);">Maskiner</button>
         </div>
+        <input type="text" id="statsSearch" class="stats-search" placeholder="Sök..." oninput="applyStatsFilters()">
+        <div class="stats-filter-row hidden" id="statsFilterRow">
+            <button type="button" class="stats-filter-chip active" data-filter="ALL" onclick="setStatsFilter('ALL')">Alla</button>
+            <button type="button" class="stats-filter-chip" data-filter="KLAR" onclick="setStatsFilter('KLAR')">Klar</button>
+            <button type="button" class="stats-filter-chip" data-filter="SERVICE" onclick="setStatsFilter('SERVICE')">Service</button>
+            <button type="button" class="stats-filter-chip" data-filter="UR DRIFT" onclick="setStatsFilter('UR DRIFT')">Ur drift</button>
+        </div>
         <div class="sheet-body">
-            <iframe id="statsIframe" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRw6n_3d87vAX6DVNmEZ-JwkOYDQcB1scVLhghcY6Cxam8Oq9VEvz1xhMvF89KOsGGJWZFxdNhCE5lZ/pubhtml?widget=true&amp;headers=false"></iframe>
-            <div id="statsCards" class="stats-cards hidden"></div>
+            <div id="statsCards" class="stats-cards"></div>
         </div>
     </div>
 </div>
 
-<!-- Bekräftelseskärm -->
 <div class="confirm-screen" id="confirmScreen">
     <div class="confirm-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -667,7 +677,6 @@ document.addEventListener('DOMContentLoaded', () => {
         'Laddare': ['Truckladdare', 'Movexx laddare', 'Bandmaskin laddare', 'Pallyftare laddare', 'Övrigt laddare']
     };
 
-    // --- OFFLINE-DETEKTION ---
     function updateOnlineStatus() {
         const banner = document.getElementById('offlineBanner');
         if (!navigator.onLine) {
@@ -680,7 +689,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('offline', updateOnlineStatus);
     updateOnlineStatus();
 
-    // --- SKIFT-BADGE ---
     function getSkift() { 
         const h = new Date().getHours(); 
         if (h >= 8 && h < 17) return "Dagskift";
@@ -695,10 +703,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (pill) pill.textContent = `${icons[skift] || '⏱'} ${skift}`;
     }
     updateSkiftBadge();
-    // Uppdatera skift varje minut
     setInterval(updateSkiftBadge, 60000);
 
-    // --- GLOBALA FUNKTIONER ---
     
     function checkTruckReady() {
         const ready = document.getElementById('truckId').value && document.getElementById('truckFel').value;
@@ -732,7 +738,6 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('fontSize', isChecked ? 'large' : 'normal');
     };
 
-  
     window.setItemStatus = (type, status) => {
         const hiddenId = type === 'truck' ? 'truckStatus' : 'maskinStatus';
         const controlId = type === 'truck' ? 'truckStatusControl' : 'maskinStatusControl';
@@ -755,7 +760,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (kom) kom.placeholder = status === 'Klar' ? "Vad gjordes för att åtgärda? *" : "Kommentar...";
     };
 
-    // Nollställer statusknapparna efter att en post lagts till i listan.
     window.resetItemStatus = (type) => {
         const hiddenId = type === 'truck' ? 'truckStatus' : 'maskinStatus';
         const controlId = type === 'truck' ? 'truckStatusControl' : 'maskinStatusControl';
@@ -907,7 +911,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } 
     };
 
-   
     let scrollLockY = 0;
     function lockBodyScroll() {
         scrollLockY = window.scrollY;
@@ -922,11 +925,8 @@ document.addEventListener('DOMContentLoaded', () => {
         window.scrollTo(0, scrollLockY);
     }
 
-    // --- MOBIL KORT-VY FÖR STATISTIK ---
-    // Samma spreadsheet som "Kalkylark"-knappen och Truckavvikelse/Maskiner-flikarna pekar på.
     const STATS_SPREADSHEET_ID = "1Pl8CX0uS1047P2SvNceA64yn0HRr9YSgnwXpzSFRjtw";
 
-    // Kolumnindex matchar exakt ordningen appendRow() skriver i Code.gs för respektive flik.
     const STATS_SHEET_CONFIGS = {
         'Skiftrapport': {
             title: r => r[2] || 'Ej angivet',
@@ -946,6 +946,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'Truckavvikelse': {
             title: r => r[4] || 'Okänd truck',
             sub: r => [r[0], r[1], r[2]].filter(Boolean).join(' · '),
+            primaryStatusField: 7,
             fields: [
                 { label: 'Feltyp', col: 5, freetext: true },
                 { label: 'Kommentar', col: 6, freetext: true },
@@ -956,6 +957,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'Maskiner': {
             title: r => r[4] || 'Okänd maskin',
             sub: r => [r[0], r[1], r[2]].filter(Boolean).join(' · '),
+            primaryStatusField: 7,
             fields: [
                 { label: 'Feltyp', col: 5, freetext: true },
                 { label: 'Kommentar', col: 6, freetext: true },
@@ -966,7 +968,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     let currentStatsSheet = 'Skiftrapport';
-    const statsCache = {}; // undviker onödiga nätverksanrop vid flikbyte fram och tillbaka
+    let currentStatsFilter = 'ALL';
+    const statsCache = {};
 
     function statsBadgeClass(value) {
         const v = (value || '').toString().trim().toUpperCase();
@@ -978,7 +981,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function formatStatsCell(cell) {
         if (cell === null || cell === undefined) return '';
-        // gviz skickar datum som t.ex. "Date(2026,6,4,16,23,0)" - gör om till svenskt datumformat
         if (typeof cell === 'string' && cell.indexOf('Date(') === 0) {
             const parts = cell.match(/Date\(([^)]+)\)/)[1].split(',').map(Number);
             return new Date(parts[0], parts[1], parts[2]).toLocaleDateString('sv-SE');
@@ -1000,12 +1002,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return rows;
     }
 
-    function renderStatsCards(sheetName, rows) {
+    function renderStatsCards(sheetName, rows, emptyMessage) {
         const config = STATS_SHEET_CONFIGS[sheetName];
         const container = document.getElementById('statsCards');
 
         if (rows.length === 0) {
-            container.innerHTML = '<div class="stats-empty">Inga rader hittades.</div>';
+            container.innerHTML = `<div class="stats-empty">${emptyMessage || 'Inga rader hittades.'}</div>`;
             return;
         }
 
@@ -1031,51 +1033,66 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.switchStatsSheet = async (sheetName) => {
         currentStatsSheet = sheetName;
+        currentStatsFilter = 'ALL';
+        document.getElementById('statsSearch').value = '';
         document.querySelectorAll('.stats-tab').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.sheet === sheetName);
         });
+
+        const config = STATS_SHEET_CONFIGS[sheetName];
+        const filterRow = document.getElementById('statsFilterRow');
+        filterRow.classList.toggle('hidden', config.primaryStatusField === undefined);
+        filterRow.querySelectorAll('.stats-filter-chip').forEach(chip => {
+            chip.classList.toggle('active', chip.dataset.filter === 'ALL');
+        });
+
         const container = document.getElementById('statsCards');
         container.innerHTML = '<div class="stats-loading">Hämtar data...</div>';
         try {
-            const rows = await fetchStatsRows(sheetName);
-            renderStatsCards(sheetName, rows);
+            await fetchStatsRows(sheetName);
+            applyStatsFilters();
         } catch (err) {
-            console.error('Kunde inte hämta statistik:', err);
+            console.error('Kunde inte hämta status:', err);
             container.innerHTML = '<div class="stats-empty">Kunde inte hämta data. Kontrollera anslutningen.</div>';
         }
+    };
+
+    window.setStatsFilter = (filterValue) => {
+        currentStatsFilter = filterValue;
+        document.querySelectorAll('.stats-filter-chip').forEach(chip => {
+            chip.classList.toggle('active', chip.dataset.filter === filterValue);
+        });
+        vibrate(20);
+        applyStatsFilters();
+    };
+
+    window.applyStatsFilters = () => {
+        const config = STATS_SHEET_CONFIGS[currentStatsSheet];
+        const allRows = statsCache[currentStatsSheet] || [];
+        const searchTerm = document.getElementById('statsSearch').value.toLowerCase().trim();
+
+        let filtered = allRows;
+        if (currentStatsFilter !== 'ALL' && config.primaryStatusField !== undefined) {
+            filtered = filtered.filter(r => (r[config.primaryStatusField] || '').toString().trim().toUpperCase() === currentStatsFilter);
+        }
+        if (searchTerm) {
+            filtered = filtered.filter(r => r.some(cell => (cell || '').toString().toLowerCase().includes(searchTerm)));
+        }
+
+        const emptyMessage = allRows.length > 0 ? 'Inga träffar.' : 'Inga rader hittades.';
+        renderStatsCards(currentStatsSheet, filtered, emptyMessage);
     };
 
     window.openStats = () => {
         document.getElementById("statsOverlay").classList.add("visible");
         lockBodyScroll();
-
-       
-        const iframe = document.getElementById('statsIframe');
-        const cards = document.getElementById('statsCards');
-        const tabs = document.getElementById('statsTabs');
-
-        iframe.classList.add('hidden');
-        cards.classList.remove('hidden');
-        tabs.classList.remove('hidden');
         window.switchStatsSheet(currentStatsSheet);
     };
-    
     window.closeStats = () => {
         document.getElementById("statsOverlay").classList.remove("visible");
         unlockBodyScroll();
     };
 
-    // --- NY SÖKFUNKTION FÖR STATUS ---
-    window.filterStatus = () => {
-        const filter = document.getElementById('statusSearch').value.toLowerCase();
-        const cards = document.querySelectorAll('#statsCards .stats-card');
-        cards.forEach(card => {
-            const text = card.textContent.toLowerCase();
-            card.style.display = text.includes(filter) ? '' : 'none';
-        });
-    };
-
-    // --- AI FELSÖKNINGSHJÄLP ---
     window.askAI = async () => {
         const maskin = document.getElementById('aiMaskin').value;
         const problem = document.getElementById('aiProblem').value.trim();
@@ -1106,8 +1123,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const result = await response.json();
 
-            // Samma exakta fras som backend tvingar fram vid avvisning (se AI_REFUSAL_TEXT i Code.gs).
-            // Håll denna i synk om frasen någonsin ändras där.
             const REFUSAL_TEXT = "Jag är inställd på att endast hjälpa till med teknisk felsökning utifrån manualen. Vänligen ställ en fråga relaterad till dokumentationen.";
 
             if (result.success) {
@@ -1115,7 +1130,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 answerBox.classList.toggle('ai-refusal', isRefusal);
 
                 if (isRefusal) {
-                 
                     answerBox.innerHTML = '<span class="ai-refusal-label">Kunde inte besvaras</span>'
                         + 'Frågan matchar inte innehållet i <strong>' + maskin + '</strong>-manualen. '
                         + 'Dubbelkolla att rätt maskin är vald ovan, eller kontakta arbetsledare om frågan gäller något manualen inte täcker.';
@@ -1143,7 +1157,6 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.innerText = "Fråga AI";
     };
 
-    // --- BEKRÄFTELSESKÄRM ---
     function showConfirmScreen(data, truckArr, maskinArr) {
         const screen = document.getElementById('confirmScreen');
         const sub = document.getElementById('confirmSub');
@@ -1193,7 +1206,6 @@ document.addEventListener('DOMContentLoaded', () => {
         location.reload();
     };
 
-    // --- INITIERING ---
     function loadSavedData() {
         const keys = ['signatur', 'datum', 'avdelning', 'truck', 'maskin', 'tillsyn', 'tillsynfel', 'rengoring', 'rengoringKommentar', 'drift', 'avvikelse', 'atgard'];
         keys.forEach(key => {
@@ -1231,7 +1243,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (datumEl && !datumEl.value) datumEl.value = today;
     }
 
-   
     (function initSheetDrag() {
         const sheet = document.querySelector('.bottom-sheet');
         const dragZones = [document.querySelector('.sheet-handle'), document.querySelector('.sheet-header')].filter(Boolean);
@@ -1240,7 +1251,6 @@ document.addEventListener('DOMContentLoaded', () => {
         function getY(e) { return e.touches ? e.touches[0].clientY : e.clientY; }
 
         function onStart(e) {
-           
             if (window.innerWidth >= 700) return;
             dragging = true;
             startY = getY(e);
@@ -1256,7 +1266,6 @@ document.addEventListener('DOMContentLoaded', () => {
             dragging = false;
             sheet.style.transition = '';
             sheet.style.transform = '';
-            // Dra ner mer än ~100px = stäng, annars snäpper den tillbaka upp
             if (deltaY > 100) {
                 window.closeStats();
             }
@@ -1275,7 +1284,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadSavedData();
 
-    // Event listeners för draft-sparning
     document.addEventListener('input', (e) => { 
         if (e.target.classList.contains('save-data')) {
             localStorage.setItem('draft_' + e.target.id, e.target.value);
@@ -1283,7 +1291,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- FORMULÄRINLÄMNING ---
     document.getElementById('reportForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         let hasError = false;
@@ -1345,7 +1352,6 @@ document.addEventListener('DOMContentLoaded', () => {
             atgard: document.getElementById('atgard').value
         };
 
-        // Nätverksfeedback med timeout
         fetchStatus.textContent = '📡 Skickar till Google Sheets...';
         fetchStatus.className = 'fetch-status sending';
 
@@ -1353,7 +1359,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), 10000);
             
-            await fetch("https://script.google.com/macros/s/AKfycbzfTKDjDt5k6MBN3lrGjPvqya_4KlwtNWMbzxSHu_7sNl21IxCN-FLIbttSnHs2hq5z/exec", { 
+            await fetch("https://script.google.com/macros/s/AKfycbyZEUSfT8Lh-8Hj9dwSOHIobOIw9-ieTw2LU6ENWTlh1ZgHSnrvxnBYVAKl_D4tzLv-/exec", { 
                 method: "POST", 
                 mode: "no-cors", 
                 body: JSON.stringify(data),
@@ -1372,7 +1378,6 @@ document.addEventListener('DOMContentLoaded', () => {
             fetchStatus.className = 'fetch-status error';
         }
 
-        // Bygg e-posttext
         const mailSubject = `Skiftrapport, ${currentSkift}, ${data.datum}`;
         let mailBody = `SKIFTRAPPORT\n`;
         mailBody += `--------------------------------\n`;
@@ -1404,7 +1409,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const mailTo = ["rapport.vovlo@samhall.se", "volvooc@samhall.onmicrosoft.com"].join(navigator.userAgent.toLowerCase().includes("windows") ? ";" : ",");
         window.location.href = `mailto:${mailTo}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
         
-        // Rensa draft-data (utom namn/avdelning) och visa bekräftelseskärm
         Object.keys(localStorage).forEach(key => {
             if (key.startsWith('draft_') && key !== 'draft_signatur' && key !== 'draft_avdelning') {
                 localStorage.removeItem(key);
@@ -1414,7 +1418,6 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.disabled = false; 
         btn.innerText = "Skicka Rapport";
 
-        // Visa bekräftelseskärm
         showConfirmScreen(data, isTruckNok ? truckArray : [], isMaskinNok ? maskinArray : []);
     });
 });
