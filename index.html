@@ -217,7 +217,7 @@
         .danger { background: var(--danger); color: white; }
         .add-btn { background: var(--success); color: white; margin-top: 5px; width: 100%; }
 
-        .hidden { display: none; }
+        .hidden { display: none !important; }
         .list-container { margin-top: 10px; background: var(--teams-bg); padding: 12px; border-radius: 8px; border-left: 4px solid var(--teams-purple); }
         .list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--teams-border); font-size: 0.9em; animation: fadeIn 0.25s ease; }
         
@@ -277,6 +277,34 @@
         }
         .sheet-body { flex: 1; overflow: hidden; overscroll-behavior: contain; }
         .sheet-body iframe { width: 100%; height: 100%; border: none; border-radius: 8px; }
+
+        /* MOBIL KORT-VY: ersätter den inbäddade Google Sheets-tabellen på mobil, så man
+           slipper scrolla i sidled - varje rad blir ett kort med etiketterade fält istället. */
+        .stats-tabs {
+            display: flex; gap: 8px; margin-bottom: 10px; flex-shrink: 0;
+            overflow-x: auto; -webkit-overflow-scrolling: touch;
+        }
+        .stats-tab {
+            flex-shrink: 0; padding: 8px 14px; border-radius: 20px;
+            border: 1px solid var(--teams-border); background: var(--teams-bg);
+            color: var(--text-sec); font-size: 0.8rem; font-weight: 600; cursor: pointer;
+        }
+        .stats-tab.active { background: var(--teams-purple); color: white; border-color: var(--teams-purple); }
+        .stats-cards { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+        .stats-card {
+            background: var(--teams-bg); border: 1px solid var(--teams-border); border-radius: 12px;
+            padding: 14px; margin-bottom: 10px; animation: fadeIn 0.25s ease;
+        }
+        .stats-card-title { font-weight: 700; font-size: 1rem; margin-bottom: 2px; }
+        .stats-card-sub { font-size: 0.75rem; color: var(--text-sec); margin-bottom: 10px; }
+        .stats-field {
+            display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
+            padding: 6px 0; font-size: 0.85rem; border-top: 1px solid var(--teams-border);
+        }
+        .stats-field:first-of-type { border-top: none; }
+        .stats-field-label { color: var(--text-sec); font-weight: 600; flex-shrink: 0; }
+        .stats-field-value.freetext { text-align: left; flex: 1; white-space: pre-wrap; }
+        .stats-loading, .stats-empty { text-align: center; color: var(--text-sec); padding: 30px 10px; font-size: 0.9rem; }
 
         /* DESKTOP: samma markup, men presenteras som en centrerad dialog istället för
            en bottom sheet - dra-i-handtaget hör hemma på mobil, inte med musen på PC. */
@@ -587,7 +615,7 @@
         <!-- Nätverksfeedback -->
         <div class="fetch-status" id="fetchStatus"></div>
     </form>
-    <div class="version-text">v1.5.2</div>
+    <div class="version-text">v1.6.1</div>
 </div>
 
 <!-- Stats bottom sheet -->
@@ -598,8 +626,14 @@
             <h3>Statistik</h3>
             <button class="sheet-close-btn" onclick="closeStats(); vibrate(30);" aria-label="Stäng">✕</button>
         </div>
+        <div class="stats-tabs hidden" id="statsTabs">
+            <button type="button" class="stats-tab active" data-sheet="Skiftrapport" onclick="switchStatsSheet('Skiftrapport'); vibrate(20);">Rapporter</button>
+            <button type="button" class="stats-tab" data-sheet="Truckavvikelse" onclick="switchStatsSheet('Truckavvikelse'); vibrate(20);">Truckar</button>
+            <button type="button" class="stats-tab" data-sheet="Maskiner" onclick="switchStatsSheet('Maskiner'); vibrate(20);">Maskiner</button>
+        </div>
         <div class="sheet-body">
-            <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRw6n_3d87vAX6DVNmEZ-JwkOYDQcB1scVLhghcY6Cxam8Oq9VEvz1xhMvF89KOsGGJWZFxdNhCE5lZ/pubhtml?widget=true&amp;headers=false"></iframe>
+            <iframe id="statsIframe" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRw6n_3d87vAX6DVNmEZ-JwkOYDQcB1scVLhghcY6Cxam8Oq9VEvz1xhMvF89KOsGGJWZFxdNhCE5lZ/pubhtml?widget=true&amp;headers=false"></iframe>
+            <div id="statsCards" class="stats-cards hidden"></div>
         </div>
     </div>
 </div>
@@ -892,9 +926,151 @@ document.addEventListener('DOMContentLoaded', () => {
         window.scrollTo(0, scrollLockY);
     }
 
+    // --- MOBIL KORT-VY FÖR STATISTIK ---
+    // Samma spreadsheet som "Kalkylark"-knappen och Truckavvikelse/Maskiner-flikarna pekar på.
+    const STATS_SPREADSHEET_ID = "1Pl8CX0uS1047P2SvNceA64yn0HRr9YSgnwXpzSFRjtw";
+
+    // Kolumnindex matchar exakt ordningen appendRow() skriver i Code.gs för respektive flik.
+    const STATS_SHEET_CONFIGS = {
+        'Skiftrapport': {
+            title: r => r[2] || 'Ej angivet',
+            sub: r => [r[0], r[1], r[3]].filter(Boolean).join(' · '),
+            fields: [
+                { label: 'Truckstatus', col: 4, badge: true },
+                { label: 'Tillsyn truckar', col: 5, badge: true },
+                { label: 'Orsak (tillsyn)', col: 6, freetext: true },
+                { label: 'Maskiner & Verktyg', col: 7, badge: true },
+                { label: 'Rengöring', col: 8, badge: true },
+                { label: 'Orsak (rengöring)', col: 9, freetext: true },
+                { label: 'Driftinfo', col: 10, freetext: true },
+                { label: 'Avvikelse', col: 11, freetext: true },
+                { label: 'Åtgärd', col: 12, freetext: true },
+            ]
+        },
+        'Truckavvikelse': {
+            title: r => r[4] || 'Okänd truck',
+            sub: r => [r[0], r[1], r[2]].filter(Boolean).join(' · '),
+            fields: [
+                { label: 'Feltyp', col: 5, freetext: true },
+                { label: 'Kommentar', col: 6, freetext: true },
+                { label: 'Status', col: 7, badge: true },
+                { label: 'Rapportör', col: 3, freetext: true },
+            ]
+        },
+        'Maskiner': {
+            title: r => r[4] || 'Okänd maskin',
+            sub: r => [r[0], r[1], r[2]].filter(Boolean).join(' · '),
+            fields: [
+                { label: 'Feltyp', col: 5, freetext: true },
+                { label: 'Kommentar', col: 6, freetext: true },
+                { label: 'Status', col: 7, badge: true },
+                { label: 'Rapportör', col: 3, freetext: true },
+            ]
+        }
+    };
+
+    let currentStatsSheet = 'Skiftrapport';
+    const statsCache = {}; // undviker onödiga nätverksanrop vid flikbyte fram och tillbaka
+
+    function isMobileStatsView() {
+        return window.innerWidth < 700;
+    }
+
+    function statsBadgeClass(value) {
+        const v = (value || '').toString().trim().toUpperCase();
+        if (v === 'OK' || v === 'KLAR' || v === 'DONE') return 'badge-klar';
+        if (v === 'SERVICE') return 'badge-service';
+        if (v === 'NOK' || v === 'UR DRIFT' || v === 'OPEN') return 'badge-urdrift';
+        return 'badge-service';
+    }
+
+    function formatStatsCell(cell) {
+        if (cell === null || cell === undefined) return '';
+        // gviz skickar datum som t.ex. "Date(2026,6,4,16,23,0)" - gör om till svenskt datumformat
+        if (typeof cell === 'string' && cell.indexOf('Date(') === 0) {
+            const parts = cell.match(/Date\(([^)]+)\)/)[1].split(',').map(Number);
+            return new Date(parts[0], parts[1], parts[2]).toLocaleDateString('sv-SE');
+        }
+        return cell;
+    }
+
+    async function fetchStatsRows(sheetName) {
+        if (statsCache[sheetName]) return statsCache[sheetName];
+        const tq = encodeURIComponent('select * order by A desc limit 50');
+        const url = `https://docs.google.com/spreadsheets/d/${STATS_SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}&tq=${tq}`;
+        const res = await fetch(url);
+        const text = await res.text();
+        const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);?\s*$/);
+        if (!match) throw new Error('Oväntat svarsformat från Google Sheets');
+        const json = JSON.parse(match[1]);
+        const rows = (json.table.rows || []).map(row => row.c.map(cell => formatStatsCell(cell ? cell.v : '')));
+        statsCache[sheetName] = rows;
+        return rows;
+    }
+
+    function renderStatsCards(sheetName, rows) {
+        const config = STATS_SHEET_CONFIGS[sheetName];
+        const container = document.getElementById('statsCards');
+
+        if (rows.length === 0) {
+            container.innerHTML = '<div class="stats-empty">Inga rader hittades.</div>';
+            return;
+        }
+
+        container.innerHTML = rows.map(r => {
+            const fieldsHtml = config.fields.map(f => {
+                const raw = r[f.col];
+                if (f.freetext && !raw) return ''; // dölj tomma kommentarsfält, precis som i tabellen
+                if (f.badge) {
+                    return `<div class="stats-field"><span class="stats-field-label">${f.label}</span>`
+                        + `<span class="status-badge ${statsBadgeClass(raw)}">${raw || '-'}</span></div>`;
+                }
+                return `<div class="stats-field"><span class="stats-field-label">${f.label}</span>`
+                    + `<span class="stats-field-value freetext">${raw}</span></div>`;
+            }).join('');
+
+            return `<div class="stats-card">`
+                + `<div class="stats-card-title">${config.title(r)}</div>`
+                + `<div class="stats-card-sub">${config.sub(r)}</div>`
+                + fieldsHtml
+                + `</div>`;
+        }).join('');
+    }
+
+    window.switchStatsSheet = async (sheetName) => {
+        currentStatsSheet = sheetName;
+        document.querySelectorAll('.stats-tab').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.sheet === sheetName);
+        });
+        const container = document.getElementById('statsCards');
+        container.innerHTML = '<div class="stats-loading">Hämtar data...</div>';
+        try {
+            const rows = await fetchStatsRows(sheetName);
+            renderStatsCards(sheetName, rows);
+        } catch (err) {
+            console.error('Kunde inte hämta statistik:', err);
+            container.innerHTML = '<div class="stats-empty">Kunde inte hämta data. Kontrollera anslutningen.</div>';
+        }
+    };
+
     window.openStats = () => {
         document.getElementById("statsOverlay").classList.add("visible");
         lockBodyScroll();
+
+        const iframe = document.getElementById('statsIframe');
+        const cards = document.getElementById('statsCards');
+        const tabs = document.getElementById('statsTabs');
+
+        if (isMobileStatsView()) {
+            iframe.classList.add('hidden');
+            cards.classList.remove('hidden');
+            tabs.classList.remove('hidden');
+            window.switchStatsSheet(currentStatsSheet);
+        } else {
+            iframe.classList.remove('hidden');
+            cards.classList.add('hidden');
+            tabs.classList.add('hidden');
+        }
     };
     window.closeStats = () => {
         document.getElementById("statsOverlay").classList.remove("visible");
