@@ -181,7 +181,7 @@
         .machine-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         .machine-circle {
             width: 65px; height: 65px; border-radius: 50%; border: 3px solid var(--teams-border);
-            overflow: hidden; background: #fff; transition: all 0.2s;
+            overflow: hidden; background: var(--teams-card); transition: all 0.2s;
             display: flex; align-items: center; justify-content: center; margin-bottom: 5px;
             padding: 5px; 
         }
@@ -292,7 +292,7 @@
             width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
             color: var(--text-sec); cursor: pointer; padding: 0;
         }
-        .sheet-body { flex: 1; overflow: hidden; overscroll-behavior: contain; }
+        .sheet-body { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
         .sheet-body iframe { width: 100%; height: 100%; border: none; border-radius: 8px; }
 
         .stats-tabs {
@@ -321,7 +321,7 @@
             border: 1px solid var(--teams-border); background: transparent;
             color: var(--text-sec); font-size: 0.75rem; font-weight: 600; cursor: pointer;
         }
-        .stats-filter-chip.active[data-filter="ALL"], .stats-filter-chip.active[data-cat="ALL"] { background: var(--teams-purple); color: white; border-color: var(--teams-purple); }
+        .stats-filter-chip.active { background: var(--teams-purple); color: white; border-color: var(--teams-purple); }
         .stats-filter-chip.active[data-filter="KLAR"] { background: var(--pastel-green); color: var(--pastel-green-text); border-color: var(--pastel-green); }
         .stats-filter-chip.active[data-filter="SERVICE"] { background: var(--pastel-yellow); color: var(--pastel-yellow-text); border-color: var(--pastel-yellow); }
         .stats-filter-chip.active[data-filter="UR DRIFT"] { background: var(--pastel-red); color: var(--danger); border-color: var(--pastel-red); }
@@ -729,48 +729,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     const TRUCK_FEL_OPTIONS = ['Hydraulik/Olja','Chassi','Stativ','Batteri','Drag','Däck','Linde Connect','Belysning','Felkod','Övrigt'];
 
-    // Bildkonfig för picker-menyerna. Fyll i dina egna filnamn nedan och lägg
-    // bilderna i samma mapp som ergopack.png/bandning.png osv. Flera nycklar kan
-    // peka på samma fil (t.ex. grupperade truckmodeller). Saknas en bild eller
-    // 404:ar filen visas automatiskt en initial-cirkel istället.
-    const TRUCK_IMAGES = {
-        'TVS-01': 'truck-model-a.png', 'TVS-02': 'truck-model-a.png', 'TVS-03': 'truck-model-a.png',
-        'TVS-04': 'truck-model-a.png', 'TVS-05': 'truck-model-a.png', 'TVS-06': 'truck-model-a.png',
-        'TVS-13': 'truck-model-b.png', 'TVS-22': 'truck-model-b.png', 'TVS-23': 'truck-model-a.png',
-        'TVS-33': 'truck-model-b.png', 'TVS-34': 'truck-model-a.png', 'TVS-11': 'truck-model-b.png',
-        'TPB-07': 'truck-model-a.png', 'TPB-08': 'truck-model-a.png', 'TPB-09': 'truck-model-a.png',
-        'TPB-10': 'truck-model-a.png', 'TPB-14': 'truck-model-b.png', 'TPB-15': 'truck-model-b.png',
-        'TPB-20': 'truck-model-b.png', 'TPB-21': 'truck-model-b.png', 'TVS-28': 'truck-model-b.png',
-        'TVS-30': 'tvs-30.png'
-    };
-    const TRUCK_FEL_IMAGES = {
-        'Hydraulik/Olja': 'fel-hydraulik.png', 'Chassi': 'fel-chassi.png', 'Stativ': 'fel-stativ.png',
-        'Batteri': 'fel-batteri.png', 'Drag': 'fel-drag.png', 'Däck': 'fel-dack.png',
-        'Linde Connect': 'fel-lindeconnect.png', 'Belysning': 'fel-belysning.png',
-        'Felkod': 'fel-felkod.png', 'Övrigt': 'fel-ovrigt.png'
-    };
-    const MACHINE_FEL_IMAGES = {
-        'Mekaniskt': 'fel-mekaniskt.png', 'Elektriskt': 'fel-elektriskt.png',
-        'Felkod': 'fel-felkod.png', 'Annat': 'fel-annat.png', 'Lokal': 'fel-lokal.png'
-    };
-    // Standardbild per maskinkategori - används som utgångspunkt nedan.
     const MACHINE_CATEGORY_IMAGES = {
         'Ergopack': 'ergopack.png', 'Bandmaskin': 'bandning.png', 'Movexx': 'Movexx.png',
         'Pallyftare': 'pallyft.png', 'Laddare': 'laddare.png'
     };
-    // Fylls automatiskt med kategoribilden för varje enhet (så du slipper mata in
-    // alla för hand), men EFTERSOM VISSA ENHETER SER ANNORLUNDA UT ÄN RESTEN AV
-    // SIN KATEGORI kan du skriva över enskilda rader nedan med en egen bildfil,
-    // t.ex.: MACHINE_SUBID_IMAGES['Pallyftare 3'] = 'pallyft-model-b.png';
-    const MACHINE_SUBID_IMAGES = {};
-    Object.keys(machineIds).forEach(category => {
-        machineIds[category].forEach(id => {
-            MACHINE_SUBID_IMAGES[id] = MACHINE_CATEGORY_IMAGES[category];
-        });
-    });
-    // Lägg dina avvikande enheter här, en rad per enhet som ser annorlunda ut:
-    // MACHINE_SUBID_IMAGES['Pallyftare 3'] = 'pallyft-model-b.png';
-    // MACHINE_SUBID_IMAGES['Bandmaskin 7'] = 'bandning-gammal.png';
 
     function updateOnlineStatus() {
         const banner = document.getElementById('offlineBanner');
@@ -1053,10 +1015,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderPickerList();
     };
 
-    function pickerInitials(item) {
-        return item.replace(/[^A-ZÅÄÖ0-9]/gi, '').slice(0, 3).toUpperCase();
-    }
-
     window.renderPickerList = () => {
         const term = document.getElementById('pickerSearch').value.toLowerCase().trim();
         let items = pickerConfig.items;
@@ -1067,31 +1025,17 @@ document.addEventListener('DOMContentLoaded', () => {
             items = items.filter(item => item.toLowerCase().includes(term));
         }
         const list = document.getElementById('pickerList');
-        list.classList.toggle('picker-grid', !!pickerConfig.getImage);
-        list.classList.toggle('stats-cards', !pickerConfig.getImage);
+        list.classList.remove('picker-grid');
+        list.classList.add('stats-cards');
 
         if (items.length === 0) {
             list.innerHTML = '<div class="stats-empty">Inga träffar.</div>';
             return;
         }
 
-        if (pickerConfig.getImage) {
-            list.innerHTML = items.map(item => {
-                const safeItem = item.replace(/'/g, "\\'");
-                const img = pickerConfig.getImage(item);
-                const initials = pickerInitials(item);
-                return `<div class="picker-grid-item" onclick="selectPickerItem('${safeItem}')">`
-                    + `<div class="picker-grid-circle">`
-                    + `<img src="${img}" alt="${item}" onerror="this.closest('.picker-grid-circle').classList.add('fallback'); this.replaceWith(document.createTextNode('${initials}'));">`
-                    + `</div>`
-                    + `<div class="picker-grid-label">${item}</div>`
-                    + `</div>`;
-            }).join('');
-        } else {
-            list.innerHTML = items.map(item =>
-                `<button type="button" class="picker-list-item" onclick="selectPickerItem('${item.replace(/'/g, "\\'")}')">${item}</button>`
-            ).join('');
-        }
+        list.innerHTML = items.map(item =>
+            `<button type="button" class="picker-list-item" onclick="selectPickerItem('${item.replace(/'/g, "\\'")}')">${item}</button>`
+        ).join('');
     };
 
     window.selectPickerItem = (value) => {
@@ -1104,7 +1048,6 @@ document.addEventListener('DOMContentLoaded', () => {
             title: 'Välj truck',
             items: TRUCK_IDS,
             categories: TRUCK_CATEGORIES,
-            getImage: (item) => TRUCK_IMAGES[item],
             onSelect: (val) => {
                 document.getElementById('truckId').value = val;
                 document.getElementById('truckIdLabel').textContent = val;
@@ -1118,7 +1061,6 @@ document.addEventListener('DOMContentLoaded', () => {
             title: 'Välj feltyp',
             items: TRUCK_FEL_OPTIONS,
             categories: null,
-            getImage: (item) => TRUCK_FEL_IMAGES[item],
             onSelect: (val) => {
                 document.getElementById('truckFel').value = val;
                 document.getElementById('truckFelLabel').textContent = val;
@@ -1134,7 +1076,6 @@ document.addEventListener('DOMContentLoaded', () => {
             title: 'Välj feltyp',
             items: options,
             categories: null,
-            getImage: (item) => MACHINE_FEL_IMAGES[item],
             onSelect: (val) => {
                 document.getElementById('machineFel').value = val;
                 document.getElementById('machineFelLabel').textContent = val;
@@ -1150,7 +1091,6 @@ document.addEventListener('DOMContentLoaded', () => {
             title: 'Välj ID/Nummer',
             items: options,
             categories: null,
-            getImage: (item) => MACHINE_SUBID_IMAGES[item] || MACHINE_CATEGORY_IMAGES[name],
             onSelect: (val) => {
                 document.getElementById('machineSubId').value = val;
                 document.getElementById('machineSubIdLabel').textContent = val;
