@@ -216,7 +216,8 @@
 
         .hidden { display: none !important; }
         .list-container { margin-top: 10px; background: var(--teams-bg); padding: 12px; border-radius: 8px; border-left: 4px solid var(--teams-purple); }
-        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--teams-border); font-size: 0.9em; animation: fadeIn 0.25s ease; }
+        .list-item { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--teams-border); font-size: 0.9em; animation: fadeIn 0.25s ease; }
+        .list-item-remove-btn { width: auto; padding: 8px 14px; white-space: nowrap; flex-shrink: 0; }
 
         .picker-btn {
             width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px;
@@ -729,6 +730,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     const TRUCK_FEL_OPTIONS = ['Hydraulik/Olja','Chassi','Stativ','Batteri','Drag','Däck','Linde Connect','Belysning','Felkod','Övrigt'];
 
+    // Kategoribilder för maskingrupperna i huvudformuläret (Ergopack, Bandmaskin osv.)
     const MACHINE_CATEGORY_IMAGES = {
         'Ergopack': 'ergopack.png', 'Bandmaskin': 'bandning.png', 'Movexx': 'Movexx.png',
         'Pallyftare': 'pallyft.png', 'Laddare': 'laddare.png'
@@ -950,7 +952,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!div) return;
         if (arr.length === 0) { div.classList.add('hidden'); return; }
         div.classList.remove('hidden');
-        div.innerHTML = arr.map((t, i) => `<div class="list-item"><span><span class="status-badge ${statusBadgeClass(t.status)}">${t.status}</span><strong>${t.id}</strong>: ${t.fel}</span><button type="button" class="danger" style="width:auto; padding:4px 8px;" onclick="removeItem('${type}', ${i})">Ta bort</button></div>`).join('');
+        div.innerHTML = arr.map((t, i) => `<div class="list-item"><span><span class="status-badge ${statusBadgeClass(t.status)}">${t.status}</span><strong>${t.id}</strong>: ${t.fel}</span><button type="button" class="danger list-item-remove-btn" onclick="removeItem('${type}', ${i})">Ta bort</button></div>`).join('');
     }
 
     window.clearForm = () => { 
