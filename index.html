@@ -217,6 +217,30 @@
         .hidden { display: none !important; }
         .list-container { margin-top: 10px; background: var(--teams-bg); padding: 12px; border-radius: 8px; border-left: 4px solid var(--teams-purple); }
         .list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--teams-border); font-size: 0.9em; animation: fadeIn 0.25s ease; }
+
+        .picker-btn {
+            width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px;
+            border: 1px solid var(--teams-border); background: var(--teams-card);
+            color: var(--text-main); font-size: var(--base-font); text-align: left;
+            cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+        }
+        .picker-btn::after { content: '›'; color: var(--text-sec); font-size: 1.2rem; }
+        .picker-list-item {
+            width: 100%; text-align: left; padding: 12px 14px; margin-bottom: 8px;
+            border-radius: 8px; border: 1px solid var(--teams-border); background: var(--teams-bg);
+            color: var(--text-main); font-size: 0.9rem; font-weight: 600; cursor: pointer;
+        }
+        .picker-list-item:active { background: rgba(91, 95, 199, 0.1); }
+        .picker-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding-bottom: 10px; }
+        .picker-grid-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .picker-grid-circle {
+            width: 65px; height: 65px; border-radius: 50%; border: 3px solid var(--teams-border);
+            overflow: hidden; background: var(--teams-bg); display: flex; align-items: center;
+            justify-content: center; margin-bottom: 5px; padding: 5px;
+        }
+        .picker-grid-circle img { width: 100%; height: 100%; object-fit: contain; }
+        .picker-grid-circle.fallback { background: var(--teams-purple); color: white; font-weight: 700; font-size: 0.7rem; }
+        .picker-grid-label { font-size: 0.7rem; font-weight: 600; text-align: center; color: var(--text-sec); }
         
         .sheet-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -297,7 +321,7 @@
             border: 1px solid var(--teams-border); background: transparent;
             color: var(--text-sec); font-size: 0.75rem; font-weight: 600; cursor: pointer;
         }
-        .stats-filter-chip.active[data-filter="ALL"] { background: var(--teams-purple); color: white; border-color: var(--teams-purple); }
+        .stats-filter-chip.active[data-filter="ALL"], .stats-filter-chip.active[data-cat="ALL"] { background: var(--teams-purple); color: white; border-color: var(--teams-purple); }
         .stats-filter-chip.active[data-filter="KLAR"] { background: var(--pastel-green); color: var(--pastel-green-text); border-color: var(--pastel-green); }
         .stats-filter-chip.active[data-filter="SERVICE"] { background: var(--pastel-yellow); color: var(--pastel-yellow-text); border-color: var(--pastel-yellow); }
         .stats-filter-chip.active[data-filter="UR DRIFT"] { background: var(--pastel-red); color: var(--danger); border-color: var(--pastel-red); }
@@ -486,14 +510,16 @@
             </div>
             <input type="hidden" id="truck" value="OK" class="save-data">
             <div id="truckContainer" class="hidden">
-                <select id="truckId">
-                    <option value="">-- Välj Truck --</option>
-                    <option>TVS-01</option><option>TVS-02</option><option>TVS-03</option><option>TVS-04</option><option>TVS-05</option><option>TVS-06</option><option>TVS-13</option><option>TVS-22</option><option>TVS-23</option><option>TVS-33</option><option>TVS-34</option><option>TPB-07</option><option>TPB-08</option><option>TPB-09</option><option>TPB-10</option><option>TPB-14</option><option>TPB-15</option><option>TPB-20</option><option>TPB-21</option><option>TVS-11</option><option>Grå Skjutsativ</option>
-                </select>
-                <select id="truckFel">
-                    <option value="">-- Feltyp --</option>
-                    <option>Hydraulik/Olja</option><option>Chassi</option><option>Stativ</option><option>Batteri</option><option>Drag</option><option>Däck</option><option>Linde Connect</option><option>Belysning</option><option>Felkod</option><option>Övrigt</option>
-                </select>
+                <button type="button" class="picker-btn" onclick="openTruckIdPicker(); vibrate(20);">
+                    <span id="truckIdLabel">-- Välj Truck --</span>
+                </button>
+                <input type="hidden" id="truckId" value="">
+
+                <button type="button" class="picker-btn" onclick="openTruckFelPicker(); vibrate(20);">
+                    <span id="truckFelLabel">-- Feltyp --</span>
+                </button>
+                <input type="hidden" id="truckFel" value="">
+
                 <div id="truckStatusWrap" class="hidden">
                     <label class="status-label">Status</label>
                     <div class="segmented-control status-segment" id="truckStatusControl">
@@ -548,17 +574,19 @@
 
                 <div id="machineSubIdContainer" class="hidden">
                     <label id="subIdLabel">Välj ID/Nummer:</label>
-                    <select id="machineSubId">
-                        <option value="">-- Välj ID --</option>
-                    </select>
+                    <button type="button" class="picker-btn" onclick="openMachineSubIdPicker(); vibrate(20);">
+                        <span id="machineSubIdLabel">-- Välj ID --</span>
+                    </button>
+                    <input type="hidden" id="machineSubId" value="">
                 </div>
                 
                 <input type="hidden" id="selectedMachineName" value="">
-                
-                <select id="machineFel">
-                    <option value="">-- Feltyp --</option>
-                    <option>Mekaniskt</option><option>Elektriskt</option><option>Felkod</option><option>Annat</option>
-                </select>
+
+                <button type="button" class="picker-btn" onclick="openMachineFelPicker(); vibrate(20);">
+                    <span id="machineFelLabel">-- Feltyp --</span>
+                </button>
+                <input type="hidden" id="machineFel" value="">
+
                 <div id="maskinStatusWrap" class="hidden">
                     <label class="status-label">Status</label>
                     <div class="segmented-control status-segment" id="maskinStatusControl">
@@ -623,7 +651,7 @@
 
         <div class="fetch-status" id="fetchStatus"></div>
     </form>
-    <div class="version-text">v1.8.0</div>
+    <div class="version-text">v2.0.1</div>
 </div>
 
 <div id="statsOverlay" class="sheet-overlay" onclick="if(event.target === this) closeStats();">
@@ -647,6 +675,21 @@
         </div>
         <div class="sheet-body">
             <div id="statsCards" class="stats-cards"></div>
+        </div>
+    </div>
+</div>
+
+<div id="pickerOverlay" class="sheet-overlay" onclick="if(event.target === this) closePicker();">
+    <div class="bottom-sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-header">
+            <h3 id="pickerTitle">Välj</h3>
+            <button class="sheet-close-btn" onclick="closePicker(); vibrate(30);" aria-label="Stäng">✕</button>
+        </div>
+        <input type="text" id="pickerSearch" class="stats-search" placeholder="Sök..." oninput="renderPickerList()">
+        <div class="stats-filter-row hidden" id="pickerFilterRow"></div>
+        <div class="sheet-body">
+            <div id="pickerList" class="stats-cards"></div>
         </div>
     </div>
 </div>
@@ -678,6 +721,57 @@ document.addEventListener('DOMContentLoaded', () => {
         'Laddare': ['Truckladdare', 'Movexx laddare', 'Bandmaskin laddare', 'Pallyftare laddare', 'Övrigt laddare']
     };
 
+    const TRUCK_IDS = ['TVS-01','TVS-02','TVS-03','TVS-04','TVS-05','TVS-06','TVS-13','TVS-22','TVS-23','TVS-28','TVS-30','TVS-33','TVS-34','TVS-11','TPB-07','TPB-08','TPB-09','TPB-10','TPB-14','TPB-15','TPB-20','TPB-21'];
+    const TRUCK_CATEGORIES = {
+        'TVS': TRUCK_IDS.filter(id => id.startsWith('TVS')),
+        'TPB': TRUCK_IDS.filter(id => id.startsWith('TPB')),
+    
+    };
+    const TRUCK_FEL_OPTIONS = ['Hydraulik/Olja','Chassi','Stativ','Batteri','Drag','Däck','Linde Connect','Belysning','Felkod','Övrigt'];
+
+    // Bildkonfig för picker-menyerna. Fyll i dina egna filnamn nedan och lägg
+    // bilderna i samma mapp som ergopack.png/bandning.png osv. Flera nycklar kan
+    // peka på samma fil (t.ex. grupperade truckmodeller). Saknas en bild eller
+    // 404:ar filen visas automatiskt en initial-cirkel istället.
+    const TRUCK_IMAGES = {
+        'TVS-01': 'truck-model-a.png', 'TVS-02': 'truck-model-a.png', 'TVS-03': 'truck-model-a.png',
+        'TVS-04': 'truck-model-a.png', 'TVS-05': 'truck-model-a.png', 'TVS-06': 'truck-model-a.png',
+        'TVS-13': 'truck-model-a.png', 'TVS-22': 'truck-model-a.png', 'TVS-23': 'truck-model-a.png',
+        'TVS-33': 'truck-model-a.png', 'TVS-34': 'truck-model-a.png', 'TVS-11': 'truck-model-a.png',
+        'TPB-07': 'truck-model-b.png', 'TPB-08': 'truck-model-b.png', 'TPB-09': 'truck-model-b.png',
+        'TPB-10': 'truck-model-b.png', 'TPB-14': 'truck-model-b.png', 'TPB-15': 'truck-model-b.png',
+        'TPB-20': 'truck-model-b.png', 'TPB-21': 'truck-model-b.png', 'TVS-28': 'truck-model-b.png',
+        'TVS-30': 'tvs-30.png'
+    };
+    const TRUCK_FEL_IMAGES = {
+        'Hydraulik/Olja': 'fel-hydraulik.png', 'Chassi': 'fel-chassi.png', 'Stativ': 'fel-stativ.png',
+        'Batteri': 'fel-batteri.png', 'Drag': 'fel-drag.png', 'Däck': 'fel-dack.png',
+        'Linde Connect': 'fel-lindeconnect.png', 'Belysning': 'fel-belysning.png',
+        'Felkod': 'fel-felkod.png', 'Övrigt': 'fel-ovrigt.png'
+    };
+    const MACHINE_FEL_IMAGES = {
+        'Mekaniskt': 'fel-mekaniskt.png', 'Elektriskt': 'fel-elektriskt.png',
+        'Felkod': 'fel-felkod.png', 'Annat': 'fel-annat.png', 'Lokal': 'fel-lokal.png'
+    };
+    // Standardbild per maskinkategori - används som utgångspunkt nedan.
+    const MACHINE_CATEGORY_IMAGES = {
+        'Ergopack': 'ergopack.png', 'Bandmaskin': 'bandning.png', 'Movexx': 'Movexx.png',
+        'Pallyftare': 'pallyft.png', 'Laddare': 'laddare.png'
+    };
+    // Fylls automatiskt med kategoribilden för varje enhet (så du slipper mata in
+    // alla för hand), men EFTERSOM VISSA ENHETER SER ANNORLUNDA UT ÄN RESTEN AV
+    // SIN KATEGORI kan du skriva över enskilda rader nedan med en egen bildfil,
+    // t.ex.: MACHINE_SUBID_IMAGES['Pallyftare 3'] = 'pallyft-model-b.png';
+    const MACHINE_SUBID_IMAGES = {};
+    Object.keys(machineIds).forEach(category => {
+        machineIds[category].forEach(id => {
+            MACHINE_SUBID_IMAGES[id] = MACHINE_CATEGORY_IMAGES[category];
+        });
+    });
+    // Lägg dina avvikande enheter här, en rad per enhet som ser annorlunda ut:
+    // MACHINE_SUBID_IMAGES['Pallyftare 3'] = 'pallyft-model-b.png';
+    // MACHINE_SUBID_IMAGES['Bandmaskin 7'] = 'bandning-gammal.png';
+
     function updateOnlineStatus() {
         const banner = document.getElementById('offlineBanner');
         if (!navigator.onLine) {
@@ -706,7 +800,6 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSkiftBadge();
     setInterval(updateSkiftBadge, 60000);
 
-    
     function checkTruckReady() {
         const ready = document.getElementById('truckId').value && document.getElementById('truckFel').value;
         document.getElementById('truckStatusWrap').classList.toggle('hidden', !ready);
@@ -718,10 +811,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const ready = name && (name === 'Övrigt' || subId) && fel;
         document.getElementById('maskinStatusWrap').classList.toggle('hidden', !ready);
     }
-    document.getElementById('truckId').addEventListener('change', checkTruckReady);
-    document.getElementById('truckFel').addEventListener('change', checkTruckReady);
-    document.getElementById('machineSubId').addEventListener('change', checkMaskinReady);
-    document.getElementById('machineFel').addEventListener('change', checkMaskinReady);
 
     window.vibrate = (ms = 40) => {
         if ('vibrate' in navigator) navigator.vibrate(ms);
@@ -812,21 +901,16 @@ document.addEventListener('DOMContentLoaded', () => {
     window.selectMachine = (name, element) => {
         document.querySelectorAll('.machine-item').forEach(item => item.classList.remove('active'));
         const subContainer = document.getElementById('machineSubIdContainer');
-        const subSelect = document.getElementById('machineSubId');
-        const felSelect = document.getElementById('machineFel');
 
         element.classList.add('active');
         document.getElementById('selectedMachineName').value = name;
 
-        subSelect.innerHTML = '<option value="">-- Välj ID --</option>';
-        felSelect.innerHTML = '<option value="">-- Feltyp --</option><option>Mekaniskt</option><option>Elektriskt</option>' + (name === 'Övrigt' ? '<option>Lokal</option>' : '') + '<option>Annat</option>';
+        document.getElementById('machineSubId').value = '';
+        document.getElementById('machineSubIdLabel').textContent = '-- Välj ID --';
+        document.getElementById('machineFel').value = '';
+        document.getElementById('machineFelLabel').textContent = '-- Feltyp --';
 
-        if (name !== 'Övrigt' && machineIds[name]) {
-            machineIds[name].forEach(id => {
-                const opt = document.createElement('option');
-                opt.value = id; opt.textContent = id;
-                subSelect.appendChild(opt);
-            });
+        if (name !== 'Övrigt') {
             subContainer.classList.remove('hidden');
         } else {
             subContainer.classList.add('hidden');
@@ -848,6 +932,8 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('draft_truckArray', JSON.stringify(truckArray));
 
             id.value = ""; fel.value = ""; kom.value = ""; kom.placeholder = "Kommentar...";
+            document.getElementById('truckIdLabel').textContent = '-- Välj Truck --';
+            document.getElementById('truckFelLabel').textContent = '-- Feltyp --';
             resetItemStatus('truck');
             document.getElementById('truckStatusWrap').classList.add('hidden');
             document.getElementById('card-truck').classList.remove('error-attention');
@@ -865,6 +951,8 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('draft_maskinArray', JSON.stringify(maskinArray));
 
             fel.value = ""; kom.value = ""; kom.placeholder = "Kommentar...";
+            document.getElementById('machineFelLabel').textContent = '-- Feltyp --';
+            document.getElementById('machineSubIdLabel').textContent = '-- Välj ID --';
             resetItemStatus('maskin');
             document.getElementById('maskinStatusWrap').classList.add('hidden');
             document.getElementById('selectedMachineName').value = "";
@@ -925,6 +1013,151 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.width = '';
         window.scrollTo(0, scrollLockY);
     }
+
+    let pickerConfig = null;
+    let pickerCategoryFilter = 'ALL';
+
+    function openPicker(config) {
+        pickerConfig = config;
+        pickerCategoryFilter = 'ALL';
+        document.getElementById('pickerTitle').textContent = config.title;
+        document.getElementById('pickerSearch').value = '';
+
+        const filterRow = document.getElementById('pickerFilterRow');
+        if (config.categories) {
+            filterRow.classList.remove('hidden');
+            filterRow.innerHTML = ['ALL', ...Object.keys(config.categories)].map(cat =>
+                `<button type="button" class="stats-filter-chip ${cat === 'ALL' ? 'active' : ''}" data-cat="${cat}" onclick="setPickerCategory('${cat}')">${cat === 'ALL' ? 'Alla' : cat}</button>`
+            ).join('');
+        } else {
+            filterRow.classList.add('hidden');
+            filterRow.innerHTML = '';
+        }
+
+        document.getElementById('pickerOverlay').classList.add('visible');
+        lockBodyScroll();
+        renderPickerList();
+    }
+
+    window.closePicker = () => {
+        document.getElementById('pickerOverlay').classList.remove('visible');
+        unlockBodyScroll();
+    };
+
+    window.setPickerCategory = (cat) => {
+        pickerCategoryFilter = cat;
+        document.querySelectorAll('#pickerFilterRow .stats-filter-chip').forEach(chip => {
+            chip.classList.toggle('active', chip.dataset.cat === cat);
+        });
+        vibrate(20);
+        renderPickerList();
+    };
+
+    function pickerInitials(item) {
+        return item.replace(/[^A-ZÅÄÖ0-9]/gi, '').slice(0, 3).toUpperCase();
+    }
+
+    window.renderPickerList = () => {
+        const term = document.getElementById('pickerSearch').value.toLowerCase().trim();
+        let items = pickerConfig.items;
+        if (pickerConfig.categories && pickerCategoryFilter !== 'ALL') {
+            items = items.filter(item => pickerConfig.categories[pickerCategoryFilter].includes(item));
+        }
+        if (term) {
+            items = items.filter(item => item.toLowerCase().includes(term));
+        }
+        const list = document.getElementById('pickerList');
+        list.classList.toggle('picker-grid', !!pickerConfig.getImage);
+        list.classList.toggle('stats-cards', !pickerConfig.getImage);
+
+        if (items.length === 0) {
+            list.innerHTML = '<div class="stats-empty">Inga träffar.</div>';
+            return;
+        }
+
+        if (pickerConfig.getImage) {
+            list.innerHTML = items.map(item => {
+                const safeItem = item.replace(/'/g, "\\'");
+                const img = pickerConfig.getImage(item);
+                const initials = pickerInitials(item);
+                return `<div class="picker-grid-item" onclick="selectPickerItem('${safeItem}')">`
+                    + `<div class="picker-grid-circle">`
+                    + `<img src="${img}" alt="${item}" onerror="this.closest('.picker-grid-circle').classList.add('fallback'); this.replaceWith(document.createTextNode('${initials}'));">`
+                    + `</div>`
+                    + `<div class="picker-grid-label">${item}</div>`
+                    + `</div>`;
+            }).join('');
+        } else {
+            list.innerHTML = items.map(item =>
+                `<button type="button" class="picker-list-item" onclick="selectPickerItem('${item.replace(/'/g, "\\'")}')">${item}</button>`
+            ).join('');
+        }
+    };
+
+    window.selectPickerItem = (value) => {
+        pickerConfig.onSelect(value);
+        closePicker();
+    };
+
+    window.openTruckIdPicker = () => {
+        openPicker({
+            title: 'Välj truck',
+            items: TRUCK_IDS,
+            categories: TRUCK_CATEGORIES,
+            getImage: (item) => TRUCK_IMAGES[item],
+            onSelect: (val) => {
+                document.getElementById('truckId').value = val;
+                document.getElementById('truckIdLabel').textContent = val;
+                checkTruckReady();
+            }
+        });
+    };
+
+    window.openTruckFelPicker = () => {
+        openPicker({
+            title: 'Välj feltyp',
+            items: TRUCK_FEL_OPTIONS,
+            categories: null,
+            getImage: (item) => TRUCK_FEL_IMAGES[item],
+            onSelect: (val) => {
+                document.getElementById('truckFel').value = val;
+                document.getElementById('truckFelLabel').textContent = val;
+                checkTruckReady();
+            }
+        });
+    };
+
+    window.openMachineFelPicker = () => {
+        const name = document.getElementById('selectedMachineName').value;
+        const options = ['Mekaniskt', 'Elektriskt'].concat(name === 'Övrigt' ? ['Lokal'] : []).concat(['Annat']);
+        openPicker({
+            title: 'Välj feltyp',
+            items: options,
+            categories: null,
+            getImage: (item) => MACHINE_FEL_IMAGES[item],
+            onSelect: (val) => {
+                document.getElementById('machineFel').value = val;
+                document.getElementById('machineFelLabel').textContent = val;
+                checkMaskinReady();
+            }
+        });
+    };
+
+    window.openMachineSubIdPicker = () => {
+        const name = document.getElementById('selectedMachineName').value;
+        const options = machineIds[name] || [];
+        openPicker({
+            title: 'Välj ID/Nummer',
+            items: options,
+            categories: null,
+            getImage: (item) => MACHINE_SUBID_IMAGES[item] || MACHINE_CATEGORY_IMAGES[name],
+            onSelect: (val) => {
+                document.getElementById('machineSubId').value = val;
+                document.getElementById('machineSubIdLabel').textContent = val;
+                checkMaskinReady();
+            }
+        });
+    };
 
     const STATS_SPREADSHEET_ID = "1Pl8CX0uS1047P2SvNceA64yn0HRr9YSgnwXpzSFRjtw";
 
@@ -1015,7 +1248,7 @@ document.addEventListener('DOMContentLoaded', () => {
         container.innerHTML = rows.map(r => {
             const fieldsHtml = config.fields.map(f => {
                 const raw = r[f.col];
-                if (f.freetext && !raw) return ''; // dölj tomma kommentarsfält, precis som i tabellen
+                if (f.freetext && !raw) return '';
                 if (f.badge) {
                     return `<div class="stats-field"><span class="stats-field-label">${f.label}</span>`
                         + `<span class="status-badge ${statsBadgeClass(raw)}">${raw || '-'}</span></div>`;
@@ -1245,42 +1478,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     (function initSheetDrag() {
-        const sheet = document.querySelector('.bottom-sheet');
-        const dragZones = [document.querySelector('.sheet-handle'), document.querySelector('.sheet-header')].filter(Boolean);
-        let startY = 0, deltaY = 0, dragging = false;
+        document.querySelectorAll('.bottom-sheet').forEach(sheet => {
+            const overlay = sheet.closest('.sheet-overlay');
+            const dragZones = [sheet.querySelector('.sheet-handle'), sheet.querySelector('.sheet-header')].filter(Boolean);
+            let startY = 0, deltaY = 0, dragging = false;
 
-        function getY(e) { return e.touches ? e.touches[0].clientY : e.clientY; }
+            function getY(e) { return e.touches ? e.touches[0].clientY : e.clientY; }
 
-        function onStart(e) {
-            if (window.innerWidth >= 700) return;
-            dragging = true;
-            startY = getY(e);
-            sheet.style.transition = 'none';
-        }
-        function onMove(e) {
-            if (!dragging) return;
-            deltaY = Math.max(0, getY(e) - startY);
-            sheet.style.transform = `translateY(${deltaY}px)`;
-        }
-        function onEnd() {
-            if (!dragging) return;
-            dragging = false;
-            sheet.style.transition = '';
-            sheet.style.transform = '';
-            if (deltaY > 100) {
-                window.closeStats();
+            function onStart(e) {
+                if (window.innerWidth >= 700) return;
+                dragging = true;
+                startY = getY(e);
+                sheet.style.transition = 'none';
             }
-            deltaY = 0;
-        }
+            function onMove(e) {
+                if (!dragging) return;
+                deltaY = Math.max(0, getY(e) - startY);
+                sheet.style.transform = `translateY(${deltaY}px)`;
+            }
+            function onEnd() {
+                if (!dragging) return;
+                dragging = false;
+                sheet.style.transition = '';
+                sheet.style.transform = '';
+                if (deltaY > 100) {
+                    overlay.classList.remove('visible');
+                    unlockBodyScroll();
+                }
+                deltaY = 0;
+            }
 
-        dragZones.forEach(el => {
-            el.addEventListener('touchstart', onStart, { passive: true });
-            el.addEventListener('touchmove', onMove, { passive: true });
-            el.addEventListener('touchend', onEnd);
-            el.addEventListener('mousedown', onStart);
+            dragZones.forEach(el => {
+                el.addEventListener('touchstart', onStart, { passive: true });
+                el.addEventListener('touchmove', onMove, { passive: true });
+                el.addEventListener('touchend', onEnd);
+                el.addEventListener('mousedown', onStart);
+            });
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onEnd);
         });
-        document.addEventListener('mousemove', onMove);
-        document.addEventListener('mouseup', onEnd);
     })();
 
     loadSavedData();
