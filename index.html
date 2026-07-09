@@ -468,6 +468,14 @@
 
         .version-text { text-align: center; font-size: 10px; color: var(--text-sec); margin-top: 20px; opacity: 0.5; }
 
+        .status-bar-fill {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: env(safe-area-inset-top);
+            background: var(--teams-purple);
+            z-index: 2500;
+        }
+
         #splashScreen {
             position: fixed;
             inset: 0;
@@ -537,6 +545,7 @@ setTimeout(() => {
 }, 2500);
 </script>
 
+<div class="status-bar-fill"></div>
 <div id="splashScreen">
     <svg class="splash-logo" xmlns="http://www.w3.org/2000/svg" viewBox="25.2 25.0 787.7 234.8" fill="currentColor">
 <g transform="translate(0.000000,285.000000) scale(0.100000,-0.100000)">
