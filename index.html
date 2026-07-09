@@ -10,7 +10,7 @@
     <link rel="shortcut icon" href="favicon-32.png">
     <link rel="manifest" href="manifest.json">
     
-    <meta name="color-scheme" content="light dark">
+    <meta name="color-scheme" content="light">
     <meta name="theme-color" content="#5b5fc7">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -139,6 +139,18 @@
             font-size: 0.85rem;
             font-weight: 700;
             letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .skift-pill svg {
+            width: 16px; height: 16px;
+            flex-shrink: 0;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
         .card { 
@@ -267,6 +279,7 @@
             cursor: pointer; display: flex; align-items: center; justify-content: space-between;
         }
         .picker-btn::after { content: '›'; color: var(--text-sec); font-size: 1.2rem; }
+        .picker-placeholder { color: var(--text-sec); font-weight: 400; }
         .picker-list-item {
             width: 100%; text-align: left; padding: 12px 14px; margin-bottom: 8px;
             border-radius: 8px; border: 1px solid var(--teams-border); background: var(--teams-bg);
@@ -637,7 +650,7 @@ setTimeout(() => {
     </div>
 
     <div class="skift-badge">
-        <div class="skift-pill" id="skiftPill">⏱ Beräknar skift...</div>
+        <div class="skift-pill" id="skiftPill">Beräknar...</div>
     </div>
 
     <div class="top-button-row">
@@ -659,13 +672,10 @@ setTimeout(() => {
             <label>Datum *</label>
             <input type="date" id="datum" required class="save-data">
             <label>Avdelning *</label>
-            <select id="avdelning" required class="save-data">
-                <option value="">-- Välj avdelning --</option>
-                <option value="TVS-Inne">TVS-Inne</option>
-                <option value="TVS-Ute">TVS-Ute</option>
-                <option value="TPB-Inne">TPB-Inne</option>
-                <option value="TPB-Ute">TPB-Ute</option>
-            </select>
+            <button type="button" class="picker-btn" onclick="openAvdelningPicker(); vibrate(20);">
+                <span id="avdelningLabel" class="picker-placeholder">Välj avdelning</span>
+            </button>
+            <input type="hidden" id="avdelning" required class="save-data" value="">
         </div>
 
         <div class="card" id="card-truck">
@@ -678,12 +688,12 @@ setTimeout(() => {
             <input type="hidden" id="truck" value="OK" class="save-data">
             <div id="truckContainer" class="hidden">
                 <button type="button" class="picker-btn" onclick="openTruckIdPicker(); vibrate(20);">
-                    <span id="truckIdLabel">-- Välj Truck --</span>
+                    <span id="truckIdLabel" class="picker-placeholder">Välj truck</span>
                 </button>
                 <input type="hidden" id="truckId" value="">
 
                 <button type="button" class="picker-btn" onclick="openTruckFelPicker(); vibrate(20);">
-                    <span id="truckFelLabel">-- Feltyp --</span>
+                    <span id="truckFelLabel" class="picker-placeholder">Välj feltyp</span>
                 </button>
                 <input type="hidden" id="truckFel" value="">
 
@@ -742,7 +752,7 @@ setTimeout(() => {
                 <div id="machineSubIdContainer" class="hidden">
                     <label id="subIdLabel">Välj ID/Nummer:</label>
                     <button type="button" class="picker-btn" onclick="openMachineSubIdPicker(); vibrate(20);">
-                        <span id="machineSubIdLabel">-- Välj ID --</span>
+                        <span id="machineSubIdLabel" class="picker-placeholder">Välj ID/nummer</span>
                     </button>
                     <input type="hidden" id="machineSubId" value="">
                 </div>
@@ -750,7 +760,7 @@ setTimeout(() => {
                 <input type="hidden" id="selectedMachineName" value="">
 
                 <button type="button" class="picker-btn" onclick="openMachineFelPicker(); vibrate(20);">
-                    <span id="machineFelLabel">-- Feltyp --</span>
+                    <span id="machineFelLabel" class="picker-placeholder">Välj feltyp</span>
                 </button>
                 <input type="hidden" id="machineFel" value="">
 
@@ -797,14 +807,10 @@ setTimeout(() => {
 
         <div class="card" id="card-ai">
             <label>AI Felsökningshjälp</label>
-            <select id="aiMaskin">
-                <option value="">-- Välj maskin --</option>
-                <option value="Truck">Truck</option>
-                <option value="Ergopack">Ergopack</option>
-                <option value="Bandmaskin">Bandmaskin</option>
-                <option value="Movexx">Movexx</option>
-                <option value="Pallyftare">Pallyftare</option>
-            </select>
+            <button type="button" class="picker-btn" onclick="openAiMaskinPicker(); vibrate(20);">
+                <span id="aiMaskinLabel" class="picker-placeholder">Välj maskin</span>
+            </button>
+            <input type="hidden" id="aiMaskin" value="">
             <textarea id="aiProblem" placeholder="Beskriv problemet du ser på maskinen..."></textarea>
             <button type="button" class="add-btn" id="aiAskBtn" onclick="askAI(); vibrate(30);">Fråga AI</button>
             <div class="fetch-status" id="aiStatus"></div>
@@ -922,18 +928,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Vänlig hälsning för visning i appen (mejlet använder fortfarande getSkift())
+    const GREETING_ICONS = {
+        sunrise: '<svg viewBox="0 0 24 24"><path d="M17 18a5 5 0 0 0-10 0"></path><line x1="12" y1="2" x2="12" y2="9"></line><line x1="4.22" y1="10.22" x2="5.64" y2="11.64"></line><line x1="1" y1="18" x2="3" y2="18"></line><line x1="21" y1="18" x2="23" y2="18"></line><line x1="18.36" y1="11.64" x2="19.78" y2="10.22"></line><line x1="23" y1="22" x2="1" y2="22"></line><polyline points="8 6 12 2 16 6"></polyline></svg>',
+        sun: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>',
+        sunset: '<svg viewBox="0 0 24 24"><path d="M17 18a5 5 0 0 0-10 0"></path><line x1="12" y1="9" x2="12" y2="2"></line><line x1="4.22" y1="10.22" x2="5.64" y2="11.64"></line><line x1="1" y1="18" x2="3" y2="18"></line><line x1="21" y1="18" x2="23" y2="18"></line><line x1="18.36" y1="11.64" x2="19.78" y2="10.22"></line><line x1="23" y1="22" x2="1" y2="22"></line><polyline points="16 5 12 9 8 5"></polyline></svg>',
+        moon: '<svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>'
+    };
+
     function getGreeting() {
         const h = new Date().getHours();
-        if (h >= 5 && h < 10) return { text: "Godmorgon", icon: "🌅" };
-        if (h >= 10 && h < 17) return { text: "God dag", icon: "☀️" };
-        if (h >= 17 && h < 22) return { text: "God kväll", icon: "🌆" };
-        return { text: "God natt", icon: "🌙" };
+        if (h >= 5 && h < 10) return { text: "Godmorgon", icon: "sunrise" };
+        if (h >= 10 && h < 17) return { text: "God dag", icon: "sun" };
+        if (h >= 17 && h < 22) return { text: "God kväll", icon: "sunset" };
+        return { text: "God natt", icon: "moon" };
     }
 
     function updateSkiftBadge() {
         const greeting = getGreeting();
         const pill = document.getElementById('skiftPill');
-        if (pill) pill.textContent = `${greeting.icon} ${greeting.text}`;
+        if (pill) pill.innerHTML = `${GREETING_ICONS[greeting.icon]}<span>${greeting.text}</span>`;
     }
     updateSkiftBadge();
     setInterval(updateSkiftBadge, 60000);
@@ -953,6 +966,13 @@ document.addEventListener('DOMContentLoaded', () => {
     window.vibrate = (ms = 40) => {
         if ('vibrate' in navigator) navigator.vibrate(ms);
     };
+
+    function resetPickerLabel(id, text) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = text;
+        el.classList.add('picker-placeholder');
+    }
 
     window.toggleDarkMode = () => {
         const isDark = !document.body.classList.contains('dark-mode');
@@ -1046,9 +1066,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('selectedMachineName').value = name;
 
         document.getElementById('machineSubId').value = '';
-        document.getElementById('machineSubIdLabel').textContent = '-- Välj ID --';
+        resetPickerLabel('machineSubIdLabel', 'Välj ID/nummer');
         document.getElementById('machineFel').value = '';
-        document.getElementById('machineFelLabel').textContent = '-- Feltyp --';
+        resetPickerLabel('machineFelLabel', 'Välj feltyp');
 
         if (name !== 'Övrigt') {
             subContainer.classList.remove('hidden');
@@ -1072,8 +1092,8 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('draft_truckArray', JSON.stringify(truckArray));
 
             id.value = ""; fel.value = ""; kom.value = ""; kom.placeholder = "Kommentar...";
-            document.getElementById('truckIdLabel').textContent = '-- Välj Truck --';
-            document.getElementById('truckFelLabel').textContent = '-- Feltyp --';
+            resetPickerLabel('truckIdLabel', 'Välj truck');
+            resetPickerLabel('truckFelLabel', 'Välj feltyp');
             resetItemStatus('truck');
             document.getElementById('truckStatusWrap').classList.add('hidden');
             document.getElementById('card-truck').classList.remove('error-attention');
@@ -1091,8 +1111,8 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('draft_maskinArray', JSON.stringify(maskinArray));
 
             fel.value = ""; kom.value = ""; kom.placeholder = "Kommentar...";
-            document.getElementById('machineFelLabel').textContent = '-- Feltyp --';
-            document.getElementById('machineSubIdLabel').textContent = '-- Välj ID --';
+            resetPickerLabel('machineFelLabel', 'Välj feltyp');
+            resetPickerLabel('machineSubIdLabel', 'Välj ID/nummer');
             resetItemStatus('maskin');
             document.getElementById('maskinStatusWrap').classList.add('hidden');
             document.getElementById('selectedMachineName').value = "";
@@ -1221,6 +1241,40 @@ document.addEventListener('DOMContentLoaded', () => {
         closePicker();
     };
 
+    const AVDELNING_OPTIONS = ['TVS-Inne', 'TVS-Ute', 'TPB-Inne', 'TPB-Ute'];
+
+    window.openAvdelningPicker = () => {
+        openPicker({
+            title: 'Välj avdelning',
+            items: AVDELNING_OPTIONS,
+            categories: null,
+            onSelect: (val) => {
+                document.getElementById('avdelning').value = val;
+                document.getElementById('avdelning').dispatchEvent(new Event('input', { bubbles: true }));
+                const label = document.getElementById('avdelningLabel');
+                label.textContent = val;
+                label.classList.remove('picker-placeholder');
+                document.getElementById('card-person').classList.remove('error-attention');
+            }
+        });
+    };
+
+    const AI_MASKIN_OPTIONS = ['Truck', 'Ergopack', 'Bandmaskin', 'Movexx', 'Pallyftare'];
+
+    window.openAiMaskinPicker = () => {
+        openPicker({
+            title: 'Välj maskin',
+            items: AI_MASKIN_OPTIONS,
+            categories: null,
+            onSelect: (val) => {
+                document.getElementById('aiMaskin').value = val;
+                const label = document.getElementById('aiMaskinLabel');
+                label.textContent = val;
+                label.classList.remove('picker-placeholder');
+            }
+        });
+    };
+
     window.openTruckIdPicker = () => {
         openPicker({
             title: 'Välj truck',
@@ -1228,7 +1282,9 @@ document.addEventListener('DOMContentLoaded', () => {
             categories: TRUCK_CATEGORIES,
             onSelect: (val) => {
                 document.getElementById('truckId').value = val;
-                document.getElementById('truckIdLabel').textContent = val;
+                const label = document.getElementById('truckIdLabel');
+                label.textContent = val;
+                label.classList.remove('picker-placeholder');
                 checkTruckReady();
             }
         });
@@ -1241,7 +1297,9 @@ document.addEventListener('DOMContentLoaded', () => {
             categories: null,
             onSelect: (val) => {
                 document.getElementById('truckFel').value = val;
-                document.getElementById('truckFelLabel').textContent = val;
+                const label = document.getElementById('truckFelLabel');
+                label.textContent = val;
+                label.classList.remove('picker-placeholder');
                 checkTruckReady();
             }
         });
@@ -1256,7 +1314,9 @@ document.addEventListener('DOMContentLoaded', () => {
             categories: null,
             onSelect: (val) => {
                 document.getElementById('machineFel').value = val;
-                document.getElementById('machineFelLabel').textContent = val;
+                const label = document.getElementById('machineFelLabel');
+                label.textContent = val;
+                label.classList.remove('picker-placeholder');
                 checkMaskinReady();
             }
         });
@@ -1271,7 +1331,9 @@ document.addEventListener('DOMContentLoaded', () => {
             categories: null,
             onSelect: (val) => {
                 document.getElementById('machineSubId').value = val;
-                document.getElementById('machineSubIdLabel').textContent = val;
+                const label = document.getElementById('machineSubIdLabel');
+                label.textContent = val;
+                label.classList.remove('picker-placeholder');
                 checkMaskinReady();
             }
         });
@@ -1565,7 +1627,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (val !== null) {
                 const el = document.getElementById(key);
                 if (el) {
-                    if (el.type === 'hidden') {
+                    if (key === 'avdelning') {
+                        el.value = val;
+                        const label = document.getElementById('avdelningLabel');
+                        if (label && val) {
+                            label.textContent = val;
+                            label.classList.remove('picker-placeholder');
+                        }
+                    } else if (el.type === 'hidden') {
                         window.setSegment(key, val, false);
                     } else {
                         el.value = val;
@@ -1682,7 +1751,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!firstErrorElement) firstErrorElement = el;
         }
 
-        if (!this.checkValidity()) { 
+        if (!this.checkValidity() || !document.getElementById('avdelning').value) { 
             const el = document.getElementById('card-person');
             el.classList.add('error-attention'); 
             hasError = true;
@@ -1788,6 +1857,15 @@ document.addEventListener('DOMContentLoaded', () => {
         showConfirmScreen(data, isTruckNok ? truckArray : [], isMaskinNok ? maskinArray : []);
     });
 });
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(err => {
+            console.warn('Service worker registration failed:', err);
+        });
+    });
+}
 </script>
 </body>
 </html>
