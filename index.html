@@ -807,11 +807,14 @@ setTimeout(() => {
             <div id="rengoringBox" class="hidden"><textarea id="rengoringKommentar" placeholder="Orsak?" class="save-data"></textarea></div>
         </div>
 
-        <div class="card">
+        <div class="card" id="card-drift">
+            <div class="error-msg">⚠︎ Beskriv vilken åtgärd som vidtagits för avvikelsen!</div>
             <label>Driftinformation & Avvikelser</label>
             <textarea id="drift" placeholder="Information..." class="save-data"></textarea>
             <textarea id="avvikelse" placeholder="Avvikelser..." class="save-data"></textarea>
-            <textarea id="atgard" placeholder="Åtgärder..." class="save-data"></textarea>
+            <div id="atgardWrap" class="hidden">
+                <textarea id="atgard" placeholder="Vilken åtgärd vidtogs? *" class="save-data"></textarea>
+            </div>
         </div>
 
         <div class="card" id="card-ai">
@@ -1095,9 +1098,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const statusVal = document.getElementById('truckStatus').value;
             if (!id.value || !fel.value) { alert("Välj truck och feltyp!"); return; }
             if (!statusVal) { alert("Välj status: Klar, Service eller Ur drift!"); return; }
-            if (statusVal === 'Klar' && !kom.value.trim()) { alert("Beskriv vad som gjordes för att åtgärda!"); return; }
-
-            truckArray.push({ id: id.value, fel: fel.value, kom: kom.value, status: statusVal });
+            if (!kom.value.trim()) { alert(statusVal === 'Klar' ? "Beskriv vad som gjordes för att åtgärda!" : "Skriv en kommentar om felet innan du lägger till!"); return; }
             localStorage.setItem('draft_truckArray', JSON.stringify(truckArray));
 
             id.value = ""; fel.value = ""; kom.value = ""; kom.placeholder = "Kommentar...";
@@ -1114,7 +1115,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const statusVal = document.getElementById('maskinStatus').value;
             if (!name || (name !== 'Övrigt' && !subId) || !fel.value) { alert("Välj maskin och feltyp!"); return; }
             if (!statusVal) { alert("Välj status: Klar, Service eller Ur drift!"); return; }
-            if (statusVal === 'Klar' && !kom.value.trim()) { alert("Beskriv vad som gjordes för att åtgärda!"); return; }
+            if (!kom.value.trim()) { alert(statusVal === 'Klar' ? "Beskriv vad som gjordes för att åtgärda!" : "Skriv en kommentar om felet innan du lägger till!"); return; }
 
             maskinArray.push({ id: (name === 'Övrigt' ? 'Övrigt' : subId), fel: fel.value, kom: kom.value, status: statusVal });
             localStorage.setItem('draft_maskinArray', JSON.stringify(maskinArray));
@@ -1714,6 +1715,7 @@ document.addEventListener('DOMContentLoaded', () => {
     })();
 
     loadSavedData();
+    updateAtgardVisibility();
 
     // Splash screen: purely visual, runs after drafts are already loaded into the form.
     // Doesn't touch localStorage/autosave logic at all.
@@ -1729,10 +1731,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }, remaining);
     }
 
+    function updateAtgardVisibility() {
+        const avvikelseVal = document.getElementById('avvikelse').value.trim();
+        const wrap = document.getElementById('atgardWrap');
+        if (avvikelseVal) {
+            wrap.classList.remove('hidden');
+        } else {
+            wrap.classList.add('hidden');
+            document.getElementById('card-drift').classList.remove('error-attention');
+        }
+    }
+
     document.addEventListener('input', (e) => { 
         if (e.target.classList.contains('save-data')) {
             localStorage.setItem('draft_' + e.target.id, e.target.value);
             e.target.closest('.card')?.classList.remove('error-attention');
+        }
+        if (e.target.id === 'avvikelse') {
+            updateAtgardVisibility();
         }
     });
 
@@ -1763,6 +1779,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!this.checkValidity() || !document.getElementById('avdelning').value) { 
             const el = document.getElementById('card-person');
             el.classList.add('error-attention'); 
+            hasError = true;
+            if (!firstErrorElement) firstErrorElement = el;
+        }
+
+        if (document.getElementById('avvikelse').value.trim() && !document.getElementById('atgard').value.trim()) {
+            const el = document.getElementById('card-drift');
+            el.classList.add('error-attention');
             hasError = true;
             if (!firstErrorElement) firstErrorElement = el;
         }
