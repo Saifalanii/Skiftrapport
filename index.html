@@ -504,6 +504,12 @@
         .top-button-row { display: flex; gap: 10px; margin-bottom: 15px; }
         .top-button-row button { flex: 1; font-size: 0.85em; padding: 10px 5px; }
 
+        .ai-intro {
+            font-size: 0.85rem;
+            color: var(--text-sec);
+            margin: -8px 0 14px;
+            line-height: 1.4;
+        }
         #aiAnswer {
             white-space: pre-wrap; line-height: 1.5; font-size: 0.9rem;
             background: rgba(91, 95, 199, 0.08);
@@ -532,6 +538,15 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: #e67e22;
+            margin-bottom: 6px;
+        }
+        .ai-answer-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--teams-purple);
             margin-bottom: 6px;
         }
     </style>
@@ -818,13 +833,14 @@ setTimeout(() => {
         </div>
 
         <div class="card" id="card-ai">
-            <label>AI Felsökningshjälp</label>
+            <label>Fråga Astrid</label>
+            <p class="ai-intro">Din AI-assistent för felsökning – välj maskin och beskriv vad du ser, så hjälper jag dig utifrån manualen.</p>
             <button type="button" class="picker-btn" onclick="openAiMaskinPicker(); vibrate(20);">
                 <span id="aiMaskinLabel" class="picker-placeholder">Välj maskin</span>
             </button>
             <input type="hidden" id="aiMaskin" value="">
-            <textarea id="aiProblem" placeholder="Beskriv problemet du ser på maskinen..."></textarea>
-            <button type="button" class="add-btn" id="aiAskBtn" onclick="askAI(); vibrate(30);">Fråga AI</button>
+            <textarea id="aiProblem" placeholder="Vad kan jag hjälpa dig med?"></textarea>
+            <button type="button" class="add-btn" id="aiAskBtn" onclick="askAI(); vibrate(30);">Fråga Astrid</button>
             <div class="fetch-status" id="aiStatus"></div>
             <div id="aiAnswer" class="list-container hidden"></div>
         </div>
@@ -1099,6 +1115,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!id.value || !fel.value) { alert("Välj truck och feltyp!"); return; }
             if (!statusVal) { alert("Välj status: Klar, Service eller Ur drift!"); return; }
             if (!kom.value.trim()) { alert(statusVal === 'Klar' ? "Beskriv vad som gjordes för att åtgärda!" : "Skriv en kommentar om felet innan du lägger till!"); return; }
+
+            truckArray.push({ id: id.value, fel: fel.value, kom: kom.value, status: statusVal });
             localStorage.setItem('draft_truckArray', JSON.stringify(truckArray));
 
             id.value = ""; fel.value = ""; kom.value = ""; kom.placeholder = "Kommentar...";
@@ -1528,7 +1546,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!problem) { alert("Beskriv problemet!"); return; }
 
         btn.disabled = true;
-        btn.innerText = "Tänker...";
+        btn.innerText = "Astrid tänker...";
         status.textContent = 'Frågar AI...';
         status.className = 'fetch-status sending';
         answerBox.classList.add('hidden');
@@ -1558,7 +1576,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         + 'Frågan matchar inte innehållet i <strong>' + maskin + '</strong>-manualen. '
                         + 'Dubbelkolla att rätt maskin är vald ovan, eller kontakta arbetsledare om frågan gäller något manualen inte täcker.';
                 } else {
-                    answerBox.textContent = result.answer;
+                    answerBox.innerHTML = '<span class="ai-answer-label">Astrid svarar</span>';
+                    const answerText = document.createElement('div');
+                    answerText.textContent = result.answer;
+                    answerBox.appendChild(answerText);
                 }
                 answerBox.classList.remove('hidden');
                 status.textContent = isRefusal ? 'Inget svar hittades' : 'Svar mottaget';
@@ -1578,7 +1599,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         btn.disabled = false;
-        btn.innerText = "Fråga AI";
+        btn.innerText = "Fråga Astrid";
     };
 
     function showConfirmScreen(data, truckArr, maskinArr) {
