@@ -362,8 +362,6 @@
             color: var(--text-sec); font-size: 0.8rem; font-weight: 600; cursor: pointer;
         }
         .stats-tab.active { background: var(--teams-purple); color: white; border-color: var(--teams-purple); }
-        .stats-tab.tab-avsluta { margin-left: auto; }
-        .stats-tab.tab-avsluta.active { background: #e67e22; color: white; border-color: #e67e22; }
 
         .stats-search {
             width: 100%; padding: 10px 12px; margin-bottom: 10px;
@@ -386,7 +384,6 @@
         }
         .stats-filter-chip.active { background: var(--teams-purple); color: white; border-color: var(--teams-purple); }
         .stats-filter-chip.hidden-chip { display: none; }
-        .stats-filter-row.avsluta-mode .stats-filter-chip.active[data-filter="ALL"] { background: #e67e22; border-color: #e67e22; color: white; }
         .stats-filter-chip.active[data-filter="KLAR"] { background: var(--pastel-green); color: var(--pastel-green-text); border-color: var(--pastel-green); }
         .stats-filter-chip.active[data-filter="SERVICE"] { background: var(--pastel-yellow); color: var(--pastel-yellow-text); border-color: var(--pastel-yellow); }
         .stats-filter-chip.active[data-filter="UR DRIFT"] { background: var(--pastel-red); color: var(--danger); border-color: var(--pastel-red); }
@@ -900,7 +897,6 @@ setTimeout(() => {
             <button type="button" class="stats-tab active" data-sheet="Skiftrapport" onclick="switchStatsSheet('Skiftrapport'); vibrate(20);">Rapporter</button>
             <button type="button" class="stats-tab" data-sheet="Truckavvikelse" onclick="switchStatsSheet('Truckavvikelse'); vibrate(20);">Truckar</button>
             <button type="button" class="stats-tab" data-sheet="Maskiner" onclick="switchStatsSheet('Maskiner'); vibrate(20);">Maskiner</button>
-            <button type="button" class="stats-tab tab-avsluta" data-sheet="Avsluta" onclick="switchStatsSheet('Avsluta'); vibrate(20);">Avsluta</button>
         </div>
         <input type="text" id="statsSearch" class="stats-search" placeholder="Sök..." oninput="applyStatsFilters()">
         <div class="stats-filter-label hidden" id="statsFilterLabel">Filtrera på status</div>
@@ -1052,7 +1048,7 @@ setTimeout(() => {
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     // En enda plats för webbappens URL - byt bara här nästa gång Apps Script omdistribueras.
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzfnTVk7RXXei3QjxP-ekB3JgyfzccGs_Sj4negwaQRepqojtYJPHrEfj1kB_ryx2Ah/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxE8GJiDmrYmntjOIlMXNtnYCAThQz4kfcEb1eY6FjIRklRw1ADSxa37g-NtDdQVu-u/exec";
 
     let truckArray = []; 
     let maskinArray = [];
@@ -1678,66 +1674,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // ===================== AVSLUTA ÄRENDE =====================
-    let openItemsCache = [];
-    let openItemsFiltered = [];
-
-    async function fetchOpenItems() {
-        const response = await fetch(GAS_URL, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify({ action: "hamtaOppna" })
-        });
-        const result = await response.json();
-        if (result.status === 'ok' && !Array.isArray(result.items)) {
-            // Servern svarade "ok" men skickade ingen items-lista - det händer om
-            // backend-koden inte känner igen "hamtaOppna" och bara körde den gamla
-            // rapport-logiken istället (som alltid svarar ok).
-            throw new Error('Servern svarade men kände inte igen "hamtaOppna" - backend-koden (Code.gs) är troligen inte uppdaterad/omdistribuerad ännu.');
-        }
-        if (result.status !== 'ok') throw new Error(result.message || 'Fel vid hämtning');
-        openItemsCache = result.items;
-    }
-
-    function formatOpenItemDate(value) {
-        if (!value) return '';
-        const d = new Date(value);
-        if (isNaN(d.getTime())) return value;
-        return d.toLocaleDateString('sv-SE');
-    }
-
-    function renderOpenItems() {
-        const term = document.getElementById('statsSearch').value.toLowerCase().trim();
-        let items = openItemsCache;
-        if (currentStatsFilter !== 'ALL') {
-            items = items.filter(it => (it.status || '').toString().trim().toUpperCase() === currentStatsFilter);
-        }
-        if (term) {
-            items = items.filter(it => Object.values(it).some(v => (v || '').toString().toLowerCase().includes(term)));
-        }
-        openItemsFiltered = items;
-        const container = document.getElementById('statsCards');
-        if (items.length === 0) {
-            container.innerHTML = '<div class="stats-empty">Inga öppna ärenden just nu 🎉</div>';
-            return;
-        }
-        container.innerHTML = items.map((it, idx) => `
-            <div class="stats-card clickable" onclick="openCloseSheet(${idx}); vibrate(20);">
-                <div class="stats-card-title">${it.id}</div>
-                <div class="stats-card-sub">${[formatOpenItemDate(it.datum), it.skift, it.avd].filter(Boolean).join(' · ')}</div>
-                <div class="stats-field"><span class="stats-field-label">Feltyp</span><span class="stats-field-value freetext">${it.fel}</span></div>
-                <div class="stats-field"><span class="stats-field-label">Kommentar</span><span class="stats-field-value freetext">${it.kom}</span></div>
-                <div class="stats-field"><span class="stats-field-label">Status</span><span class="status-badge ${statsBadgeClass(it.status)}">${it.status}</span></div>
-                <div class="stats-card-action">
-                    <span>Tryck för att avsluta ärendet</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    window.openCloseSheet = (idx) => {
-        window.currentCloseItem = openItemsFiltered[idx];
+    // ===================== AVSLUTA ÄRENDE (direkt från Truckar/Maskiner) =====================
+    window.openCloseSheetFromRow = (idx) => {
+        const r = lastRenderedRows[idx];
+        if (!r) return;
+        // Kolumner: datum(0), skift(1), avd(2), sign(3), id(4), fel(5), kom(6), status(7)
+        window.currentCloseItem = {
+            sheetName: currentStatsSheet,
+            rowIndex: 1, // Dummy-värde - backend hittar rätt rad via id+fel+sign+kom istället.
+            id: r[4], fel: r[5], kom: r[6], sign: r[3], status: r[7]
+        };
         const it = window.currentCloseItem;
         document.getElementById('closeSheetSummary').innerHTML = `
             <div class="list-item"><span><strong>${it.id}</strong>: ${it.fel}<br><span style="color:var(--text-sec);font-size:0.85em;">${it.kom}</span></span></div>
@@ -1773,7 +1719,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({
                     action: "avslutaArende",
                     sheetName: it.sheetName, rowIndex: it.rowIndex,
-                    id: it.id, fel: it.fel, sign: it.sign, datum: it.datum,
+                    id: it.id, fel: it.fel, sign: it.sign, kom: it.kom,
                     atgard: atgard, kostnad: kostnad
                 })
             });
@@ -1784,7 +1730,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 vibrate(60);
                 setTimeout(() => {
                     closeCloseSheet();
-                    switchStatsSheet('Avsluta');
+                    delete statsCache[it.sheetName];
+                    switchStatsSheet(it.sheetName);
                 }, 800);
             } else {
                 status.textContent = result.message || 'Något gick fel';
@@ -1819,6 +1766,7 @@ document.addEventListener('DOMContentLoaded', () => {
             title: r => r[4] || 'Okänd truck',
             sub: r => [r[0], r[1], r[2]].filter(Boolean).join(' · '),
             primaryStatusField: 7,
+            closable: true,
             fields: [
                 { label: 'Feltyp', col: 5, freetext: true },
                 { label: 'Kommentar', col: 6, freetext: true },
@@ -1830,6 +1778,7 @@ document.addEventListener('DOMContentLoaded', () => {
             title: r => r[4] || 'Okänd maskin',
             sub: r => [r[0], r[1], r[2]].filter(Boolean).join(' · '),
             primaryStatusField: 7,
+            closable: true,
             fields: [
                 { label: 'Feltyp', col: 5, freetext: true },
                 { label: 'Kommentar', col: 6, freetext: true },
@@ -1874,16 +1823,19 @@ document.addEventListener('DOMContentLoaded', () => {
         return rows;
     }
 
+    let lastRenderedRows = [];
+
     function renderStatsCards(sheetName, rows, emptyMessage) {
         const config = STATS_SHEET_CONFIGS[sheetName];
         const container = document.getElementById('statsCards');
+        lastRenderedRows = rows;
 
         if (rows.length === 0) {
             container.innerHTML = `<div class="stats-empty">${emptyMessage || 'Inga rader hittades.'}</div>`;
             return;
         }
 
-        container.innerHTML = rows.map(r => {
+        container.innerHTML = rows.map((r, idx) => {
             const fieldsHtml = config.fields.map(f => {
                 const raw = r[f.col];
                 if (f.freetext && !raw) return '';
@@ -1895,10 +1847,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     + `<span class="stats-field-value freetext">${raw}</span></div>`;
             }).join('');
 
-            return `<div class="stats-card">`
+            const status = (r[config.primaryStatusField] || '').toString().trim().toUpperCase();
+            const isOpen = config.closable && (status === 'SERVICE' || status === 'UR DRIFT');
+
+            const actionHtml = isOpen ? `
+                <div class="stats-card-action">
+                    <span>Tryck för att avsluta ärendet</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>` : '';
+
+            const clickAttr = isOpen ? ` onclick="openCloseSheetFromRow(${idx}); vibrate(20);"` : '';
+
+            return `<div class="stats-card${isOpen ? ' clickable' : ''}"${clickAttr}>`
                 + `<div class="stats-card-title">${config.title(r)}</div>`
                 + `<div class="stats-card-sub">${config.sub(r)}</div>`
                 + fieldsHtml
+                + actionHtml
                 + `</div>`;
         }).join('');
     }
@@ -1911,31 +1875,8 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.classList.toggle('active', btn.dataset.sheet === sheetName);
         });
 
-        if (sheetName === 'Avsluta') {
-            const filterRow = document.getElementById('statsFilterRow');
-            filterRow.classList.remove('hidden');
-            filterRow.classList.add('avsluta-mode');
-            document.getElementById('statsFilterLabel').classList.remove('hidden');
-            filterRow.querySelectorAll('.stats-filter-chip').forEach(chip => {
-                const f = chip.dataset.filter;
-                chip.classList.toggle('hidden-chip', f === 'KLAR');
-                chip.classList.toggle('active', f === 'ALL');
-            });
-            const openContainer = document.getElementById('statsCards');
-            openContainer.innerHTML = '<div class="stats-loading">Hämtar öppna ärenden...</div>';
-            try {
-                await fetchOpenItems();
-                renderOpenItems();
-            } catch (err) {
-                console.error('Kunde inte hämta öppna ärenden:', err);
-                openContainer.innerHTML = '<div class="stats-empty">⚠️ ' + (err.message || 'Okänt fel') + '</div>';
-            }
-            return;
-        }
-
         const config = STATS_SHEET_CONFIGS[sheetName];
         const filterRow = document.getElementById('statsFilterRow');
-        filterRow.classList.remove('avsluta-mode');
         const filterVisible = config.primaryStatusField !== undefined;
         filterRow.classList.toggle('hidden', !filterVisible);
         document.getElementById('statsFilterLabel').classList.toggle('hidden', !filterVisible);
@@ -1964,10 +1905,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.applyStatsFilters = () => {
-        if (currentStatsSheet === 'Avsluta') {
-            renderOpenItems();
-            return;
-        }
         const config = STATS_SHEET_CONFIGS[currentStatsSheet];
         const allRows = statsCache[currentStatsSheet] || [];
         const searchTerm = document.getElementById('statsSearch').value.toLowerCase().trim();
