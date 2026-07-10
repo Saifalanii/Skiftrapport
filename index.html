@@ -352,8 +352,9 @@
         .sheet-body iframe { width: 100%; height: 100%; border: none; border-radius: 8px; }
 
         .stats-tabs {
-            display: flex; gap: 8px; margin-bottom: 10px; flex-shrink: 0;
+            display: flex; gap: 8px; margin-bottom: 12px; padding-bottom: 12px; flex-shrink: 0;
             overflow-x: auto; -webkit-overflow-scrolling: touch;
+            border-bottom: 1px solid var(--teams-border);
         }
         .stats-tab {
             flex-shrink: 0; padding: 8px 14px; border-radius: 20px;
@@ -368,12 +369,16 @@
             background: var(--teams-bg); color: var(--text-main);
             font-size: 0.85rem; flex-shrink: 0;
         }
+        .stats-filter-label {
+            font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.5px; color: var(--text-sec); margin-bottom: 6px; flex-shrink: 0;
+        }
         .stats-filter-row {
             display: flex; gap: 6px; margin-bottom: 10px; flex-shrink: 0;
             overflow-x: auto; -webkit-overflow-scrolling: touch;
         }
         .stats-filter-chip {
-            flex-shrink: 0; padding: 6px 12px; border-radius: 20px;
+            flex-shrink: 0; padding: 6px 12px; border-radius: 6px;
             border: 1px solid var(--teams-border); background: transparent;
             color: var(--text-sec); font-size: 0.75rem; font-weight: 600; cursor: pointer;
         }
@@ -388,6 +393,17 @@
             padding: 14px; margin-bottom: 10px; animation: fadeIn 0.25s ease;
         }
         .stats-card-title { font-weight: 700; font-size: 1rem; margin-bottom: 2px; }
+        .stats-card.clickable {
+            border-left: 4px solid var(--teams-purple);
+            position: relative;
+        }
+        .stats-card.clickable:active { background: rgba(91, 95, 199, 0.12); }
+        .stats-card-action {
+            margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--teams-border);
+            display: flex; align-items: center; justify-content: space-between;
+            color: var(--teams-purple); font-size: 0.8rem; font-weight: 700;
+        }
+        .stats-card-action svg { width: 18px; height: 18px; stroke: var(--teams-purple); }
         .stats-card-sub { font-size: 0.75rem; color: var(--text-sec); margin-bottom: 10px; }
         .stats-field {
             display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
@@ -875,6 +891,7 @@ setTimeout(() => {
             <button type="button" class="stats-tab" data-sheet="Avsluta" onclick="switchStatsSheet('Avsluta'); vibrate(20);">Avsluta</button>
         </div>
         <input type="text" id="statsSearch" class="stats-search" placeholder="Sök..." oninput="applyStatsFilters()">
+        <div class="stats-filter-label hidden" id="statsFilterLabel">Filtrera på status</div>
         <div class="stats-filter-row hidden" id="statsFilterRow">
             <button type="button" class="stats-filter-chip active" data-filter="ALL" onclick="setStatsFilter('ALL')">Alla</button>
             <button type="button" class="stats-filter-chip" data-filter="KLAR" onclick="setStatsFilter('KLAR')">Klar</button>
@@ -1670,6 +1687,13 @@ document.addEventListener('DOMContentLoaded', () => {
         openItemsCache = result.items;
     }
 
+    function formatOpenItemDate(value) {
+        if (!value) return '';
+        const d = new Date(value);
+        if (isNaN(d.getTime())) return value;
+        return d.toLocaleDateString('sv-SE');
+    }
+
     function renderOpenItems() {
         const term = document.getElementById('statsSearch').value.toLowerCase().trim();
         let items = openItemsCache;
@@ -1686,12 +1710,16 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         container.innerHTML = items.map((it, idx) => `
-            <div class="stats-card" onclick="openCloseSheet(${idx}); vibrate(20);" style="cursor:pointer;">
+            <div class="stats-card clickable" onclick="openCloseSheet(${idx}); vibrate(20);">
                 <div class="stats-card-title">${it.id}</div>
-                <div class="stats-card-sub">${[it.datum, it.skift, it.avd].filter(Boolean).join(' · ')}</div>
+                <div class="stats-card-sub">${[formatOpenItemDate(it.datum), it.skift, it.avd].filter(Boolean).join(' · ')}</div>
                 <div class="stats-field"><span class="stats-field-label">Feltyp</span><span class="stats-field-value freetext">${it.fel}</span></div>
                 <div class="stats-field"><span class="stats-field-label">Kommentar</span><span class="stats-field-value freetext">${it.kom}</span></div>
                 <div class="stats-field"><span class="stats-field-label">Status</span><span class="status-badge ${statsBadgeClass(it.status)}">${it.status}</span></div>
+                <div class="stats-card-action">
+                    <span>Tryck för att avsluta ärendet</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
             </div>
         `).join('');
     }
@@ -1874,6 +1902,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (sheetName === 'Avsluta') {
             const filterRow = document.getElementById('statsFilterRow');
             filterRow.classList.remove('hidden');
+            document.getElementById('statsFilterLabel').classList.remove('hidden');
             filterRow.querySelectorAll('.stats-filter-chip').forEach(chip => {
                 const f = chip.dataset.filter;
                 chip.classList.toggle('hidden-chip', f === 'KLAR');
@@ -1893,7 +1922,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const config = STATS_SHEET_CONFIGS[sheetName];
         const filterRow = document.getElementById('statsFilterRow');
-        filterRow.classList.toggle('hidden', config.primaryStatusField === undefined);
+        const filterVisible = config.primaryStatusField !== undefined;
+        filterRow.classList.toggle('hidden', !filterVisible);
+        document.getElementById('statsFilterLabel').classList.toggle('hidden', !filterVisible);
         filterRow.querySelectorAll('.stats-filter-chip').forEach(chip => {
             chip.classList.toggle('active', chip.dataset.filter === 'ALL');
         });
