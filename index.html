@@ -432,18 +432,19 @@
             font-size: 0.95rem; font-weight: 700; margin: 0 0 14px;
             color: var(--text-main);
         }
-        .pie-wrap { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
-        .pie-svg { width: 160px; height: 160px; flex-shrink: 0; }
-        .pie-legend { flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: 6px; }
-        .legend-row { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; }
-        .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-        .legend-label { flex: 1; color: var(--text-main); }
-        .legend-value { color: var(--text-sec); font-weight: 600; flex-shrink: 0; }
+        .bar-chart { display: flex; flex-direction: column; gap: 10px; }
+        .bar-row { cursor: pointer; }
+        .bar-row-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; font-size: 0.8rem; gap: 8px; }
+        .bar-label { color: var(--text-main); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+        .bar-value { color: var(--text-sec); font-weight: 600; flex-shrink: 0; margin-left: 10px; }
+        .bar-track { background: var(--teams-bg); border-radius: 5px; height: 10px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 5px; transition: width 0.3s ease; }
         .dashboard-total { font-size: 0.75rem; color: var(--text-sec); margin-bottom: 8px; line-height: 1.6; }
-        .dashboard-trend { font-size: 0.75rem; color: var(--text-sec); margin-bottom: 14px; }
+        .dashboard-trend { font-size: 0.75rem; color: var(--text-sec); margin-bottom: 6px; }
+        .dashboard-hint { font-size: 0.7rem; color: var(--text-sec); opacity: 0.7; margin-bottom: 16px; }
         .drill-panel {
             background: var(--teams-bg); border-left: 3px solid var(--teams-purple);
-            border-radius: 6px; padding: 8px 10px; margin: 2px 0 8px 18px;
+            border-radius: 6px; padding: 8px 10px; margin: 6px 0 0;
             font-size: 0.75rem; color: var(--text-sec);
         }
         .drill-item { padding: 4px 0; border-bottom: 1px solid var(--teams-border); }
@@ -455,14 +456,9 @@
         }
         .unit-row:first-child { border-top: none; }
         .unit-header { font-weight: 700; color: var(--text-sec); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.3px; }
-        .unit-name { font-weight: 600; }
+        .unit-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .unit-count { color: var(--text-sec); }
         .unit-cost { text-align: right; font-weight: 700; color: var(--teams-purple); }
-
-        @media (min-width: 700px) {
-            .pie-wrap { flex-wrap: nowrap; }
-        }
-
         @media (min-width: 700px) {
             .sheet-overlay { align-items: center; }
             .bottom-sheet {
@@ -2033,32 +2029,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const entries = Object.entries(groups).sort((a, b) => b[1].length - a[1].length);
         const total = rows.length;
         if (total === 0) return '<div class="stats-empty">Ingen data.</div>';
+        const maxCount = entries[0][1].length;
 
-        const cx = 100, cy = 100, r = 90;
-        let angle = -90;
-        let paths = '';
-        entries.forEach(([, groupRows], i) => {
-            const count = groupRows.length;
-            const slice = (count / total) * 360;
-            const startRad = angle * Math.PI / 180;
-            const endRad = (angle + slice) * Math.PI / 180;
-            const x1 = cx + r * Math.cos(startRad);
-            const y1 = cy + r * Math.sin(startRad);
-            const x2 = cx + r * Math.cos(endRad);
-            const y2 = cy + r * Math.sin(endRad);
-            const largeArc = slice > 180 ? 1 : 0;
-            const color = PIE_COLORS[i % PIE_COLORS.length];
-            if (entries.length === 1) {
-                paths += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}"></circle>`;
-            } else {
-                paths += `<path d="M${cx},${cy} L${x1.toFixed(2)},${y1.toFixed(2)} A${r},${r} 0 ${largeArc} 1 ${x2.toFixed(2)},${y2.toFixed(2)} Z" fill="${color}" stroke="var(--teams-card)" stroke-width="1.5"></path>`;
-            }
-            angle += slice;
-        });
-
-        const legend = entries.map(([label, groupRows], i) => {
+        const bars = entries.map(([label, groupRows], i) => {
             const count = groupRows.length;
             const pct = ((count / total) * 100).toFixed(1);
+            const widthPct = (count / maxCount) * 100;
             const color = PIE_COLORS[i % PIE_COLORS.length];
             drillCounter++;
             const detailId = 'drill-' + drillCounter;
@@ -2069,16 +2045,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }).join('');
             const moreText = groupRows.length > 15 ? `<div class="drill-item" style="color:var(--text-sec);">+ ${groupRows.length - 15} till...</div>` : '';
             return `
-                <div class="legend-row" onclick="toggleDrilldown('${detailId}'); vibrate(20);" style="cursor:pointer;">
-                    <span class="legend-dot" style="background:${color}"></span>
-                    <span class="legend-label">${label}</span>
-                    <span class="legend-value">${count} (${pct}%)</span>
+                <div class="bar-row" onclick="toggleDrilldown('${detailId}'); vibrate(20);">
+                    <div class="bar-row-top">
+                        <span class="bar-label">${label}</span>
+                        <span class="bar-value">${count} (${pct}%)</span>
+                    </div>
+                    <div class="bar-track"><div class="bar-fill" style="width:${widthPct}%; background:${color};"></div></div>
                 </div>
                 <div class="drill-panel hidden" id="${detailId}">${detailItems}${moreText}</div>
             `;
         }).join('');
 
-        return `<div class="pie-wrap"><svg viewBox="0 0 200 200" class="pie-svg">${paths}</svg><div class="pie-legend">${legend}</div></div>`;
+        return `<div class="bar-chart">${bars}</div>`;
     }
 
     window.toggleDrilldown = (id) => {
@@ -2115,12 +2093,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 · Snitt per avslutat ärende: <strong>${avgKostnad.toLocaleString('sv-SE', {maximumFractionDigits: 0})} kr</strong>
             </div>
             ${renderTrend(allRows)}
+            <div class="dashboard-hint">Tryck på en rad för detaljer</div>
             <div class="dashboard-section">
-                <h4 class="dashboard-title">Vad strular mest <span style="font-weight:400;color:var(--text-sec);font-size:0.75rem;">(tryck på en rad för detaljer)</span></h4>
+                <h4 class="dashboard-title">Vad strular mest</h4>
                 ${renderPieChart(allRows, 'id')}
             </div>
             <div class="dashboard-section">
-                <h4 class="dashboard-title">Orsak <span style="font-weight:400;color:var(--text-sec);font-size:0.75rem;">(tryck på en rad för detaljer)</span></h4>
+                <h4 class="dashboard-title">Orsak</h4>
                 ${renderPieChart(allRows, 'fel')}
             </div>
             ${renderUnitTable(unitMap)}
