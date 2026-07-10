@@ -254,6 +254,10 @@
             color: var(--pastel-green-text); 
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+        #qbtn-typ-truck.active, #qbtn-typ-maskin.active {
+            background: var(--teams-purple) !important;
+            color: white !important;
+        }
         .segment-btn.active.nok { 
             background: var(--pastel-red); 
             color: var(--pastel-red-text);
@@ -435,7 +439,15 @@
         .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
         .legend-label { flex: 1; color: var(--text-main); }
         .legend-value { color: var(--text-sec); font-weight: 600; flex-shrink: 0; }
-        .dashboard-total { font-size: 0.75rem; color: var(--text-sec); margin-bottom: 14px; }
+        .dashboard-total { font-size: 0.75rem; color: var(--text-sec); margin-bottom: 8px; line-height: 1.6; }
+        .dashboard-trend { font-size: 0.75rem; color: var(--text-sec); margin-bottom: 14px; }
+        .drill-panel {
+            background: var(--teams-bg); border-left: 3px solid var(--teams-purple);
+            border-radius: 6px; padding: 8px 10px; margin: 2px 0 8px 18px;
+            font-size: 0.75rem; color: var(--text-sec);
+        }
+        .drill-item { padding: 4px 0; border-bottom: 1px solid var(--teams-border); }
+        .drill-item:last-child { border-bottom: none; }
         .unit-table { display: flex; flex-direction: column; }
         .unit-row {
             display: grid; grid-template-columns: 1.4fr 0.9fr 0.9fr; gap: 8px;
@@ -743,7 +755,7 @@ setTimeout(() => {
             Status
         </button>
         <button class="secondary" onclick="openStatistik(); vibrate(30);">
-            <svg class="icon" viewBox="0 0 24 24" style="margin-right: 4px;"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            <svg class="icon" viewBox="0 0 24 24" style="margin-right: 4px;"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
             Statistik
         </button>
     </div>
@@ -1918,31 +1930,68 @@ document.addEventListener('DOMContentLoaded', () => {
     const PIE_COLORS = ['#5b5fc7', '#e67e22', '#27ae60', '#c0392b', '#f1c40f', '#16a085', '#8e44ad', '#2980b9', '#d35400', '#7f8c8d', '#a8e6cf', '#ffe08a'];
     let currentStatistikCategory = 'Truckavvikelse';
 
-    function countBy(rows, keyIndex) {
-        const map = {};
-        rows.forEach(r => {
-            const key = (r[keyIndex] || '').toString().trim() || 'Okänt';
-            map[key] = (map[key] || 0) + 1;
-        });
-        return map;
-    }
-
     function parseKostnad(value) {
         const n = parseFloat((value || '0').toString().replace(/\s/g, '').replace(',', '.'));
         return isNaN(n) ? 0 : n;
     }
 
-    function buildUnitStats(openRows, arkivRows) {
-        const map = {};
-        openRows.concat(arkivRows).forEach(r => {
-            const id = (r[4] || '').toString().trim() || 'Okänt';
-            if (!map[id]) map[id] = { count: 0, kostnad: 0 };
-            map[id].count++;
+    // Öppna rader (Truckavvikelse/Maskiner) och Arkiv-rader har OLIKA kolumnordning.
+    // Vi normaliserar båda till samma objektform här en gång, så resten av koden
+    // aldrig behöver hålla reda på vilket index som betyder vad.
+    function normalizeRow(r, isArkiv) {
+        return {
+            datum: r[0] || '', skift: r[1] || '', avd: r[2] || '', sign: r[3] || '',
+            id: (r[4] || '').toString().trim() || 'Okänt',
+            fel: (r[5] || '').toString().trim() || 'Okänt',
+            kom: r[6] || '',
+            atgard: isArkiv ? (r[7] || '') : '',
+            status: isArkiv ? (r[8] || 'DONE') : (r[7] || ''),
+            kostnad: isArkiv ? parseKostnad(r[10]) : 0,
+            isArkiv: isArkiv
+        };
+    }
+
+    function monthKey(datumStr) {
+        const d = new Date(datumStr);
+        if (isNaN(d.getTime())) return null;
+        return d.getFullYear() + '-' + (d.getMonth() + 1);
+    }
+
+    function renderTrend(rows) {
+        const now = new Date();
+        const thisKey = now.getFullYear() + '-' + (now.getMonth() + 1);
+        const prevDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const prevKey = prevDate.getFullYear() + '-' + (prevDate.getMonth() + 1);
+
+        let thisCount = 0, prevCount = 0;
+        rows.forEach(row => {
+            const k = monthKey(row.datum);
+            if (k === thisKey) thisCount++;
+            else if (k === prevKey) prevCount++;
         });
-        arkivRows.forEach(r => {
-            const id = (r[4] || '').toString().trim() || 'Okänt';
-            if (!map[id]) map[id] = { count: 0, kostnad: 0 };
-            map[id].kostnad += parseKostnad(r[10]);
+
+        let trendHtml = '';
+        if (prevCount > 0) {
+            const diff = thisCount - prevCount;
+            const pct = Math.round((diff / prevCount) * 100);
+            if (diff > 0) {
+                trendHtml = `<span style="color:#ff8b7d;">▲ ${pct > 0 ? '+' : ''}${pct}% fler ärenden än förra månaden</span>`;
+            } else if (diff < 0) {
+                trendHtml = `<span style="color:#6fe0a0;">▼ ${pct}% färre ärenden än förra månaden</span>`;
+            } else {
+                trendHtml = `<span>Oförändrat jämfört med förra månaden</span>`;
+            }
+        }
+
+        return `<div class="dashboard-trend">Denna månad: <strong>${thisCount}</strong> · Förra månaden: <strong>${prevCount}</strong>${trendHtml ? ' · ' + trendHtml : ''}</div>`;
+    }
+
+    function buildUnitStats(rows) {
+        const map = {};
+        rows.forEach(row => {
+            if (!map[row.id]) map[row.id] = { count: 0, kostnad: 0 };
+            map[row.id].count++;
+            map[row.id].kostnad += row.kostnad;
         });
         return map;
     }
@@ -1972,15 +2021,24 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
-    function renderPieChart(countsObj) {
-        const entries = Object.entries(countsObj).sort((a, b) => b[1] - a[1]);
-        const total = entries.reduce((sum, [, c]) => sum + c, 0);
+    let drillCounter = 0;
+
+    function renderPieChart(rows, field) {
+        const groups = {};
+        rows.forEach(row => {
+            const key = row[field] || 'Okänt';
+            if (!groups[key]) groups[key] = [];
+            groups[key].push(row);
+        });
+        const entries = Object.entries(groups).sort((a, b) => b[1].length - a[1].length);
+        const total = rows.length;
         if (total === 0) return '<div class="stats-empty">Ingen data.</div>';
 
         const cx = 100, cy = 100, r = 90;
         let angle = -90;
         let paths = '';
-        entries.forEach(([, count], i) => {
+        entries.forEach(([, groupRows], i) => {
+            const count = groupRows.length;
             const slice = (count / total) * 360;
             const startRad = angle * Math.PI / 180;
             const endRad = (angle + slice) * Math.PI / 180;
@@ -1998,40 +2056,72 @@ document.addEventListener('DOMContentLoaded', () => {
             angle += slice;
         });
 
-        const legend = entries.map(([label, count], i) => {
+        const legend = entries.map(([label, groupRows], i) => {
+            const count = groupRows.length;
             const pct = ((count / total) * 100).toFixed(1);
             const color = PIE_COLORS[i % PIE_COLORS.length];
-            return `<div class="legend-row"><span class="legend-dot" style="background:${color}"></span><span class="legend-label">${label}</span><span class="legend-value">${count} (${pct}%)</span></div>`;
+            drillCounter++;
+            const detailId = 'drill-' + drillCounter;
+            const detailItems = groupRows.slice(0, 15).map(row => {
+                const statusLabel = row.status === 'DONE' ? 'Klar' : row.status;
+                const extra = row.isArkiv && row.atgard ? ` — Åtgärd: ${row.atgard}` : '';
+                return `<div class="drill-item"><strong>${row.datum || '-'}</strong> · ${row.kom || 'Ingen kommentar'}${extra} <span class="status-badge ${statsBadgeClass(row.status)}" style="margin-left:6px;">${statusLabel}</span></div>`;
+            }).join('');
+            const moreText = groupRows.length > 15 ? `<div class="drill-item" style="color:var(--text-sec);">+ ${groupRows.length - 15} till...</div>` : '';
+            return `
+                <div class="legend-row" onclick="toggleDrilldown('${detailId}'); vibrate(20);" style="cursor:pointer;">
+                    <span class="legend-dot" style="background:${color}"></span>
+                    <span class="legend-label">${label}</span>
+                    <span class="legend-value">${count} (${pct}%)</span>
+                </div>
+                <div class="drill-panel hidden" id="${detailId}">${detailItems}${moreText}</div>
+            `;
         }).join('');
 
         return `<div class="pie-wrap"><svg viewBox="0 0 200 200" class="pie-svg">${paths}</svg><div class="pie-legend">${legend}</div></div>`;
     }
 
+    window.toggleDrilldown = (id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const wasHidden = el.classList.contains('hidden');
+        document.querySelectorAll('.drill-panel').forEach(p => p.classList.add('hidden'));
+        if (wasHidden) el.classList.remove('hidden');
+    };
+
     async function renderDashboard(realSheet, container) {
-        const [openRows, arkivRowsAll] = await Promise.all([
+        const [openRowsRaw, arkivRowsRaw] = await Promise.all([
             fetchStatsRows(realSheet),
             fetchStatsRows('Arkiv')
         ]);
-        const arkivRows = arkivRowsAll.filter(r => (r[9] || '').toString().trim() === realSheet);
-        const allRows = openRows.concat(arkivRows);
+        const arkivRowsRawFiltered = arkivRowsRaw.filter(r => (r[9] || '').toString().trim() === realSheet);
+        const allRows = openRowsRaw.map(r => normalizeRow(r, false))
+            .concat(arkivRowsRawFiltered.map(r => normalizeRow(r, true)));
 
         if (allRows.length === 0) {
             container.innerHTML = '<div class="stats-empty">Ingen data att visa statistik för än.</div>';
             return;
         }
 
-        const totalKostnad = arkivRows.reduce((sum, r) => sum + parseKostnad(r[10]), 0);
-        const unitMap = buildUnitStats(openRows, arkivRows);
+        const closedRows = allRows.filter(r => r.isArkiv);
+        const totalKostnad = closedRows.reduce((sum, r) => sum + r.kostnad, 0);
+        const avgKostnad = closedRows.length > 0 ? totalKostnad / closedRows.length : 0;
+        const unitMap = buildUnitStats(allRows);
 
         container.innerHTML = `
-            <div class="dashboard-total">Baserat på ${allRows.length} ärende(n) - öppna och avslutade. Total kostnad: <strong>${totalKostnad.toLocaleString('sv-SE')} kr</strong></div>
+            <div class="dashboard-total">
+                Baserat på ${allRows.length} ärende(n) - öppna och avslutade.<br>
+                Total kostnad: <strong>${totalKostnad.toLocaleString('sv-SE')} kr</strong>
+                · Snitt per avslutat ärende: <strong>${avgKostnad.toLocaleString('sv-SE', {maximumFractionDigits: 0})} kr</strong>
+            </div>
+            ${renderTrend(allRows)}
             <div class="dashboard-section">
-                <h4 class="dashboard-title">Vad strular mest</h4>
-                ${renderPieChart(countBy(allRows, 4))}
+                <h4 class="dashboard-title">Vad strular mest <span style="font-weight:400;color:var(--text-sec);font-size:0.75rem;">(tryck på en rad för detaljer)</span></h4>
+                ${renderPieChart(allRows, 'id')}
             </div>
             <div class="dashboard-section">
-                <h4 class="dashboard-title">Orsak</h4>
-                ${renderPieChart(countBy(allRows, 5))}
+                <h4 class="dashboard-title">Orsak <span style="font-weight:400;color:var(--text-sec);font-size:0.75rem;">(tryck på en rad för detaljer)</span></h4>
+                ${renderPieChart(allRows, 'fel')}
             </div>
             ${renderUnitTable(unitMap)}
         `;
