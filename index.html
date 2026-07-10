@@ -423,6 +423,24 @@
         .stats-field-value.freetext { text-align: left; flex: 1; white-space: pre-wrap; }
         .stats-loading, .stats-empty { text-align: center; color: var(--text-sec); padding: 30px 10px; font-size: 0.9rem; }
 
+        .dashboard-section { margin-bottom: 28px; }
+        .dashboard-title {
+            font-size: 0.95rem; font-weight: 700; margin: 0 0 14px;
+            color: var(--text-main);
+        }
+        .pie-wrap { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+        .pie-svg { width: 160px; height: 160px; flex-shrink: 0; }
+        .pie-legend { flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: 6px; }
+        .legend-row { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; }
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .legend-label { flex: 1; color: var(--text-main); }
+        .legend-value { color: var(--text-sec); font-weight: 600; flex-shrink: 0; }
+        .dashboard-total { font-size: 0.75rem; color: var(--text-sec); margin-bottom: 14px; }
+
+        @media (min-width: 700px) {
+            .pie-wrap { flex-wrap: nowrap; }
+        }
+
         @media (min-width: 700px) {
             .sheet-overlay { align-items: center; }
             .bottom-sheet {
@@ -445,6 +463,7 @@
                 gap: 12px;
                 align-content: start;
             }
+            .stats-cards.dashboard-mode { display: block; }
             .stats-card { margin-bottom: 0; }
         }
 
@@ -897,6 +916,8 @@ setTimeout(() => {
             <button type="button" class="stats-tab active" data-sheet="Skiftrapport" onclick="switchStatsSheet('Skiftrapport'); vibrate(20);">Rapporter</button>
             <button type="button" class="stats-tab" data-sheet="Truckavvikelse" onclick="switchStatsSheet('Truckavvikelse'); vibrate(20);">Truckar</button>
             <button type="button" class="stats-tab" data-sheet="Maskiner" onclick="switchStatsSheet('Maskiner'); vibrate(20);">Maskiner</button>
+            <button type="button" class="stats-tab" data-sheet="DashboardTruckar" onclick="switchStatsSheet('DashboardTruckar'); vibrate(20);">Statistik Truck</button>
+            <button type="button" class="stats-tab" data-sheet="DashboardMaskiner" onclick="switchStatsSheet('DashboardMaskiner'); vibrate(20);">Statistik Maskin</button>
         </div>
         <input type="text" id="statsSearch" class="stats-search" placeholder="Sök..." oninput="applyStatsFilters()">
         <div class="stats-filter-label hidden" id="statsFilterLabel">Filtrera på status</div>
@@ -1048,7 +1069,7 @@ setTimeout(() => {
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     // En enda plats för webbappens URL - byt bara här nästa gång Apps Script omdistribueras.
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbx65aQiVsgZOZdIcikjx2AsGUWxqMAWuvNb1AY1Nyh7PzrKnJOLQcPbMX8RL0hLE-j2/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzfnTVk7RXXei3QjxP-ekB3JgyfzccGs_Sj4negwaQRepqojtYJPHrEfj1kB_ryx2Ah/exec";
 
     let truckArray = []; 
     let maskinArray = [];
@@ -1731,6 +1752,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => {
                     closeCloseSheet();
                     delete statsCache[it.sheetName];
+                    delete statsCache['Arkiv'];
                     switchStatsSheet(it.sheetName);
                 }, 800);
             } else {
@@ -1867,6 +1889,81 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('');
     }
 
+    // ===================== STATISTIK-DASHBOARD =====================
+    const DASHBOARD_SHEET_MAP = { 'DashboardTruckar': 'Truckavvikelse', 'DashboardMaskiner': 'Maskiner' };
+    const PIE_COLORS = ['#5b5fc7', '#e67e22', '#27ae60', '#c0392b', '#f1c40f', '#16a085', '#8e44ad', '#2980b9', '#d35400', '#7f8c8d', '#a8e6cf', '#ffe08a'];
+
+    function countBy(rows, keyIndex) {
+        const map = {};
+        rows.forEach(r => {
+            const key = (r[keyIndex] || '').toString().trim() || 'Okänt';
+            map[key] = (map[key] || 0) + 1;
+        });
+        return map;
+    }
+
+    function renderPieChart(countsObj) {
+        const entries = Object.entries(countsObj).sort((a, b) => b[1] - a[1]);
+        const total = entries.reduce((sum, [, c]) => sum + c, 0);
+        if (total === 0) return '<div class="stats-empty">Ingen data.</div>';
+
+        const cx = 100, cy = 100, r = 90;
+        let angle = -90;
+        let paths = '';
+        entries.forEach(([, count], i) => {
+            const slice = (count / total) * 360;
+            const startRad = angle * Math.PI / 180;
+            const endRad = (angle + slice) * Math.PI / 180;
+            const x1 = cx + r * Math.cos(startRad);
+            const y1 = cy + r * Math.sin(startRad);
+            const x2 = cx + r * Math.cos(endRad);
+            const y2 = cy + r * Math.sin(endRad);
+            const largeArc = slice > 180 ? 1 : 0;
+            const color = PIE_COLORS[i % PIE_COLORS.length];
+            if (entries.length === 1) {
+                paths += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}"></circle>`;
+            } else {
+                paths += `<path d="M${cx},${cy} L${x1.toFixed(2)},${y1.toFixed(2)} A${r},${r} 0 ${largeArc} 1 ${x2.toFixed(2)},${y2.toFixed(2)} Z" fill="${color}" stroke="var(--teams-card)" stroke-width="1.5"></path>`;
+            }
+            angle += slice;
+        });
+
+        const legend = entries.map(([label, count], i) => {
+            const pct = ((count / total) * 100).toFixed(1);
+            const color = PIE_COLORS[i % PIE_COLORS.length];
+            return `<div class="legend-row"><span class="legend-dot" style="background:${color}"></span><span class="legend-label">${label}</span><span class="legend-value">${count} (${pct}%)</span></div>`;
+        }).join('');
+
+        return `<div class="pie-wrap"><svg viewBox="0 0 200 200" class="pie-svg">${paths}</svg><div class="pie-legend">${legend}</div></div>`;
+    }
+
+    async function renderDashboard(realSheet) {
+        const container = document.getElementById('statsCards');
+        const [openRows, arkivRowsAll] = await Promise.all([
+            fetchStatsRows(realSheet),
+            fetchStatsRows('Arkiv')
+        ]);
+        const arkivRows = arkivRowsAll.filter(r => (r[9] || '').toString().trim() === realSheet);
+        const allRows = openRows.concat(arkivRows);
+
+        if (allRows.length === 0) {
+            container.innerHTML = '<div class="stats-empty">Ingen data att visa statistik för än.</div>';
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="dashboard-total">Baserat på ${allRows.length} ärende(n) - öppna och avslutade</div>
+            <div class="dashboard-section">
+                <h4 class="dashboard-title">Vad strular mest</h4>
+                ${renderPieChart(countBy(allRows, 4))}
+            </div>
+            <div class="dashboard-section">
+                <h4 class="dashboard-title">Orsak</h4>
+                ${renderPieChart(countBy(allRows, 5))}
+            </div>
+        `;
+    }
+
     window.switchStatsSheet = async (sheetName) => {
         currentStatsSheet = sheetName;
         currentStatsFilter = 'ALL';
@@ -1874,6 +1971,26 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.stats-tab').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.sheet === sheetName);
         });
+
+        const container = document.getElementById('statsCards');
+
+        if (DASHBOARD_SHEET_MAP[sheetName]) {
+            document.getElementById('statsSearch').classList.add('hidden');
+            document.getElementById('statsFilterRow').classList.add('hidden');
+            document.getElementById('statsFilterLabel').classList.add('hidden');
+            container.classList.add('dashboard-mode');
+            container.innerHTML = '<div class="stats-loading">Räknar statistik...</div>';
+            try {
+                await renderDashboard(DASHBOARD_SHEET_MAP[sheetName]);
+            } catch (err) {
+                console.error('Kunde inte räkna statistik:', err);
+                container.innerHTML = '<div class="stats-empty">Kunde inte hämta statistik. Kontrollera anslutningen.</div>';
+            }
+            return;
+        }
+
+        document.getElementById('statsSearch').classList.remove('hidden');
+        container.classList.remove('dashboard-mode');
 
         const config = STATS_SHEET_CONFIGS[sheetName];
         const filterRow = document.getElementById('statsFilterRow');
@@ -1884,7 +2001,6 @@ document.addEventListener('DOMContentLoaded', () => {
             chip.classList.toggle('active', chip.dataset.filter === 'ALL');
         });
 
-        const container = document.getElementById('statsCards');
         container.innerHTML = '<div class="stats-loading">Hämtar data...</div>';
         try {
             await fetchStatsRows(sheetName);
