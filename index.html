@@ -378,6 +378,7 @@
             color: var(--text-sec); font-size: 0.75rem; font-weight: 600; cursor: pointer;
         }
         .stats-filter-chip.active { background: var(--teams-purple); color: white; border-color: var(--teams-purple); }
+        .stats-filter-chip.hidden-chip { display: none; }
         .stats-filter-chip.active[data-filter="KLAR"] { background: var(--pastel-green); color: var(--pastel-green-text); border-color: var(--pastel-green); }
         .stats-filter-chip.active[data-filter="SERVICE"] { background: var(--pastel-yellow); color: var(--pastel-yellow-text); border-color: var(--pastel-yellow); }
         .stats-filter-chip.active[data-filter="UR DRIFT"] { background: var(--pastel-red); color: var(--danger); border-color: var(--pastel-red); }
@@ -1650,6 +1651,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ===================== AVSLUTA ÄRENDE =====================
     let openItemsCache = [];
+    let openItemsFiltered = [];
 
     async function fetchOpenItems() {
         const response = await fetch(GAS_URL, {
@@ -1658,6 +1660,12 @@ document.addEventListener('DOMContentLoaded', () => {
             body: JSON.stringify({ action: "hamtaOppna" })
         });
         const result = await response.json();
+        if (result.status === 'ok' && !Array.isArray(result.items)) {
+            // Servern svarade "ok" men skickade ingen items-lista - det händer om
+            // backend-koden inte känner igen "hamtaOppna" och bara körde den gamla
+            // rapport-logiken istället (som alltid svarar ok).
+            throw new Error('Servern svarade men kände inte igen "hamtaOppna" - backend-koden (Code.gs) är troligen inte uppdaterad/omdistribuerad ännu.');
+        }
         if (result.status !== 'ok') throw new Error(result.message || 'Fel vid hämtning');
         openItemsCache = result.items;
     }
@@ -1665,9 +1673,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderOpenItems() {
         const term = document.getElementById('statsSearch').value.toLowerCase().trim();
         let items = openItemsCache;
+        if (currentStatsFilter !== 'ALL') {
+            items = items.filter(it => (it.status || '').toString().trim().toUpperCase() === currentStatsFilter);
+        }
         if (term) {
             items = items.filter(it => Object.values(it).some(v => (v || '').toString().toLowerCase().includes(term)));
         }
+        openItemsFiltered = items;
         const container = document.getElementById('statsCards');
         if (items.length === 0) {
             container.innerHTML = '<div class="stats-empty">Inga öppna ärenden just nu 🎉</div>';
@@ -1685,7 +1697,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     window.openCloseSheet = (idx) => {
-        window.currentCloseItem = openItemsCache[idx];
+        window.currentCloseItem = openItemsFiltered[idx];
         const it = window.currentCloseItem;
         document.getElementById('closeSheetSummary').innerHTML = `
             <div class="list-item"><span><strong>${it.id}</strong>: ${it.fel}<br><span style="color:var(--text-sec);font-size:0.85em;">${it.kom}</span></span></div>
@@ -1860,7 +1872,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (sheetName === 'Avsluta') {
-            document.getElementById('statsFilterRow').classList.add('hidden');
+            const filterRow = document.getElementById('statsFilterRow');
+            filterRow.classList.remove('hidden');
+            filterRow.querySelectorAll('.stats-filter-chip').forEach(chip => {
+                const f = chip.dataset.filter;
+                chip.classList.toggle('hidden-chip', f === 'KLAR');
+                chip.classList.toggle('active', f === 'ALL');
+            });
             const openContainer = document.getElementById('statsCards');
             openContainer.innerHTML = '<div class="stats-loading">Hämtar öppna ärenden...</div>';
             try {
@@ -1868,7 +1886,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderOpenItems();
             } catch (err) {
                 console.error('Kunde inte hämta öppna ärenden:', err);
-                openContainer.innerHTML = '<div class="stats-empty">Kunde inte hämta öppna ärenden. Kontrollera anslutningen.</div>';
+                openContainer.innerHTML = '<div class="stats-empty">⚠️ ' + (err.message || 'Okänt fel') + '</div>';
             }
             return;
         }
