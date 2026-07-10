@@ -678,6 +678,10 @@ setTimeout(() => {
     </div>
 
     <div class="top-button-row">
+        <button class="secondary" onclick="openQuickSheet(); vibrate(30);">
+            <svg class="icon" viewBox="0 0 24 24" style="margin-right: 4px;"><path d="M12 9v4"></path><path d="M12 17h.01"></path><path d="M10.29 3.86l-8.18 14.14A2 2 0 0 0 3.82 21h16.36a2 2 0 0 0 1.71-3l-8.18-14.14a2 2 0 0 0-3.42 0z"></path></svg>
+            Snabbanmäl
+        </button>
         <button class="secondary" onclick="openStats(); vibrate(30);">
             <svg class="icon" viewBox="0 0 24 24" style="margin-right: 4px;"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
             Status
@@ -866,6 +870,7 @@ setTimeout(() => {
             <button type="button" class="stats-tab active" data-sheet="Skiftrapport" onclick="switchStatsSheet('Skiftrapport'); vibrate(20);">Rapporter</button>
             <button type="button" class="stats-tab" data-sheet="Truckavvikelse" onclick="switchStatsSheet('Truckavvikelse'); vibrate(20);">Truckar</button>
             <button type="button" class="stats-tab" data-sheet="Maskiner" onclick="switchStatsSheet('Maskiner'); vibrate(20);">Maskiner</button>
+            <button type="button" class="stats-tab" data-sheet="Avsluta" onclick="switchStatsSheet('Avsluta'); vibrate(20);">Avsluta</button>
         </div>
         <input type="text" id="statsSearch" class="stats-search" placeholder="Sök..." oninput="applyStatsFilters()">
         <div class="stats-filter-row hidden" id="statsFilterRow">
@@ -891,6 +896,110 @@ setTimeout(() => {
         <div class="stats-filter-row hidden" id="pickerFilterRow"></div>
         <div class="sheet-body">
             <div id="pickerList" class="stats-cards"></div>
+        </div>
+    </div>
+</div>
+
+<div id="quickOverlay" class="sheet-overlay" onclick="if(event.target === this) closeQuickSheet();">
+    <div class="bottom-sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-header">
+            <h3>Snabbanmäl fel</h3>
+            <button class="sheet-close-btn" onclick="closeQuickSheet(); vibrate(30);" aria-label="Stäng">✕</button>
+        </div>
+        <div class="sheet-body">
+            <label>Typ</label>
+            <div class="segmented-control">
+                <button type="button" class="segment-btn active" id="qbtn-typ-truck" onclick="setQuickTyp('truck'); vibrate(20);">Truck</button>
+                <button type="button" class="segment-btn" id="qbtn-typ-maskin" onclick="setQuickTyp('maskin'); vibrate(20);">Maskin</button>
+            </div>
+            <input type="hidden" id="quickTyp" value="truck">
+
+            <div id="quickTruckFields">
+                <button type="button" class="picker-btn" onclick="openQuickTruckIdPicker(); vibrate(20);">
+                    <span id="quickTruckIdLabel" class="picker-placeholder">Välj truck</span>
+                </button>
+                <button type="button" class="picker-btn" onclick="openQuickTruckFelPicker(); vibrate(20);">
+                    <span id="quickTruckFelLabel" class="picker-placeholder">Välj feltyp</span>
+                </button>
+            </div>
+
+            <div id="quickMaskinFields" class="hidden">
+                <label>Välj:</label>
+                <div class="machine-grid" id="quickMachineGrid">
+                    <div class="machine-item" onclick="quickSelectMachine('Ergopack', this); vibrate(30);">
+                        <div class="machine-circle"><img src="ergopack.png" alt="Ergo"></div>
+                        <div class="machine-label">Ergopack</div>
+                    </div>
+                    <div class="machine-item" onclick="quickSelectMachine('Bandmaskin', this); vibrate(30);">
+                        <div class="machine-circle"><img src="bandning.png" alt="Band"></div>
+                        <div class="machine-label">Bandmaskin</div>
+                    </div>
+                    <div class="machine-item" onclick="quickSelectMachine('Movexx', this); vibrate(30);">
+                        <div class="machine-circle"><img src="Movexx.png" alt="Pall"></div>
+                        <div class="machine-label">Movexx</div>
+                    </div>
+                    <div class="machine-item" onclick="quickSelectMachine('Pallyftare', this); vibrate(30);">
+                        <div class="machine-circle"><img src="pallyft.png" alt="drag"></div>
+                        <div class="machine-label">Pallyftare</div>
+                    </div>
+                    <div class="machine-item" onclick="quickSelectMachine('Laddare', this); vibrate(30);">
+                        <div class="machine-circle"><img src="laddare.png" alt="Laddare"></div>
+                        <div class="machine-label">Laddare</div>
+                    </div>
+                    <div class="machine-item" onclick="quickSelectMachine('Övrigt', this); vibrate(30);">
+                        <div class="machine-circle"><img src="ovrigt.png" alt="Ovr"></div>
+                        <div class="machine-label">Övrigt</div>
+                    </div>
+                </div>
+                <div id="quickMachineSubIdContainer" class="hidden">
+                    <button type="button" class="picker-btn" onclick="openQuickMachineSubIdPicker(); vibrate(20);">
+                        <span id="quickMachineSubIdLabel" class="picker-placeholder">Välj ID/nummer</span>
+                    </button>
+                </div>
+                <button type="button" class="picker-btn" onclick="openQuickMachineFelPicker(); vibrate(20);">
+                    <span id="quickMachineFelLabel" class="picker-placeholder">Välj feltyp</span>
+                </button>
+            </div>
+
+            <input type="hidden" id="quickId" value="">
+            <input type="hidden" id="quickFel" value="">
+            <input type="hidden" id="quickSelectedMachineName" value="">
+            <input type="hidden" id="quickMachineSubId" value="">
+
+            <label class="status-label">Status</label>
+            <div class="segmented-control status-segment" id="quickStatusControl">
+                <button type="button" class="segment-btn" data-status="Service" onclick="setQuickStatus('Service'); vibrate(20);">Service</button>
+                <button type="button" class="segment-btn" data-status="Ur drift" onclick="setQuickStatus('Ur drift'); vibrate(20);">Ur drift</button>
+            </div>
+            <input type="hidden" id="quickStatus" value="">
+
+            <textarea id="quickKom" placeholder="Kommentar - vad är felet?"></textarea>
+
+            <label>Rapportör *</label>
+            <input type="text" id="quickSign" placeholder="Ditt namn...">
+
+            <button type="button" class="primary" style="width:100%;" onclick="submitQuick(); vibrate(60);">Skicka felanmälan</button>
+            <div class="fetch-status" id="quickStatusMsg"></div>
+        </div>
+    </div>
+</div>
+
+<div id="closeOverlay" class="sheet-overlay" onclick="if(event.target === this) closeCloseSheet();">
+    <div class="bottom-sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-header">
+            <h3>Avsluta ärende</h3>
+            <button class="sheet-close-btn" onclick="closeCloseSheet(); vibrate(30);" aria-label="Stäng">✕</button>
+        </div>
+        <div class="sheet-body">
+            <div id="closeSheetSummary" class="list-container" style="margin-bottom:15px;"></div>
+            <label>Åtgärd *</label>
+            <textarea id="closeAtgard" placeholder="Vad gjordes för att åtgärda felet?"></textarea>
+            <label>Kostnad (kr)</label>
+            <input type="number" id="closeKostnad" placeholder="0" min="0">
+            <button type="button" class="primary" style="width:100%;" onclick="submitCloseArende(); vibrate(60);">Avsluta ärende</button>
+            <div class="fetch-status" id="closeStatus"></div>
         </div>
     </div>
 </div>
@@ -1367,6 +1476,273 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    // ===================== SNABBANMÄL =====================
+    const GAS_URL = "https://script.google.com/macros/s/AKfycby1not5aW8qP93XDnMo5OuGSUmGGIEG4DiH_MG_T3FdZ_L6MSMBAXw9IZJWpQJ_370W/exec";
+
+    window.openQuickSheet = () => {
+        resetQuickForm();
+        document.getElementById('quickOverlay').classList.add('visible');
+        lockBodyScroll();
+        const savedName = localStorage.getItem('draft_signatur');
+        if (savedName) document.getElementById('quickSign').value = savedName;
+    };
+
+    window.closeQuickSheet = () => {
+        document.getElementById('quickOverlay').classList.remove('visible');
+        unlockBodyScroll();
+    };
+
+    function resetQuickForm() {
+        document.getElementById('quickTyp').value = 'truck';
+        document.getElementById('qbtn-typ-truck').classList.add('active');
+        document.getElementById('qbtn-typ-maskin').classList.remove('active');
+        document.getElementById('quickTruckFields').classList.remove('hidden');
+        document.getElementById('quickMaskinFields').classList.add('hidden');
+        document.getElementById('quickId').value = '';
+        document.getElementById('quickFel').value = '';
+        document.getElementById('quickSelectedMachineName').value = '';
+        document.getElementById('quickMachineSubId').value = '';
+        document.getElementById('quickStatus').value = '';
+        document.getElementById('quickKom').value = '';
+        resetPickerLabel('quickTruckIdLabel', 'Välj truck');
+        resetPickerLabel('quickTruckFelLabel', 'Välj feltyp');
+        resetPickerLabel('quickMachineFelLabel', 'Välj feltyp');
+        resetPickerLabel('quickMachineSubIdLabel', 'Välj ID/nummer');
+        document.querySelectorAll('#quickMachineGrid .machine-item').forEach(el => el.classList.remove('active'));
+        document.getElementById('quickMachineSubIdContainer').classList.add('hidden');
+        document.querySelectorAll('#quickStatusControl .segment-btn').forEach(btn => {
+            btn.classList.remove('active', 'status-service', 'status-urdrift');
+        });
+        const msg = document.getElementById('quickStatusMsg');
+        msg.textContent = '';
+        msg.className = 'fetch-status';
+    }
+
+    window.setQuickTyp = (typ) => {
+        document.getElementById('quickTyp').value = typ;
+        document.getElementById('qbtn-typ-truck').classList.toggle('active', typ === 'truck');
+        document.getElementById('qbtn-typ-maskin').classList.toggle('active', typ === 'maskin');
+        document.getElementById('quickTruckFields').classList.toggle('hidden', typ !== 'truck');
+        document.getElementById('quickMaskinFields').classList.toggle('hidden', typ !== 'maskin');
+        document.getElementById('quickId').value = '';
+        document.getElementById('quickFel').value = '';
+    };
+
+    window.openQuickTruckIdPicker = () => {
+        openPicker({
+            title: 'Välj truck', items: TRUCK_IDS, categories: TRUCK_CATEGORIES,
+            onSelect: (val) => {
+                document.getElementById('quickId').value = val;
+                const label = document.getElementById('quickTruckIdLabel');
+                label.textContent = val; label.classList.remove('picker-placeholder');
+            }
+        });
+    };
+
+    window.openQuickTruckFelPicker = () => {
+        openPicker({
+            title: 'Välj feltyp', items: TRUCK_FEL_OPTIONS, categories: null,
+            onSelect: (val) => {
+                document.getElementById('quickFel').value = val;
+                const label = document.getElementById('quickTruckFelLabel');
+                label.textContent = val; label.classList.remove('picker-placeholder');
+            }
+        });
+    };
+
+    window.quickSelectMachine = (name, element) => {
+        document.querySelectorAll('#quickMachineGrid .machine-item').forEach(item => item.classList.remove('active'));
+        element.classList.add('active');
+        document.getElementById('quickSelectedMachineName').value = name;
+        document.getElementById('quickId').value = name === 'Övrigt' ? 'Övrigt' : '';
+        document.getElementById('quickMachineSubId').value = '';
+        resetPickerLabel('quickMachineSubIdLabel', 'Välj ID/nummer');
+        document.getElementById('quickMachineSubIdContainer').classList.toggle('hidden', name === 'Övrigt');
+    };
+
+    window.openQuickMachineSubIdPicker = () => {
+        const name = document.getElementById('quickSelectedMachineName').value;
+        const options = machineIds[name] || [];
+        openPicker({
+            title: 'Välj ID/Nummer', items: options, categories: null,
+            onSelect: (val) => {
+                document.getElementById('quickMachineSubId').value = val;
+                document.getElementById('quickId').value = val;
+                const label = document.getElementById('quickMachineSubIdLabel');
+                label.textContent = val; label.classList.remove('picker-placeholder');
+            }
+        });
+    };
+
+    window.openQuickMachineFelPicker = () => {
+        const name = document.getElementById('quickSelectedMachineName').value;
+        const options = ['Mekaniskt', 'Elektriskt'].concat(name === 'Övrigt' ? ['Lokal'] : []).concat(['Annat']);
+        openPicker({
+            title: 'Välj feltyp', items: options, categories: null,
+            onSelect: (val) => {
+                document.getElementById('quickFel').value = val;
+                const label = document.getElementById('quickMachineFelLabel');
+                label.textContent = val; label.classList.remove('picker-placeholder');
+            }
+        });
+    };
+
+    window.setQuickStatus = (status) => {
+        document.getElementById('quickStatus').value = status;
+        document.querySelectorAll('#quickStatusControl .segment-btn').forEach(btn => {
+            btn.classList.remove('active', 'status-service', 'status-urdrift');
+        });
+        const activeBtn = document.querySelector('#quickStatusControl .segment-btn[data-status="' + status + '"]');
+        if (activeBtn) {
+            activeBtn.classList.add('active');
+            activeBtn.classList.add(status === 'Service' ? 'status-service' : 'status-urdrift');
+        }
+    };
+
+    window.submitQuick = async () => {
+        const typ = document.getElementById('quickTyp').value;
+        const id = document.getElementById('quickId').value;
+        const fel = document.getElementById('quickFel').value;
+        const kom = document.getElementById('quickKom').value.trim();
+        const status = document.getElementById('quickStatus').value;
+        const sign = document.getElementById('quickSign').value.trim();
+        const statusMsg = document.getElementById('quickStatusMsg');
+
+        if (!id) { alert(typ === 'truck' ? 'Välj truck!' : 'Välj maskin!'); return; }
+        if (!fel) { alert('Välj feltyp!'); return; }
+        if (!status) { alert('Välj status: Service eller Ur drift!'); return; }
+        if (!kom) { alert('Skriv en kommentar om felet!'); return; }
+        if (!sign) { alert('Ange rapportör!'); return; }
+
+        statusMsg.textContent = 'Skickar...';
+        statusMsg.className = 'fetch-status sending';
+
+        const today = new Date().toISOString().split('T')[0];
+        const h = new Date().getHours();
+        const skift = (h >= 8 && h < 17) ? 'Dagskift' : (h >= 17 || h < 2) ? 'Kvällskift' : 'Nattskift';
+        const avdelning = document.getElementById('avdelning').value || 'Ej angivet';
+
+        try {
+            const response = await fetch(GAS_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({ action: 'snabbanmalan', typ, id, fel, kom, status, sign, avdelning, datum: today, skift })
+            });
+            const result = await response.json();
+            if (result.status === 'ok') {
+                statusMsg.textContent = '✅ Felanmälan skickad!';
+                statusMsg.className = 'fetch-status success';
+                vibrate(60);
+                localStorage.setItem('draft_signatur', sign);
+                setTimeout(() => { closeQuickSheet(); }, 900);
+            } else {
+                statusMsg.textContent = result.message || 'Något gick fel';
+                statusMsg.className = 'fetch-status error';
+            }
+        } catch (err) {
+            console.error(err);
+            statusMsg.textContent = 'Kunde inte nå servern';
+            statusMsg.className = 'fetch-status error';
+        }
+    };
+
+    // ===================== AVSLUTA ÄRENDE =====================
+    let openItemsCache = [];
+
+    async function fetchOpenItems() {
+        const response = await fetch(GAS_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({ action: "hamtaOppna" })
+        });
+        const result = await response.json();
+        if (result.status !== 'ok') throw new Error(result.message || 'Fel vid hämtning');
+        openItemsCache = result.items;
+    }
+
+    function renderOpenItems() {
+        const term = document.getElementById('statsSearch').value.toLowerCase().trim();
+        let items = openItemsCache;
+        if (term) {
+            items = items.filter(it => Object.values(it).some(v => (v || '').toString().toLowerCase().includes(term)));
+        }
+        const container = document.getElementById('statsCards');
+        if (items.length === 0) {
+            container.innerHTML = '<div class="stats-empty">Inga öppna ärenden just nu 🎉</div>';
+            return;
+        }
+        container.innerHTML = items.map((it, idx) => `
+            <div class="stats-card" onclick="openCloseSheet(${idx}); vibrate(20);" style="cursor:pointer;">
+                <div class="stats-card-title">${it.id}</div>
+                <div class="stats-card-sub">${[it.datum, it.skift, it.avd].filter(Boolean).join(' · ')}</div>
+                <div class="stats-field"><span class="stats-field-label">Feltyp</span><span class="stats-field-value freetext">${it.fel}</span></div>
+                <div class="stats-field"><span class="stats-field-label">Kommentar</span><span class="stats-field-value freetext">${it.kom}</span></div>
+                <div class="stats-field"><span class="stats-field-label">Status</span><span class="status-badge ${statsBadgeClass(it.status)}">${it.status}</span></div>
+            </div>
+        `).join('');
+    }
+
+    window.openCloseSheet = (idx) => {
+        window.currentCloseItem = openItemsCache[idx];
+        const it = window.currentCloseItem;
+        document.getElementById('closeSheetSummary').innerHTML = `
+            <div class="list-item"><span><strong>${it.id}</strong>: ${it.fel}<br><span style="color:var(--text-sec);font-size:0.85em;">${it.kom}</span></span></div>
+        `;
+        document.getElementById('closeAtgard').value = '';
+        document.getElementById('closeKostnad').value = '';
+        const status = document.getElementById('closeStatus');
+        status.textContent = ''; status.className = 'fetch-status';
+        document.getElementById('closeOverlay').classList.add('visible');
+        lockBodyScroll();
+    };
+
+    window.closeCloseSheet = () => {
+        document.getElementById('closeOverlay').classList.remove('visible');
+        unlockBodyScroll();
+    };
+
+    window.submitCloseArende = async () => {
+        const it = window.currentCloseItem;
+        const atgard = document.getElementById('closeAtgard').value.trim();
+        const kostnad = document.getElementById('closeKostnad').value.trim() || '0';
+        const status = document.getElementById('closeStatus');
+
+        if (!atgard) { alert('Beskriv åtgärden innan du avslutar ärendet!'); return; }
+
+        status.textContent = 'Avslutar ärende...';
+        status.className = 'fetch-status sending';
+
+        try {
+            const response = await fetch(GAS_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({
+                    action: "avslutaArende",
+                    sheetName: it.sheetName, rowIndex: it.rowIndex,
+                    id: it.id, fel: it.fel, sign: it.sign, datum: it.datum,
+                    atgard: atgard, kostnad: kostnad
+                })
+            });
+            const result = await response.json();
+            if (result.status === 'ok') {
+                status.textContent = '✅ Ärendet avslutat!';
+                status.className = 'fetch-status success';
+                vibrate(60);
+                setTimeout(() => {
+                    closeCloseSheet();
+                    switchStatsSheet('Avsluta');
+                }, 800);
+            } else {
+                status.textContent = result.message || 'Något gick fel';
+                status.className = 'fetch-status error';
+            }
+        } catch (err) {
+            console.error(err);
+            status.textContent = 'Kunde inte nå servern';
+            status.className = 'fetch-status error';
+        }
+    };
+
     const STATS_SPREADSHEET_ID = "1Pl8CX0uS1047P2SvNceA64yn0HRr9YSgnwXpzSFRjtw";
 
     const STATS_SHEET_CONFIGS = {
@@ -1481,6 +1857,20 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.classList.toggle('active', btn.dataset.sheet === sheetName);
         });
 
+        if (sheetName === 'Avsluta') {
+            document.getElementById('statsFilterRow').classList.add('hidden');
+            const openContainer = document.getElementById('statsCards');
+            openContainer.innerHTML = '<div class="stats-loading">Hämtar öppna ärenden...</div>';
+            try {
+                await fetchOpenItems();
+                renderOpenItems();
+            } catch (err) {
+                console.error('Kunde inte hämta öppna ärenden:', err);
+                openContainer.innerHTML = '<div class="stats-empty">Kunde inte hämta öppna ärenden. Kontrollera anslutningen.</div>';
+            }
+            return;
+        }
+
         const config = STATS_SHEET_CONFIGS[sheetName];
         const filterRow = document.getElementById('statsFilterRow');
         filterRow.classList.toggle('hidden', config.primaryStatusField === undefined);
@@ -1509,6 +1899,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.applyStatsFilters = () => {
+        if (currentStatsSheet === 'Avsluta') {
+            renderOpenItems();
+            return;
+        }
         const config = STATS_SHEET_CONFIGS[currentStatsSheet];
         const allRows = statsCache[currentStatsSheet] || [];
         const searchTerm = document.getElementById('statsSearch').value.toLowerCase().trim();
@@ -1555,7 +1949,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), 90000);
 
-            const response = await fetch("https://script.google.com/macros/s/AKfycby1not5aW8qP93XDnMo5OuGSUmGGIEG4DiH_MG_T3FdZ_L6MSMBAXw9IZJWpQJ_370W/exec", {
+            const response = await fetch("https://script.google.com/macros/s/AKfycbzfnTVk7RXXei3QjxP-ekB3JgyfzccGs_Sj4negwaQRepqojtYJPHrEfj1kB_ryx2Ah/exec", {
                 method: "POST",
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify({ action: "askAI", maskin: maskin, problem: problem }),
@@ -1848,7 +2242,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), 10000);
             
-            await fetch("https://script.google.com/macros/s/AKfycby1not5aW8qP93XDnMo5OuGSUmGGIEG4DiH_MG_T3FdZ_L6MSMBAXw9IZJWpQJ_370W/exec", { 
+            await fetch("https://script.google.com/macros/s/AKfycbzfnTVk7RXXei3QjxP-ekB3JgyfzccGs_Sj4negwaQRepqojtYJPHrEfj1kB_ryx2Ah/exec", { 
                 method: "POST", 
                 mode: "no-cors", 
                 body: JSON.stringify(data),
