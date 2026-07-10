@@ -19,7 +19,6 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html { scroll-behavior: smooth; }
@@ -65,7 +64,6 @@
             padding-top: calc(12px + env(safe-area-inset-top)); 
             padding-bottom: calc(40px + env(safe-area-inset-bottom)); 
         }
-
         .icon { width: 1.2em; height: 1.2em; vertical-align: middle; margin-right: 8px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         
         .offline-banner {
@@ -81,7 +79,6 @@
             z-index: 100;
         }
         .offline-banner.visible { display: block; }
-
         .top-header-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
         .header-controls { display: flex; flex-direction: row; flex-wrap: wrap; gap: 10px 14px; align-items: center; flex-shrink: 0; background: var(--teams-card); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--teams-border); }
         .switch-group { display: flex; align-items: center; gap: 8px; }
@@ -91,9 +88,7 @@
         .slider:before { background-color: #fff; bottom: 2px; content: ""; height: 16px; left: 2px; position: absolute; transition: .4s; width: 16px; border-radius: 50%; }
         input:checked + .slider { background-color: var(--success); }
         input:checked + .slider:before { transform: translateX(18px); }
-
         h2 { text-align: center; margin: 15px 0; font-size: var(--h2-font); display: flex; align-items: center; justify-content: center; }
-
         .logo-row { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 22px; }
         .logo-wrap { display: flex; flex-direction: column; }
         .astrid-logo-img {
@@ -124,7 +119,6 @@
             background: var(--teams-purple); color: white; border-color: var(--teams-purple);
         }
         
-
         .skift-badge {
             display: flex;
             align-items: center;
@@ -152,7 +146,6 @@
             stroke-linecap: round;
             stroke-linejoin: round;
         }
-
         .card { 
             background: var(--teams-card); padding: 20px; border-radius: 12px; 
             border: 1px solid var(--teams-border); box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
@@ -161,7 +154,6 @@
             width: 100%;
         }
         .card.error-attention { border-color: var(--danger); box-shadow: var(--error-glow); transform: scale(1.01); }
-
         .error-msg {
             color: #fff;
             background: var(--danger);
@@ -174,11 +166,8 @@
             animation: fadeIn 0.3s;
         }
         .error-attention .error-msg { display: inline-block; }
-
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
         label { display: block; margin-bottom: 10px; font-weight: bold; font-size: var(--label-font); }
-
         input, select, textarea {
             width: 100%; 
             max-width: 100%;
@@ -197,7 +186,6 @@
             scroll-margin-bottom: 20px;
         }
         input:focus, select:focus, textarea:focus { border-color: var(--teams-purple); }
-
         .status-label {
             font-weight: normal;
             font-size: 0.8em;
@@ -229,7 +217,6 @@
         .status-badge.badge-klar { background: var(--pastel-green); color: var(--pastel-green-text); }
         .status-badge.badge-service { background: var(--pastel-yellow); color: var(--pastel-yellow-text); }
         .status-badge.badge-urdrift { background: var(--pastel-red); color: var(--danger); }
-
         .machine-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
         .machine-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         .machine-circle {
@@ -241,7 +228,6 @@
         .machine-circle img { width: 100%; height: 100%; object-fit: contain; } 
         .machine-item.active .machine-circle { border-color: var(--teams-purple); transform: scale(1.08); box-shadow: 0 0 12px rgba(91, 95, 199, 0.4); background: rgba(91, 95, 199, 0.05); }
         .machine-label { font-size: 0.7rem; font-weight: 600; text-align: center; color: var(--text-sec); transition: color 0.2s; }
-
         .segmented-control { display: flex; background: var(--teams-bg); padding: 4px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--teams-border); }
         .segment-btn { 
             flex: 1; border: none; padding: 10px; background: transparent; 
@@ -263,19 +249,16 @@
             color: var(--pastel-red-text);
             box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
         }
-
         button { padding: 12px; border: none; border-radius: 8px; font-size: 0.95em; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: opacity 0.2s, transform 0.1s; }
         button:active { transform: scale(0.98); }
         .primary { background: var(--teams-purple); color: white; flex: 2; }
         .secondary { background: var(--teams-card); color: var(--text-main); border: 1px solid var(--teams-border); flex: 1; }
         .danger { background: var(--danger); color: white; }
         .add-btn { background: var(--success); color: white; margin-top: 5px; width: 100%; }
-
         .hidden { display: none !important; }
         .list-container { margin-top: 10px; background: var(--teams-bg); padding: 12px; border-radius: 8px; border-left: 4px solid var(--teams-purple); }
         .list-item { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--teams-border); font-size: 0.9em; animation: fadeIn 0.25s ease; }
         .list-item-remove-btn { width: auto; padding: 8px 14px; white-space: nowrap; flex-shrink: 0; }
-
         .picker-btn {
             width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px;
             border: 1px solid var(--teams-border); background: var(--teams-card);
@@ -354,7 +337,6 @@
         }
         .sheet-body { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
         .sheet-body iframe { width: 100%; height: 100%; border: none; border-radius: 8px; }
-
         .stats-tabs {
             display: flex; gap: 8px; margin-bottom: 12px; padding-bottom: 12px; flex-shrink: 0;
             overflow-x: auto; -webkit-overflow-scrolling: touch;
@@ -366,7 +348,6 @@
             color: var(--text-sec); font-size: 0.8rem; font-weight: 600; cursor: pointer;
         }
         .stats-tab.active { background: var(--teams-purple); color: white; border-color: var(--teams-purple); }
-
         .stats-search {
             width: 100%; padding: 10px 12px; margin-bottom: 10px;
             border-radius: 10px; border: 1px solid var(--teams-border);
@@ -426,7 +407,6 @@
         .stats-field-label { color: var(--text-sec); font-weight: 600; flex-shrink: 0; }
         .stats-field-value.freetext { text-align: left; flex: 1; white-space: pre-wrap; }
         .stats-loading, .stats-empty { text-align: center; color: var(--text-sec); padding: 30px 10px; font-size: 0.9rem; }
-
         .dashboard-section { margin-bottom: 28px; }
         .dashboard-title {
             font-size: 0.95rem; font-weight: 700; margin: 0 0 14px;
@@ -474,7 +454,6 @@
             .sheet-overlay.visible .bottom-sheet { transform: translateY(0) scale(1); opacity: 1; }
             .sheet-handle { display: none; }
             .sheet-header { cursor: default; }
-
             .stats-cards {
                 display: grid;
                 grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -484,7 +463,6 @@
             .stats-cards.dashboard-mode { display: block; }
             .stats-card { margin-bottom: 0; }
         }
-
         .confirm-screen {
             display: none;
             position: fixed;
@@ -514,7 +492,6 @@
         .badge-nok { background: #fde8e8; color: var(--danger); }
         body.dark-mode .badge-nok { background: rgba(192, 57, 43, 0.25); color: #ff8b94; }
         .confirm-new-btn { background: var(--teams-purple); color: white; width: 100%; padding: 16px; font-size: 1rem; border-radius: 12px; border: none; cursor: pointer; font-weight: 700; margin-top: 10px; }
-
         .fetch-status {
             text-align: center;
             font-size: 0.8rem;
@@ -529,9 +506,7 @@
         body.dark-mode .fetch-status.sending { background: rgba(26, 110, 168, 0.2); color: #6cb4e8; }
         body.dark-mode .fetch-status.success { background: rgba(39, 174, 96, 0.2); color: #6fe0a0; }
         body.dark-mode .fetch-status.error { background: rgba(192, 57, 43, 0.2); color: #ff8b7d; }
-
         .version-text { text-align: center; font-size: 10px; color: var(--text-sec); margin-top: 20px; opacity: 0.5; }
-
         .status-bar-fill {
             position: fixed;
             top: 0; left: 0; right: 0;
@@ -539,7 +514,6 @@
             background: var(--teams-purple);
             z-index: 2500;
         }
-
         #splashScreen {
             position: fixed;
             inset: 0;
@@ -564,10 +538,8 @@
             0%, 100% { opacity: 0.55; transform: scale(0.97); }
             50% { opacity: 1; transform: scale(1); }
         }
-
         .top-button-row { display: flex; gap: 10px; margin-bottom: 15px; }
         .top-button-row button { flex: 1; font-size: 0.85em; padding: 10px 5px; }
-
         .ai-intro {
             font-size: 0.85rem;
             color: var(--text-sec);
@@ -623,7 +595,6 @@ setTimeout(() => {
     if (s) { s.classList.add('splash-hidden'); setTimeout(() => s.remove(), 450); }
 }, 2500);
 </script>
-
 <div class="status-bar-fill"></div>
 <div id="splashScreen">
     <svg class="splash-logo" xmlns="http://www.w3.org/2000/svg" viewBox="25.2 25.0 787.7 234.8" fill="currentColor">
@@ -674,9 +645,7 @@ setTimeout(() => {
 </g>
 </svg>
 </div>
-
 <div class="offline-banner" id="offlineBanner">⚠️ Ingen internetanslutning – rapporten kan inte skickas</div>
-
 <div class="container">
     <div class="logo-row">
         <div class="logo-wrap">
@@ -736,11 +705,9 @@ setTimeout(() => {
             </button>
         </div>
     </div>
-
     <div class="skift-badge">
         <div class="skift-pill" id="skiftPill">Beräknar...</div>
     </div>
-
     <div class="top-button-row">
         <button class="secondary" onclick="openQuickSheet(); vibrate(30);">
             <svg class="icon" viewBox="0 0 24 24" style="margin-right: 4px;"><path d="M12 9v4"></path><path d="M12 17h.01"></path><path d="M10.29 3.86l-8.18 14.14A2 2 0 0 0 3.82 21h16.36a2 2 0 0 0 1.71-3l-8.18-14.14a2 2 0 0 0-3.42 0z"></path></svg>
@@ -755,7 +722,6 @@ setTimeout(() => {
             Statistik
         </button>
     </div>
-
     <form id="reportForm" novalidate>
         <div class="card" id="card-person">
             <div class="error-msg">⚠︎ Fyll i alla obligatoriska fält!</div>
@@ -769,7 +735,6 @@ setTimeout(() => {
             </button>
             <input type="hidden" id="avdelning" required class="save-data" value="">
         </div>
-
         <div class="card" id="card-truck">
             <div class="error-msg">⚠︎ Du har valt NOK – Lägg till minst en truck i listan!</div>
             <label>Truckstatus</label>
@@ -783,12 +748,10 @@ setTimeout(() => {
                     <span id="truckIdLabel" class="picker-placeholder">Välj truck</span>
                 </button>
                 <input type="hidden" id="truckId" value="">
-
                 <button type="button" class="picker-btn" onclick="openTruckFelPicker(); vibrate(20);">
                     <span id="truckFelLabel" class="picker-placeholder">Välj feltyp</span>
                 </button>
                 <input type="hidden" id="truckFel" value="">
-
                 <div id="truckStatusWrap" class="hidden">
                     <label class="status-label">Status</label>
                     <div class="segmented-control status-segment" id="truckStatusControl">
@@ -803,7 +766,6 @@ setTimeout(() => {
                 <div id="truckList" class="list-container hidden"></div>
             </div>
         </div>
-
         <div class="card" id="card-maskin">
             <div class="error-msg">⚠︎ Du har valt NOK – Lägg till minst en maskin i listan!</div>
             <label>Maskiner & Verktyg</label>
@@ -840,7 +802,6 @@ setTimeout(() => {
                         <div class="machine-label">Övrigt</div>
                     </div>
                 </div>
-
                 <div id="machineSubIdContainer" class="hidden">
                     <label id="subIdLabel">Välj ID/Nummer:</label>
                     <button type="button" class="picker-btn" onclick="openMachineSubIdPicker(); vibrate(20);">
@@ -850,12 +811,10 @@ setTimeout(() => {
                 </div>
                 
                 <input type="hidden" id="selectedMachineName" value="">
-
                 <button type="button" class="picker-btn" onclick="openMachineFelPicker(); vibrate(20);">
                     <span id="machineFelLabel" class="picker-placeholder">Välj feltyp</span>
                 </button>
                 <input type="hidden" id="machineFel" value="">
-
                 <div id="maskinStatusWrap" class="hidden">
                     <label class="status-label">Status</label>
                     <div class="segmented-control status-segment" id="maskinStatusControl">
@@ -870,7 +829,6 @@ setTimeout(() => {
                 <div id="maskinList" class="list-container hidden"></div>
             </div>
         </div>
-
         <div class="card">
             <label>Tillsyn & Rengöring</label>
             <label style="font-weight: normal; font-size: 0.8em;">Daglig tillsyn truckar</label>
@@ -880,7 +838,6 @@ setTimeout(() => {
             </div>
             <input type="hidden" id="tillsyn" value="OK" class="save-data">
             <div id="tillsynBox" class="hidden"><textarea id="tillsynfel" placeholder="Orsak?" class="save-data"></textarea></div>
-
             <label style="font-weight: normal; font-size: 0.8em;">Rengöring Bandningsmaskiner</label>
             <div class="segmented-control">
                 <button type="button" class="segment-btn active" id="btn-rengoring-ok" onclick="setSegment('rengoring', 'OK'); vibrate(30);">OK</button>
@@ -889,7 +846,6 @@ setTimeout(() => {
             <input type="hidden" id="rengoring" value="OK" class="save-data">
             <div id="rengoringBox" class="hidden"><textarea id="rengoringKommentar" placeholder="Orsak?" class="save-data"></textarea></div>
         </div>
-
         <div class="card" id="card-drift">
             <div class="error-msg">⚠︎ Beskriv vilken åtgärd som vidtagits för avvikelsen!</div>
             <label>Driftinformation & Avvikelser</label>
@@ -899,7 +855,6 @@ setTimeout(() => {
                 <textarea id="atgard" placeholder="Vilken åtgärd vidtogs? *" class="save-data"></textarea>
             </div>
         </div>
-
         <div class="card" id="card-ai">
             <label>Fråga Astrid</label>
             <p class="ai-intro">Din AI-assistent för felsökning – välj maskin och beskriv vad du ser, så hjälper jag dig utifrån manualen.</p>
@@ -912,17 +867,14 @@ setTimeout(() => {
             <div class="fetch-status" id="aiStatus"></div>
             <div id="aiAnswer" class="list-container hidden"></div>
         </div>
-
         <div class="button-group" style="display: flex; gap: 10px;">
             <button type="button" class="secondary" onclick="clearForm(); vibrate(40);" style="flex:1;">Rensa</button>
             <button type="submit" id="submitBtn" class="primary" style="flex:2;" onclick="vibrate(60);">Skicka Rapport</button>
         </div>
-
         <div class="fetch-status" id="fetchStatus"></div>
     </form>
     <div class="version-text">v2.0.1</div>
 </div>
-
 <div id="statsOverlay" class="sheet-overlay" onclick="if(event.target === this) closeStats();">
     <div class="bottom-sheet">
         <div class="sheet-handle"></div>
@@ -948,7 +900,6 @@ setTimeout(() => {
         </div>
     </div>
 </div>
-
 <div id="pickerOverlay" class="sheet-overlay" onclick="if(event.target === this) closePicker();">
     <div class="bottom-sheet">
         <div class="sheet-handle"></div>
@@ -963,7 +914,6 @@ setTimeout(() => {
         </div>
     </div>
 </div>
-
 <div id="quickOverlay" class="sheet-overlay" onclick="if(event.target === this) closeQuickSheet();">
     <div class="bottom-sheet">
         <div class="sheet-handle"></div>
@@ -978,7 +928,6 @@ setTimeout(() => {
                 <button type="button" class="segment-btn" id="qbtn-typ-maskin" onclick="setQuickTyp('maskin'); vibrate(20);">Maskin</button>
             </div>
             <input type="hidden" id="quickTyp" value="truck">
-
             <div id="quickTruckFields">
                 <button type="button" class="picker-btn" onclick="openQuickTruckIdPicker(); vibrate(20);">
                     <span id="quickTruckIdLabel" class="picker-placeholder">Välj truck</span>
@@ -987,7 +936,6 @@ setTimeout(() => {
                     <span id="quickTruckFelLabel" class="picker-placeholder">Välj feltyp</span>
                 </button>
             </div>
-
             <div id="quickMaskinFields" class="hidden">
                 <label>Välj:</label>
                 <div class="machine-grid" id="quickMachineGrid">
@@ -1025,30 +973,29 @@ setTimeout(() => {
                     <span id="quickMachineFelLabel" class="picker-placeholder">Välj feltyp</span>
                 </button>
             </div>
-
             <input type="hidden" id="quickId" value="">
             <input type="hidden" id="quickFel" value="">
             <input type="hidden" id="quickSelectedMachineName" value="">
             <input type="hidden" id="quickMachineSubId" value="">
-
             <label class="status-label">Status</label>
             <div class="segmented-control status-segment" id="quickStatusControl">
                 <button type="button" class="segment-btn" data-status="Service" onclick="setQuickStatus('Service'); vibrate(20);">Service</button>
                 <button type="button" class="segment-btn" data-status="Ur drift" onclick="setQuickStatus('Ur drift'); vibrate(20);">Ur drift</button>
             </div>
             <input type="hidden" id="quickStatus" value="">
-
             <textarea id="quickKom" placeholder="Kommentar - vad är felet?"></textarea>
-
+            <label>Avdelning *</label>
+            <button type="button" class="picker-btn" onclick="openQuickAvdelningPicker(); vibrate(20);">
+                <span id="quickAvdelningLabel" class="picker-placeholder">Välj avdelning</span>
+            </button>
+            <input type="hidden" id="quickAvdelning" value="">
             <label>Rapportör *</label>
             <input type="text" id="quickSign" placeholder="Ditt namn...">
-
             <button type="button" class="primary" style="width:100%;" onclick="submitQuick(); vibrate(60);">Skicka felanmälan</button>
             <div class="fetch-status" id="quickStatusMsg"></div>
         </div>
     </div>
 </div>
-
 <div id="closeOverlay" class="sheet-overlay" onclick="if(event.target === this) closeCloseSheet();">
     <div class="bottom-sheet">
         <div class="sheet-handle"></div>
@@ -1067,7 +1014,6 @@ setTimeout(() => {
         </div>
     </div>
 </div>
-
 <div id="statistikOverlay" class="sheet-overlay" onclick="if(event.target === this) closeStatistik();">
     <div class="bottom-sheet">
         <div class="sheet-handle"></div>
@@ -1084,7 +1030,6 @@ setTimeout(() => {
         </div>
     </div>
 </div>
-
 <div class="confirm-screen" id="confirmScreen">
     <div class="confirm-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1098,15 +1043,11 @@ setTimeout(() => {
         ✚ Ny rapport
     </button>
 </div>
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // En enda plats för webbappens URL - byt bara här nästa gång Apps Script omdistribueras.
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzfnTVk7RXXei3QjxP-ekB3JgyfzccGs_Sj4negwaQRepqojtYJPHrEfj1kB_ryx2Ah/exec";
-
+    const GAS_URL = "https://script.google.com/macros/s/AKfycby4ZfKXZrPVLCZgT6qf2rQpTxmDEp_W5NA-nQ4-Dwm5DfWi91Hvn08fusbyJxhW4fSo/exec";
     let truckArray = []; 
     let maskinArray = [];
-
     const machineIds = {
         'Ergopack': ['Ergopack 1', 'Ergopack 2', 'Ergopack 3', 'Ergopack 4', 'Ergopack 5', 'Ergopack 6'],
         'Bandmaskin': ['Bandmaskin 1', 'Bandmaskin 2', 'Bandmaskin 3', 'Bandmaskin 4', 'Bandmaskin 5', 'Bandmaskin 6', 'Bandmaskin 7', 'Bandmaskin 8', 'Bandmaskin 9', 'Bandmaskin 10', 'Bandmaskin 11', 'Bandmaskin 12'],
@@ -1114,7 +1055,6 @@ document.addEventListener('DOMContentLoaded', () => {
         'Pallyftare': ['Pallyftare 1', 'Pallyftare 2', 'Pallyftare 3', 'Pallyftare 4', 'Pallyftare 5', 'Pallyftare 6', 'Pallyftare 7', 'Pallyftare 8', 'Pallyftare 9', 'Pallyftare 10', 'Pallyftare 11', 'Pallyftare 12'],
         'Laddare': ['Truckladdare', 'Movexx laddare', 'Bandmaskin laddare', 'Pallyftare laddare', 'Övrigt laddare']
     };
-
     const TRUCK_IDS = ['TVS-01','TVS-02','TVS-03','TVS-04','TVS-05','TVS-06','TVS-11','TVS-13','TVS-22','TVS-23','TVS-28','TVS-30','TVS-33','TVS-34','TPB-07','TPB-08','TPB-09','TPB-10','TPB-14','TPB-15','TPB-20','TPB-21'];
     const TRUCK_CATEGORIES = {
         'TVS': TRUCK_IDS.filter(id => id.startsWith('TVS')),
@@ -1122,13 +1062,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     };
     const TRUCK_FEL_OPTIONS = ['Hydraulik/Olja','Chassi','Stativ','Batteri','Drag','Däck','Linde Connect','Belysning','Felkod','Övrigt'];
-
     // Kategoribilder för maskingrupperna i huvudformuläret (Ergopack, Bandmaskin osv.)
     const MACHINE_CATEGORY_IMAGES = {
         'Ergopack': 'ergopack.png', 'Bandmaskin': 'bandning.png', 'Movexx': 'Movexx.png',
         'Pallyftare': 'pallyft.png', 'Laddare': 'laddare.png'
     };
-
     function updateOnlineStatus() {
         const banner = document.getElementById('offlineBanner');
         if (!navigator.onLine) {
@@ -1140,14 +1078,12 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('online', updateOnlineStatus);
     window.addEventListener('offline', updateOnlineStatus);
     updateOnlineStatus();
-
     function getSkift() { 
         const h = new Date().getHours(); 
         if (h >= 8 && h < 17) return "Dagskift";
         if (h >= 17 || h < 2) return "Kvällskift";
         return "Nattskift"; 
     }
-
     // Vänlig hälsning för visning i appen (mejlet använder fortfarande getSkift())
     const GREETING_ICONS = {
         sunrise: '<svg viewBox="0 0 24 24"><path d="M17 18a5 5 0 0 0-10 0"></path><line x1="12" y1="2" x2="12" y2="9"></line><line x1="4.22" y1="10.22" x2="5.64" y2="11.64"></line><line x1="1" y1="18" x2="3" y2="18"></line><line x1="21" y1="18" x2="23" y2="18"></line><line x1="18.36" y1="11.64" x2="19.78" y2="10.22"></line><line x1="23" y1="22" x2="1" y2="22"></line><polyline points="8 6 12 2 16 6"></polyline></svg>',
@@ -1155,7 +1091,6 @@ document.addEventListener('DOMContentLoaded', () => {
         sunset: '<svg viewBox="0 0 24 24"><path d="M17 18a5 5 0 0 0-10 0"></path><line x1="12" y1="9" x2="12" y2="2"></line><line x1="4.22" y1="10.22" x2="5.64" y2="11.64"></line><line x1="1" y1="18" x2="3" y2="18"></line><line x1="21" y1="18" x2="23" y2="18"></line><line x1="18.36" y1="11.64" x2="19.78" y2="10.22"></line><line x1="23" y1="22" x2="1" y2="22"></line><polyline points="16 5 12 9 8 5"></polyline></svg>',
         moon: '<svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>'
     };
-
     function getGreeting() {
         const h = new Date().getHours();
         if (h >= 5 && h < 10) return { text: "Godmorgon", icon: "sunrise" };
@@ -1163,7 +1098,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (h >= 17 && h < 22) return { text: "God kväll", icon: "sunset" };
         return { text: "God natt", icon: "moon" };
     }
-
     function updateSkiftBadge() {
         const greeting = getGreeting();
         const pill = document.getElementById('skiftPill');
@@ -1171,7 +1105,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     updateSkiftBadge();
     setInterval(updateSkiftBadge, 60000);
-
     function checkTruckReady() {
         const ready = document.getElementById('truckId').value && document.getElementById('truckFel').value;
         document.getElementById('truckStatusWrap').classList.toggle('hidden', !ready);
@@ -1183,39 +1116,32 @@ document.addEventListener('DOMContentLoaded', () => {
         const ready = name && (name === 'Övrigt' || subId) && fel;
         document.getElementById('maskinStatusWrap').classList.toggle('hidden', !ready);
     }
-
     window.vibrate = (ms = 40) => {
         if ('vibrate' in navigator) navigator.vibrate(ms);
     };
-
     function resetPickerLabel(id, text) {
         const el = document.getElementById(id);
         if (!el) return;
         el.textContent = text;
         el.classList.add('picker-placeholder');
     }
-
     window.toggleDarkMode = () => {
         const isDark = !document.body.classList.contains('dark-mode');
         document.body.classList.toggle('dark-mode', isDark);
         document.getElementById('darkmodeBtn')?.classList.toggle('active', isDark);
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
     };
-
     window.toggleLargeText = () => {
         const isLarge = !document.body.classList.contains('large-text');
         document.body.classList.toggle('large-text', isLarge);
         document.getElementById('largeTextBtn')?.classList.toggle('active', isLarge);
         localStorage.setItem('fontSize', isLarge ? 'large' : 'normal');
     };
-
     window.setItemStatus = (type, status) => {
         const hiddenId = type === 'truck' ? 'truckStatus' : 'maskinStatus';
         const controlId = type === 'truck' ? 'truckStatusControl' : 'maskinStatusControl';
         const komId = type === 'truck' ? 'truckKom' : 'machineKom';
-
         document.getElementById(hiddenId).value = status;
-
         document.querySelectorAll('#' + controlId + ' .segment-btn').forEach(btn => {
             btn.classList.remove('active', 'status-klar', 'status-service', 'status-urdrift');
         });
@@ -1226,11 +1152,9 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (status === 'Service') activeBtn.classList.add('status-service');
             else activeBtn.classList.add('status-urdrift');
         }
-
         const kom = document.getElementById(komId);
         if (kom) kom.placeholder = status === 'Klar' ? "Vad gjordes för att åtgärda? *" : "Kommentar...";
     };
-
     window.resetItemStatus = (type) => {
         const hiddenId = type === 'truck' ? 'truckStatus' : 'maskinStatus';
         const controlId = type === 'truck' ? 'truckStatusControl' : 'maskinStatusControl';
@@ -1239,16 +1163,13 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.classList.remove('active', 'status-klar', 'status-service', 'status-urdrift');
         });
     };
-
     window.setSegment = (type, val, save = true) => {
         const inputEl = document.getElementById(type);
         if (!inputEl) return;
         inputEl.value = val;
         if (save) localStorage.setItem('draft_' + type, val);
-
         const okBtn = document.getElementById(`btn-${type}-ok`); 
         const nokBtn = document.getElementById(`btn-${type}-nok`);
-
         let boxId;
         if (type === 'truck' || type === 'maskin') {
             boxId = type + 'Container';
@@ -1256,7 +1177,6 @@ document.addEventListener('DOMContentLoaded', () => {
             boxId = type + 'Box';
         }
         const box = boxId ? document.getElementById(boxId) : null;
-
         if (val === 'OK') {
             document.getElementById(`card-${type}`)?.classList.remove('error-attention');
             okBtn?.classList.add('active'); 
@@ -1278,19 +1198,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (box) box.classList.remove('hidden'); 
         }
     };
-
     window.selectMachine = (name, element) => {
         document.querySelectorAll('.machine-item').forEach(item => item.classList.remove('active'));
         const subContainer = document.getElementById('machineSubIdContainer');
-
         element.classList.add('active');
         document.getElementById('selectedMachineName').value = name;
-
         document.getElementById('machineSubId').value = '';
         resetPickerLabel('machineSubIdLabel', 'Välj ID/nummer');
         document.getElementById('machineFel').value = '';
         resetPickerLabel('machineFelLabel', 'Välj feltyp');
-
         if (name !== 'Övrigt') {
             subContainer.classList.remove('hidden');
         } else {
@@ -1298,7 +1214,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         checkMaskinReady();
     };
-
     window.addItem = (type) => {
         if (type === 'truck') {
             const id = document.getElementById('truckId'); 
@@ -1308,10 +1223,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!id.value || !fel.value) { alert("Välj truck och feltyp!"); return; }
             if (!statusVal) { alert("Välj status: Klar, Service eller Ur drift!"); return; }
             if (!kom.value.trim()) { alert(statusVal === 'Klar' ? "Beskriv vad som gjordes för att åtgärda!" : "Skriv en kommentar om felet innan du lägger till!"); return; }
-
             truckArray.push({ id: id.value, fel: fel.value, kom: kom.value, status: statusVal });
             localStorage.setItem('draft_truckArray', JSON.stringify(truckArray));
-
             id.value = ""; fel.value = ""; kom.value = ""; kom.placeholder = "Kommentar...";
             resetPickerLabel('truckIdLabel', 'Välj truck');
             resetPickerLabel('truckFelLabel', 'Välj feltyp');
@@ -1327,10 +1240,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!name || (name !== 'Övrigt' && !subId) || !fel.value) { alert("Välj maskin och feltyp!"); return; }
             if (!statusVal) { alert("Välj status: Klar, Service eller Ur drift!"); return; }
             if (!kom.value.trim()) { alert(statusVal === 'Klar' ? "Beskriv vad som gjordes för att åtgärda!" : "Skriv en kommentar om felet innan du lägger till!"); return; }
-
             maskinArray.push({ id: (name === 'Övrigt' ? 'Övrigt' : subId), fel: fel.value, kom: kom.value, status: statusVal });
             localStorage.setItem('draft_maskinArray', JSON.stringify(maskinArray));
-
             fel.value = ""; kom.value = ""; kom.placeholder = "Kommentar...";
             resetPickerLabel('machineFelLabel', 'Välj feltyp');
             resetPickerLabel('machineSubIdLabel', 'Välj ID/nummer');
@@ -1344,7 +1255,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         renderList(type);
     };
-
     window.removeItem = (type, idx) => {
         window.vibrate(30);
         if (type === 'truck') { 
@@ -1356,13 +1266,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         renderList(type);
     };
-
     function statusBadgeClass(status) {
         if (status === 'Klar') return 'badge-klar';
         if (status === 'Service') return 'badge-service';
         return 'badge-urdrift';
     }
-
     function renderList(type) {
         const div = document.getElementById(type + 'List'); 
         const arr = (type === 'truck' ? truckArray : maskinArray);
@@ -1371,7 +1279,6 @@ document.addEventListener('DOMContentLoaded', () => {
         div.classList.remove('hidden');
         div.innerHTML = arr.map((t, i) => `<div class="list-item"><span><span class="status-badge ${statusBadgeClass(t.status)}">${t.status}</span><strong>${t.id}</strong>: ${t.fel}</span><button type="button" class="danger list-item-remove-btn" onclick="removeItem('${type}', ${i})">Ta bort</button></div>`).join('');
     }
-
     window.clearForm = () => { 
         if (confirm("Rensa formuläret?")) { 
             Object.keys(localStorage).forEach(key => {
@@ -1380,7 +1287,6 @@ document.addEventListener('DOMContentLoaded', () => {
             location.reload(); 
         } 
     };
-
     let scrollLockY = 0;
     function lockBodyScroll() {
         scrollLockY = window.scrollY;
@@ -1394,16 +1300,13 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.width = '';
         window.scrollTo(0, scrollLockY);
     }
-
     let pickerConfig = null;
     let pickerCategoryFilter = 'ALL';
-
     function openPicker(config) {
         pickerConfig = config;
         pickerCategoryFilter = 'ALL';
         document.getElementById('pickerTitle').textContent = config.title;
         document.getElementById('pickerSearch').value = '';
-
         const filterRow = document.getElementById('pickerFilterRow');
         if (config.categories) {
             filterRow.classList.remove('hidden');
@@ -1414,17 +1317,14 @@ document.addEventListener('DOMContentLoaded', () => {
             filterRow.classList.add('hidden');
             filterRow.innerHTML = '';
         }
-
         document.getElementById('pickerOverlay').classList.add('visible');
         lockBodyScroll();
         renderPickerList();
     }
-
     window.closePicker = () => {
         document.getElementById('pickerOverlay').classList.remove('visible');
         unlockBodyScroll();
     };
-
     window.setPickerCategory = (cat) => {
         pickerCategoryFilter = cat;
         document.querySelectorAll('#pickerFilterRow .stats-filter-chip').forEach(chip => {
@@ -1433,7 +1333,6 @@ document.addEventListener('DOMContentLoaded', () => {
         vibrate(20);
         renderPickerList();
     };
-
     window.renderPickerList = () => {
         const term = document.getElementById('pickerSearch').value.toLowerCase().trim();
         let items = pickerConfig.items;
@@ -1446,24 +1345,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const list = document.getElementById('pickerList');
         list.classList.remove('picker-grid');
         list.classList.add('stats-cards');
-
         if (items.length === 0) {
             list.innerHTML = '<div class="stats-empty">Inga träffar.</div>';
             return;
         }
-
         list.innerHTML = items.map(item =>
             `<button type="button" class="picker-list-item" onclick="selectPickerItem('${item.replace(/'/g, "\\'")}')">${item}</button>`
         ).join('');
     };
-
     window.selectPickerItem = (value) => {
         pickerConfig.onSelect(value);
         closePicker();
     };
-
     const AVDELNING_OPTIONS = ['TVS-Inne', 'TVS-Ute', 'TPB-Inne', 'TPB-Ute'];
-
     window.openAvdelningPicker = () => {
         openPicker({
             title: 'Välj avdelning',
@@ -1479,9 +1373,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     };
-
     const AI_MASKIN_OPTIONS = ['Truck', 'Ergopack', 'Bandmaskin', 'Movexx', 'Pallyftare'];
-
     window.openAiMaskinPicker = () => {
         openPicker({
             title: 'Välj maskin',
@@ -1495,7 +1387,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     };
-
     window.openTruckIdPicker = () => {
         openPicker({
             title: 'Välj truck',
@@ -1510,7 +1401,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     };
-
     window.openTruckFelPicker = () => {
         openPicker({
             title: 'Välj feltyp',
@@ -1525,7 +1415,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     };
-
     window.openMachineFelPicker = () => {
         const name = document.getElementById('selectedMachineName').value;
         const options = ['Mekaniskt', 'Elektriskt'].concat(name === 'Övrigt' ? ['Lokal'] : []).concat(['Annat']);
@@ -1542,7 +1431,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     };
-
     window.openMachineSubIdPicker = () => {
         const name = document.getElementById('selectedMachineName').value;
         const options = machineIds[name] || [];
@@ -1559,7 +1447,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     };
-
     // ===================== SNABBANMÄL =====================
     window.openQuickSheet = () => {
         resetQuickForm();
@@ -1567,13 +1454,18 @@ document.addEventListener('DOMContentLoaded', () => {
         lockBodyScroll();
         const savedName = localStorage.getItem('draft_signatur');
         if (savedName) document.getElementById('quickSign').value = savedName;
+        const savedAvd = localStorage.getItem('draft_avdelning');
+        if (savedAvd) {
+            document.getElementById('quickAvdelning').value = savedAvd;
+            const avdLabel = document.getElementById('quickAvdelningLabel');
+            avdLabel.textContent = savedAvd;
+            avdLabel.classList.remove('picker-placeholder');
+        }
     };
-
     window.closeQuickSheet = () => {
         document.getElementById('quickOverlay').classList.remove('visible');
         unlockBodyScroll();
     };
-
     function resetQuickForm() {
         document.getElementById('quickTyp').value = 'truck';
         document.getElementById('qbtn-typ-truck').classList.add('active');
@@ -1586,6 +1478,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('quickMachineSubId').value = '';
         document.getElementById('quickStatus').value = '';
         document.getElementById('quickKom').value = '';
+        document.getElementById('quickAvdelning').value = '';
+        resetPickerLabel('quickAvdelningLabel', 'Välj avdelning');
         resetPickerLabel('quickTruckIdLabel', 'Välj truck');
         resetPickerLabel('quickTruckFelLabel', 'Välj feltyp');
         resetPickerLabel('quickMachineFelLabel', 'Välj feltyp');
@@ -1599,7 +1493,6 @@ document.addEventListener('DOMContentLoaded', () => {
         msg.textContent = '';
         msg.className = 'fetch-status';
     }
-
     window.setQuickTyp = (typ) => {
         document.getElementById('quickTyp').value = typ;
         document.getElementById('qbtn-typ-truck').classList.toggle('active', typ === 'truck');
@@ -1609,7 +1502,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('quickId').value = '';
         document.getElementById('quickFel').value = '';
     };
-
     window.openQuickTruckIdPicker = () => {
         openPicker({
             title: 'Välj truck', items: TRUCK_IDS, categories: TRUCK_CATEGORIES,
@@ -1620,7 +1512,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     };
-
     window.openQuickTruckFelPicker = () => {
         openPicker({
             title: 'Välj feltyp', items: TRUCK_FEL_OPTIONS, categories: null,
@@ -1631,7 +1522,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     };
-
     window.quickSelectMachine = (name, element) => {
         document.querySelectorAll('#quickMachineGrid .machine-item').forEach(item => item.classList.remove('active'));
         element.classList.add('active');
@@ -1641,7 +1531,6 @@ document.addEventListener('DOMContentLoaded', () => {
         resetPickerLabel('quickMachineSubIdLabel', 'Välj ID/nummer');
         document.getElementById('quickMachineSubIdContainer').classList.toggle('hidden', name === 'Övrigt');
     };
-
     window.openQuickMachineSubIdPicker = () => {
         const name = document.getElementById('quickSelectedMachineName').value;
         const options = machineIds[name] || [];
@@ -1655,7 +1544,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     };
-
     window.openQuickMachineFelPicker = () => {
         const name = document.getElementById('quickSelectedMachineName').value;
         const options = ['Mekaniskt', 'Elektriskt'].concat(name === 'Övrigt' ? ['Lokal'] : []).concat(['Annat']);
@@ -1668,7 +1556,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     };
-
+    window.openQuickAvdelningPicker = () => {
+        openPicker({
+            title: 'Välj avdelning', items: AVDELNING_OPTIONS, categories: null,
+            onSelect: (val) => {
+                document.getElementById('quickAvdelning').value = val;
+                const label = document.getElementById('quickAvdelningLabel');
+                label.textContent = val; label.classList.remove('picker-placeholder');
+            }
+        });
+    };
     window.setQuickStatus = (status) => {
         document.getElementById('quickStatus').value = status;
         document.querySelectorAll('#quickStatusControl .segment-btn').forEach(btn => {
@@ -1680,7 +1577,6 @@ document.addEventListener('DOMContentLoaded', () => {
             activeBtn.classList.add(status === 'Service' ? 'status-service' : 'status-urdrift');
         }
     };
-
     window.submitQuick = async () => {
         const typ = document.getElementById('quickTyp').value;
         const id = document.getElementById('quickId').value;
@@ -1688,22 +1584,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const kom = document.getElementById('quickKom').value.trim();
         const status = document.getElementById('quickStatus').value;
         const sign = document.getElementById('quickSign').value.trim();
+        const avdelning = document.getElementById('quickAvdelning').value;
         const statusMsg = document.getElementById('quickStatusMsg');
-
         if (!id) { alert(typ === 'truck' ? 'Välj truck!' : 'Välj maskin!'); return; }
         if (!fel) { alert('Välj feltyp!'); return; }
         if (!status) { alert('Välj status: Service eller Ur drift!'); return; }
         if (!kom) { alert('Skriv en kommentar om felet!'); return; }
+        if (!avdelning) { alert('Välj avdelning!'); return; }
         if (!sign) { alert('Ange rapportör!'); return; }
-
         statusMsg.textContent = 'Skickar...';
         statusMsg.className = 'fetch-status sending';
-
         const today = new Date().toISOString().split('T')[0];
         const h = new Date().getHours();
         const skift = (h >= 8 && h < 17) ? 'Dagskift' : (h >= 17 || h < 2) ? 'Kvällskift' : 'Nattskift';
-        const avdelning = document.getElementById('avdelning').value || 'Ej angivet';
-
         try {
             const response = await fetch(GAS_URL, {
                 method: "POST",
@@ -1716,6 +1609,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 statusMsg.className = 'fetch-status success';
                 vibrate(60);
                 localStorage.setItem('draft_signatur', sign);
+                localStorage.setItem('draft_avdelning', avdelning);
                 setTimeout(() => { closeQuickSheet(); }, 900);
             } else {
                 statusMsg.textContent = result.message || 'Något gick fel';
@@ -1727,15 +1621,12 @@ document.addEventListener('DOMContentLoaded', () => {
             statusMsg.className = 'fetch-status error';
         }
     };
-
-    // ===================== AVSLUTA ÄRENDE (direkt från Truckar/Maskiner) =====================
     window.openCloseSheetFromRow = (idx) => {
         const r = lastRenderedRows[idx];
         if (!r) return;
-        // Kolumner: datum(0), skift(1), avd(2), sign(3), id(4), fel(5), kom(6), status(7)
         window.currentCloseItem = {
             sheetName: currentStatsSheet,
-            rowIndex: 1, // Dummy-värde - backend hittar rätt rad via id+fel+sign+kom istället.
+            rowIndex: 1,
             id: r[4], fel: r[5], kom: r[6], sign: r[3], status: r[7]
         };
         const it = window.currentCloseItem;
@@ -1749,23 +1640,18 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('closeOverlay').classList.add('visible');
         lockBodyScroll();
     };
-
     window.closeCloseSheet = () => {
         document.getElementById('closeOverlay').classList.remove('visible');
         unlockBodyScroll();
     };
-
     window.submitCloseArende = async () => {
         const it = window.currentCloseItem;
         const atgard = document.getElementById('closeAtgard').value.trim();
         const kostnad = document.getElementById('closeKostnad').value.trim() || '0';
         const status = document.getElementById('closeStatus');
-
         if (!atgard) { alert('Beskriv åtgärden innan du avslutar ärendet!'); return; }
-
         status.textContent = 'Avslutar ärende...';
         status.className = 'fetch-status sending';
-
         try {
             const response = await fetch(GAS_URL, {
                 method: "POST",
@@ -1798,9 +1684,7 @@ document.addEventListener('DOMContentLoaded', () => {
             status.className = 'fetch-status error';
         }
     };
-
     const STATS_SPREADSHEET_ID = "1Pl8CX0uS1047P2SvNceA64yn0HRr9YSgnwXpzSFRjtw";
-
     const STATS_SHEET_CONFIGS = {
         'Skiftrapport': {
             title: r => r[2] || 'Ej angivet',
@@ -1842,11 +1726,9 @@ document.addEventListener('DOMContentLoaded', () => {
             ]
         }
     };
-
     let currentStatsSheet = 'Skiftrapport';
     let currentStatsFilter = 'ALL';
     const statsCache = {};
-
     function statsBadgeClass(value) {
         const v = (value || '').toString().trim().toUpperCase();
         if (v === 'OK' || v === 'KLAR' || v === 'DONE') return 'badge-klar';
@@ -1854,7 +1736,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (v === 'NOK' || v === 'UR DRIFT' || v === 'OPEN') return 'badge-urdrift';
         return 'badge-service';
     }
-
     function formatStatsCell(cell) {
         if (cell === null || cell === undefined) return '';
         if (typeof cell === 'string' && cell.indexOf('Date(') === 0) {
@@ -1863,7 +1744,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return cell;
     }
-
     async function fetchStatsRows(sheetName) {
         if (statsCache[sheetName]) return statsCache[sheetName];
         const tq = encodeURIComponent('select * order by A desc limit 50');
@@ -1877,19 +1757,15 @@ document.addEventListener('DOMContentLoaded', () => {
         statsCache[sheetName] = rows;
         return rows;
     }
-
     let lastRenderedRows = [];
-
     function renderStatsCards(sheetName, rows, emptyMessage) {
         const config = STATS_SHEET_CONFIGS[sheetName];
         const container = document.getElementById('statsCards');
         lastRenderedRows = rows;
-
         if (rows.length === 0) {
             container.innerHTML = `<div class="stats-empty">${emptyMessage || 'Inga rader hittades.'}</div>`;
             return;
         }
-
         container.innerHTML = rows.map((r, idx) => {
             const fieldsHtml = config.fields.map(f => {
                 const raw = r[f.col];
@@ -1901,18 +1777,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 return `<div class="stats-field"><span class="stats-field-label">${f.label}</span>`
                     + `<span class="stats-field-value freetext">${raw}</span></div>`;
             }).join('');
-
             const status = (r[config.primaryStatusField] || '').toString().trim().toUpperCase();
             const isOpen = config.closable && (status === 'SERVICE' || status === 'UR DRIFT');
-
             const actionHtml = isOpen ? `
                 <div class="stats-card-action">
                     <span>Tryck för att avsluta ärendet</span>
                     <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </div>` : '';
-
             const clickAttr = isOpen ? ` onclick="openCloseSheetFromRow(${idx}); vibrate(20);"` : '';
-
             return `<div class="stats-card${isOpen ? ' clickable' : ''}"${clickAttr}>`
                 + `<div class="stats-card-title">${config.title(r)}</div>`
                 + `<div class="stats-card-sub">${config.sub(r)}</div>`
@@ -1921,19 +1793,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 + `</div>`;
         }).join('');
     }
-
     // ===================== STATISTIK (egen knapp) =====================
     const PIE_COLORS = ['#5b5fc7', '#e67e22', '#27ae60', '#c0392b', '#f1c40f', '#16a085', '#8e44ad', '#2980b9', '#d35400', '#7f8c8d', '#a8e6cf', '#ffe08a'];
     let currentStatistikCategory = 'Truckavvikelse';
-
     function parseKostnad(value) {
         const n = parseFloat((value || '0').toString().replace(/\s/g, '').replace(',', '.'));
         return isNaN(n) ? 0 : n;
     }
-
-    // Öppna rader (Truckavvikelse/Maskiner) och Arkiv-rader har OLIKA kolumnordning.
-    // Vi normaliserar båda till samma objektform här en gång, så resten av koden
-    // aldrig behöver hålla reda på vilket index som betyder vad.
     function normalizeRow(r, isArkiv) {
         return {
             datum: r[0] || '', skift: r[1] || '', avd: r[2] || '', sign: r[3] || '',
@@ -1946,26 +1812,22 @@ document.addEventListener('DOMContentLoaded', () => {
             isArkiv: isArkiv
         };
     }
-
     function monthKey(datumStr) {
         const d = new Date(datumStr);
         if (isNaN(d.getTime())) return null;
         return d.getFullYear() + '-' + (d.getMonth() + 1);
     }
-
     function renderTrend(rows) {
         const now = new Date();
         const thisKey = now.getFullYear() + '-' + (now.getMonth() + 1);
         const prevDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
         const prevKey = prevDate.getFullYear() + '-' + (prevDate.getMonth() + 1);
-
         let thisCount = 0, prevCount = 0;
         rows.forEach(row => {
             const k = monthKey(row.datum);
             if (k === thisKey) thisCount++;
             else if (k === prevKey) prevCount++;
         });
-
         let trendHtml = '';
         if (prevCount > 0) {
             const diff = thisCount - prevCount;
@@ -1978,10 +1840,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 trendHtml = `<span>Oförändrat jämfört med förra månaden</span>`;
             }
         }
-
         return `<div class="dashboard-trend">Denna månad: <strong>${thisCount}</strong> · Förra månaden: <strong>${prevCount}</strong>${trendHtml ? ' · ' + trendHtml : ''}</div>`;
     }
-
     function buildUnitStats(rows) {
         const map = {};
         rows.forEach(row => {
@@ -1991,7 +1851,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         return map;
     }
-
     function renderUnitTable(unitMap) {
         const rows = Object.entries(unitMap).sort((a, b) => b[1].count - a[1].count);
         if (rows.length === 0) return '';
@@ -2016,9 +1875,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
     }
-
     let drillCounter = 0;
-
     function renderPieChart(rows, field) {
         const groups = {};
         rows.forEach(row => {
@@ -2030,7 +1887,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const total = rows.length;
         if (total === 0) return '<div class="stats-empty">Ingen data.</div>';
         const maxCount = entries[0][1].length;
-
         const bars = entries.map(([label, groupRows], i) => {
             const count = groupRows.length;
             const pct = ((count / total) * 100).toFixed(1);
@@ -2055,10 +1911,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="drill-panel hidden" id="${detailId}">${detailItems}${moreText}</div>
             `;
         }).join('');
-
         return `<div class="bar-chart">${bars}</div>`;
     }
-
     window.toggleDrilldown = (id) => {
         const el = document.getElementById(id);
         if (!el) return;
@@ -2066,7 +1920,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.drill-panel').forEach(p => p.classList.add('hidden'));
         if (wasHidden) el.classList.remove('hidden');
     };
-
     async function renderDashboard(realSheet, container) {
         const [openRowsRaw, arkivRowsRaw] = await Promise.all([
             fetchStatsRows(realSheet),
@@ -2075,17 +1928,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const arkivRowsRawFiltered = arkivRowsRaw.filter(r => (r[9] || '').toString().trim() === realSheet);
         const allRows = openRowsRaw.map(r => normalizeRow(r, false))
             .concat(arkivRowsRawFiltered.map(r => normalizeRow(r, true)));
-
         if (allRows.length === 0) {
             container.innerHTML = '<div class="stats-empty">Ingen data att visa statistik för än.</div>';
             return;
         }
-
         const closedRows = allRows.filter(r => r.isArkiv);
         const totalKostnad = closedRows.reduce((sum, r) => sum + r.kostnad, 0);
         const avgKostnad = closedRows.length > 0 ? totalKostnad / closedRows.length : 0;
         const unitMap = buildUnitStats(allRows);
-
         container.innerHTML = `
             <div class="dashboard-total">
                 Baserat på ${allRows.length} ärende(n) - öppna och avslutade.<br>
@@ -2105,18 +1955,15 @@ document.addEventListener('DOMContentLoaded', () => {
             ${renderUnitTable(unitMap)}
         `;
     }
-
     window.openStatistik = () => {
         document.getElementById('statistikOverlay').classList.add('visible');
         lockBodyScroll();
         switchStatistikCategory(currentStatistikCategory);
     };
-
     window.closeStatistik = () => {
         document.getElementById('statistikOverlay').classList.remove('visible');
         unlockBodyScroll();
     };
-
     window.switchStatistikCategory = async (realSheet) => {
         currentStatistikCategory = realSheet;
         document.querySelectorAll('#statistikTabs .stats-tab').forEach(btn => {
@@ -2131,7 +1978,6 @@ document.addEventListener('DOMContentLoaded', () => {
             container.innerHTML = '<div class="stats-empty">Kunde inte hämta statistik. Kontrollera anslutningen.</div>';
         }
     };
-
     window.switchStatsSheet = async (sheetName) => {
         currentStatsSheet = sheetName;
         currentStatsFilter = 'ALL';
@@ -2139,9 +1985,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.stats-tab').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.sheet === sheetName);
         });
-
         const container = document.getElementById('statsCards');
-
         const config = STATS_SHEET_CONFIGS[sheetName];
         const filterRow = document.getElementById('statsFilterRow');
         const filterVisible = config.primaryStatusField !== undefined;
@@ -2150,7 +1994,6 @@ document.addEventListener('DOMContentLoaded', () => {
         filterRow.querySelectorAll('.stats-filter-chip').forEach(chip => {
             chip.classList.toggle('active', chip.dataset.filter === 'ALL');
         });
-
         container.innerHTML = '<div class="stats-loading">Hämtar data...</div>';
         try {
             await fetchStatsRows(sheetName);
@@ -2160,7 +2003,6 @@ document.addEventListener('DOMContentLoaded', () => {
             container.innerHTML = '<div class="stats-empty">Kunde inte hämta data. Kontrollera anslutningen.</div>';
         }
     };
-
     window.setStatsFilter = (filterValue) => {
         currentStatsFilter = filterValue;
         document.querySelectorAll('.stats-filter-chip').forEach(chip => {
@@ -2169,12 +2011,10 @@ document.addEventListener('DOMContentLoaded', () => {
         vibrate(20);
         applyStatsFilters();
     };
-
     window.applyStatsFilters = () => {
         const config = STATS_SHEET_CONFIGS[currentStatsSheet];
         const allRows = statsCache[currentStatsSheet] || [];
         const searchTerm = document.getElementById('statsSearch').value.toLowerCase().trim();
-
         let filtered = allRows;
         if (currentStatsFilter !== 'ALL' && config.primaryStatusField !== undefined) {
             filtered = filtered.filter(r => (r[config.primaryStatusField] || '').toString().trim().toUpperCase() === currentStatsFilter);
@@ -2182,11 +2022,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (searchTerm) {
             filtered = filtered.filter(r => r.some(cell => (cell || '').toString().toLowerCase().includes(searchTerm)));
         }
-
         const emptyMessage = allRows.length > 0 ? 'Inga träffar.' : 'Inga rader hittades.';
         renderStatsCards(currentStatsSheet, filtered, emptyMessage);
     };
-
     window.openStats = () => {
         document.getElementById("statsOverlay").classList.add("visible");
         lockBodyScroll();
@@ -2196,27 +2034,22 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById("statsOverlay").classList.remove("visible");
         unlockBodyScroll();
     };
-
     window.askAI = async () => {
         const maskin = document.getElementById('aiMaskin').value;
         const problem = document.getElementById('aiProblem').value.trim();
         const status = document.getElementById('aiStatus');
         const answerBox = document.getElementById('aiAnswer');
         const btn = document.getElementById('aiAskBtn');
-
         if (!maskin) { alert("Välj en maskin!"); return; }
         if (!problem) { alert("Beskriv problemet!"); return; }
-
         btn.disabled = true;
         btn.innerText = "Astrid tänker...";
         status.textContent = 'Frågar AI...';
         status.className = 'fetch-status sending';
         answerBox.classList.add('hidden');
-
         try {
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), 90000);
-
             const response = await fetch(GAS_URL, {
                 method: "POST",
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -2224,15 +2057,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 signal: controller.signal
             });
             clearTimeout(timeout);
-
             const result = await response.json();
-
             const REFUSAL_TEXT = "Jag är inställd på att endast hjälpa till med teknisk felsökning utifrån manualen. Vänligen ställ en fråga relaterad till dokumentationen.";
-
             if (result.success) {
                 const isRefusal = result.answer.trim() === REFUSAL_TEXT;
                 answerBox.classList.toggle('ai-refusal', isRefusal);
-
                 if (isRefusal) {
                     answerBox.innerHTML = '<span class="ai-refusal-label">Kunde inte besvaras</span>'
                         + 'Frågan matchar inte innehållet i <strong>' + maskin + '</strong>-manualen. '
@@ -2259,27 +2088,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             status.className = 'fetch-status error';
         }
-
         btn.disabled = false;
         btn.innerText = "Fråga Astrid";
     };
-
     function showConfirmScreen(data, truckArr, maskinArr) {
         const screen = document.getElementById('confirmScreen');
         const sub = document.getElementById('confirmSub');
         const summary = document.getElementById('confirmSummary');
-
         sub.textContent = `${data.avdelning} · ${data.datum} · ${data.skift}`;
-
         function badge(val) {
             const isOk = val === 'OK';
             return `<span class="confirm-badge ${isOk ? 'badge-ok' : 'badge-nok'}">${val}</span>`;
         }
-
         function itemLabel(item) {
             return `${item.id} (${item.status})`;
         }
-
         let html = `
             <div class="confirm-row"><strong>Rapportör</strong><span>${data.signatur}</span></div>
             <div class="confirm-row"><strong>Truckstatus</strong>${badge(data.truckstatus)}</div>
@@ -2296,12 +2119,10 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="confirm-row"><strong>Rengöring</strong>${badge(data.rengoring)}</div>
         `;
         if (data.drift) html += `<div class="confirm-row"><strong>Driftinfo</strong><span style="max-width:60%;text-align:right;font-size:0.8rem;">${data.drift.substring(0, 60)}${data.drift.length > 60 ? '…' : ''}</span></div>`;
-
         summary.innerHTML = html;
         screen.classList.add('visible');
         window.scrollTo(0, 0);
     }
-
     window.startNewReport = () => {
         document.getElementById('confirmScreen').classList.remove('visible');
         const keepKeys = ['draft_signatur', 'draft_avdelning'];
@@ -2312,7 +2133,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         location.reload();
     };
-
     function loadSavedData() {
         const keys = ['signatur', 'datum', 'avdelning', 'truck', 'maskin', 'tillsyn', 'tillsynfel', 'rengoring', 'rengoringKommentar', 'drift', 'avvikelse', 'atgard'];
         keys.forEach(key => {
@@ -2335,7 +2155,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
-
         const savedTrucks = localStorage.getItem('draft_truckArray');
         if (savedTrucks) { truckArray = JSON.parse(savedTrucks); renderList('truck'); }
         const savedMaskiner = localStorage.getItem('draft_maskinArray');
@@ -2354,15 +2173,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const datumEl = document.getElementById('datum');
         if (datumEl && !datumEl.value) datumEl.value = today;
     }
-
     (function initSheetDrag() {
         document.querySelectorAll('.bottom-sheet').forEach(sheet => {
             const overlay = sheet.closest('.sheet-overlay');
             const dragZones = [sheet.querySelector('.sheet-handle'), sheet.querySelector('.sheet-header')].filter(Boolean);
             let startY = 0, deltaY = 0, dragging = false;
-
             function getY(e) { return e.touches ? e.touches[0].clientY : e.clientY; }
-
             function onStart(e) {
                 if (window.innerWidth >= 700) return;
                 dragging = true;
@@ -2385,7 +2201,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 deltaY = 0;
             }
-
             dragZones.forEach(el => {
                 el.addEventListener('touchstart', onStart, { passive: true });
                 el.addEventListener('touchmove', onMove, { passive: true });
@@ -2396,10 +2211,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.addEventListener('mouseup', onEnd);
         });
     })();
-
     loadSavedData();
     updateAtgardVisibility();
-
     // Splash screen: purely visual, runs after drafts are already loaded into the form.
     // Doesn't touch localStorage/autosave logic at all.
     const splashMinTime = 500; // ms, so it doesn't just flash on fast loads
@@ -2413,7 +2226,6 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => splashEl.remove(), 450);
         }, remaining);
     }
-
     function updateAtgardVisibility() {
         const avvikelseVal = document.getElementById('avvikelse').value.trim();
         const wrap = document.getElementById('atgardWrap');
@@ -2424,7 +2236,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('card-drift').classList.remove('error-attention');
         }
     }
-
     document.addEventListener('input', (e) => { 
         if (e.target.classList.contains('save-data')) {
             localStorage.setItem('draft_' + e.target.id, e.target.value);
@@ -2434,17 +2245,13 @@ document.addEventListener('DOMContentLoaded', () => {
             updateAtgardVisibility();
         }
     });
-
     document.getElementById('reportForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         let hasError = false;
         let firstErrorElement = null;
-
         const isTruckNok = document.getElementById('truck').value !== 'OK';
         const isMaskinNok = document.getElementById('maskin').value !== 'OK';
-
         document.querySelectorAll('.card').forEach(c => c.classList.remove('error-attention'));
-
         if (isTruckNok && truckArray.length === 0) { 
             const el = document.getElementById('card-truck');
             el.classList.add('error-attention'); 
@@ -2458,27 +2265,23 @@ document.addEventListener('DOMContentLoaded', () => {
             hasError = true;
             if (!firstErrorElement) firstErrorElement = el;
         }
-
         if (!this.checkValidity() || !document.getElementById('avdelning').value) { 
             const el = document.getElementById('card-person');
             el.classList.add('error-attention'); 
             hasError = true;
             if (!firstErrorElement) firstErrorElement = el;
         }
-
         if (document.getElementById('avvikelse').value.trim() && !document.getElementById('atgard').value.trim()) {
             const el = document.getElementById('card-drift');
             el.classList.add('error-attention');
             hasError = true;
             if (!firstErrorElement) firstErrorElement = el;
         }
-
         if (hasError) { 
             window.vibrate([100, 50, 100]);
             firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return; 
         }
-
         const btn = document.getElementById('submitBtn'); 
         const fetchStatus = document.getElementById('fetchStatus');
         btn.disabled = true; 
@@ -2502,10 +2305,8 @@ document.addEventListener('DOMContentLoaded', () => {
             avvikelse: document.getElementById('avvikelse').value,
             atgard: document.getElementById('atgard').value
         };
-
         fetchStatus.textContent = '📡 Skickar till Google Sheets...';
         fetchStatus.className = 'fetch-status sending';
-
         try { 
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), 10000);
@@ -2528,7 +2329,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             fetchStatus.className = 'fetch-status error';
         }
-
         const mailSubject = `Skiftrapport, ${currentSkift}, ${data.datum}`;
         let mailBody = `SKIFTRAPPORT\n`;
         mailBody += `--------------------------------\n`;
@@ -2565,10 +2365,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.removeItem(key);
             }
         });
-
         btn.disabled = false; 
         btn.innerText = "Skicka Rapport";
-
         showConfirmScreen(data, isTruckNok ? truckArray : [], isMaskinNok ? maskinArray : []);
     });
 });
