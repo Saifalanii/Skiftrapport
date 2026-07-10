@@ -362,6 +362,8 @@
             color: var(--text-sec); font-size: 0.8rem; font-weight: 600; cursor: pointer;
         }
         .stats-tab.active { background: var(--teams-purple); color: white; border-color: var(--teams-purple); }
+        .stats-tab.tab-avsluta { margin-left: auto; }
+        .stats-tab.tab-avsluta.active { background: #e67e22; color: white; border-color: #e67e22; }
 
         .stats-search {
             width: 100%; padding: 10px 12px; margin-bottom: 10px;
@@ -384,6 +386,7 @@
         }
         .stats-filter-chip.active { background: var(--teams-purple); color: white; border-color: var(--teams-purple); }
         .stats-filter-chip.hidden-chip { display: none; }
+        .stats-filter-row.avsluta-mode .stats-filter-chip.active[data-filter="ALL"] { background: #e67e22; border-color: #e67e22; color: white; }
         .stats-filter-chip.active[data-filter="KLAR"] { background: var(--pastel-green); color: var(--pastel-green-text); border-color: var(--pastel-green); }
         .stats-filter-chip.active[data-filter="SERVICE"] { background: var(--pastel-yellow); color: var(--pastel-yellow-text); border-color: var(--pastel-yellow); }
         .stats-filter-chip.active[data-filter="UR DRIFT"] { background: var(--pastel-red); color: var(--danger); border-color: var(--pastel-red); }
@@ -396,14 +399,23 @@
         .stats-card.clickable {
             border-left: 4px solid var(--teams-purple);
             position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
-        .stats-card.clickable:active { background: rgba(91, 95, 199, 0.12); }
+        .stats-card.clickable:active { opacity: 0.9; }
         .stats-card-action {
-            margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--teams-border);
-            display: flex; align-items: center; justify-content: space-between;
-            color: var(--teams-purple); font-size: 0.8rem; font-weight: 700;
+            margin-top: auto;
+            padding-top: 0;
+            border-top: none;
+            background: var(--teams-purple);
+            color: white;
+            border-radius: 8px;
+            padding: 10px 14px;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            font-size: 0.85rem; font-weight: 700;
         }
-        .stats-card-action svg { width: 18px; height: 18px; stroke: var(--teams-purple); }
+        .stats-card-action svg { width: 16px; height: 16px; stroke: white; }
         .stats-card-sub { font-size: 0.75rem; color: var(--text-sec); margin-bottom: 10px; }
         .stats-field {
             display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
@@ -888,7 +900,7 @@ setTimeout(() => {
             <button type="button" class="stats-tab active" data-sheet="Skiftrapport" onclick="switchStatsSheet('Skiftrapport'); vibrate(20);">Rapporter</button>
             <button type="button" class="stats-tab" data-sheet="Truckavvikelse" onclick="switchStatsSheet('Truckavvikelse'); vibrate(20);">Truckar</button>
             <button type="button" class="stats-tab" data-sheet="Maskiner" onclick="switchStatsSheet('Maskiner'); vibrate(20);">Maskiner</button>
-            <button type="button" class="stats-tab" data-sheet="Avsluta" onclick="switchStatsSheet('Avsluta'); vibrate(20);">Avsluta</button>
+            <button type="button" class="stats-tab tab-avsluta" data-sheet="Avsluta" onclick="switchStatsSheet('Avsluta'); vibrate(20);">Avsluta</button>
         </div>
         <input type="text" id="statsSearch" class="stats-search" placeholder="Sök..." oninput="applyStatsFilters()">
         <div class="stats-filter-label hidden" id="statsFilterLabel">Filtrera på status</div>
@@ -1902,6 +1914,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (sheetName === 'Avsluta') {
             const filterRow = document.getElementById('statsFilterRow');
             filterRow.classList.remove('hidden');
+            filterRow.classList.add('avsluta-mode');
             document.getElementById('statsFilterLabel').classList.remove('hidden');
             filterRow.querySelectorAll('.stats-filter-chip').forEach(chip => {
                 const f = chip.dataset.filter;
@@ -1922,6 +1935,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const config = STATS_SHEET_CONFIGS[sheetName];
         const filterRow = document.getElementById('statsFilterRow');
+        filterRow.classList.remove('avsluta-mode');
         const filterVisible = config.primaryStatusField !== undefined;
         filterRow.classList.toggle('hidden', !filterVisible);
         document.getElementById('statsFilterLabel').classList.toggle('hidden', !filterVisible);
