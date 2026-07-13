@@ -1127,7 +1127,7 @@ setTimeout(() => {
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     // En enda plats för webbappens URL - byt bara här nästa gång Apps Script omdistribueras.
-    const GAS_URL = "https://script.google.com/macros/s/AKfycby0H3PrAAUOa9v0EeNVvBVJyjvj4Xq7adTe_zHbME0Y1zvyABDGFhl1jXZCmV02PxmX/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycby-LXWk2nSXzC_LqJ4qGaOTozK1L-Z6H_dM-dtqbA0a3C2y2vSgztSV8EVq8Ix8VkvH/exec";
     let truckArray = []; 
     let maskinArray = [];
     const machineIds = {
@@ -1895,7 +1895,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }).join('');
 
             const status = (r[config.primaryStatusField] || '').toString().trim().toUpperCase();
-            const isCloseable = config.closable && (status === 'SERVICE' || status === 'UR DRIFT');
+            const isLegacyKlarInLiveSheet = status === 'KLAR' && currentStatsFilter !== 'KLAR';
+            const isCloseable = config.closable && (status === 'SERVICE' || status === 'UR DRIFT' || isLegacyKlarInLiveSheet);
 
             // Vid NOK på Skiftrapport-kort: slå upp matchande rader i Truckavvikelse/Maskiner
             // (samma datum+skift+avdelning+signatur) för att kunna visa vad som är NOK.
@@ -2159,17 +2160,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         container.innerHTML = '<div class="stats-loading">Hämtar data...</div>';
         try {
+            const fetches = [fetchStatsRows(sheetName)];
             if (config.detailSources) {
                 // Hämta även källbladen (Truckavvikelse/Maskiner) parallellt, så
                 // NOK-uppslagningen på korten kan slå upp detaljer direkt.
-                await Promise.all([
-                    fetchStatsRows(sheetName),
-                    ...config.detailSources.map(src => fetchStatsRows(src.sheetName)),
-                    fetchStatsRows('Arkiv')
-                ]);
-            } else {
-                await fetchStatsRows(sheetName);
+                fetches.push(...config.detailSources.map(src => fetchStatsRows(src.sheetName)));
             }
+            if (config.detailSources || config.primaryStatusField !== undefined) {
+                // Behövs även för Klar-filtret på Truckar/Maskiner-sheets, som läser
+                // avslutade poster direkt från Arkiv.
+                fetches.push(fetchStatsRows('Arkiv'));
+            }
+            await Promise.all(fetches);
             applyStatsFilters();
         } catch (err) {
             console.error('Kunde inte hämta status:', err);
@@ -2186,10 +2188,19 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     window.applyStatsFilters = () => {
         const config = STATS_SHEET_CONFIGS[currentStatsSheet];
-        const allRows = statsCache[currentStatsSheet] || [];
         const searchTerm = document.getElementById('statsSearch').value.toLowerCase().trim();
+        let allRows;
+        if (currentStatsFilter === 'KLAR' && config.primaryStatusField !== undefined) {
+            // Klar-poster arkiveras direkt vid rapportering (se Kod.gs) och ligger
+            // därför i Arkiv, inte i det öppna bladet - "Klar"-filtret läser därifrån.
+            allRows = (statsCache['Arkiv'] || [])
+                .filter(row => (row[9] || '').toString().trim() === currentStatsSheet)
+                .map(row => [row[0], row[1], row[2], row[3], row[4], row[5], row[6], 'Klar']);
+        } else {
+            allRows = statsCache[currentStatsSheet] || [];
+        }
         let filtered = allRows;
-        if (currentStatsFilter !== 'ALL' && config.primaryStatusField !== undefined) {
+        if (currentStatsFilter !== 'ALL' && currentStatsFilter !== 'KLAR' && config.primaryStatusField !== undefined) {
             filtered = filtered.filter(r => (r[config.primaryStatusField] || '').toString().trim().toUpperCase() === currentStatsFilter);
         }
         if (searchTerm) {
@@ -2231,9 +2242,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             clearTimeout(timeout);
             const result = await response.json();
-            const REFUSAL_TEXT = "Jag är inställd på att endast hjälpa till med teknisk felsökning utifrån manualen. Vänligen ställ en fråga relaterad till dokumentationen.";
             if (result.success) {
-                const isRefusal = result.answer.trim() === REFUSAL_TEXT;
+                const isRefusal = !!result.isRefusal;
                 answerBox.classList.toggle('ai-refusal', isRefusal);
                 if (isRefusal) {
                     answerBox.innerHTML = '<span class="ai-refusal-label">Kunde inte besvaras</span>'
@@ -2466,7 +2476,6 @@ document.addEventListener('DOMContentLoaded', () => {
             datum: document.getElementById('datum').value,
             avdelning: document.getElementById('avdelning').value,
             skift: currentSkift,
-            harAvvikelse: (isTruckNok || isMaskinNok || document.getElementById('tillsyn').value === 'NOK'),
             truckstatus: document.getElementById('truck').value,
             truckar: isTruckNok ? truckArray : [],
             maskiner: isMaskinNok ? maskinArray : [],
@@ -2480,67 +2489,77 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         fetchStatus.textContent = 'Skickar till Google Sheets...';
         fetchStatus.className = 'fetch-status sending';
+        let saveSucceeded = false;
         try { 
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), 10000);
             
-            await fetch(GAS_URL, { 
+            const response = await fetch(GAS_URL, { 
                 method: "POST", 
-                mode: "no-cors", 
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify(data),
                 signal: controller.signal
             });
             clearTimeout(timeout);
+            const result = await response.json();
+            if (result.status !== 'ok') throw new Error(result.message || 'Okänt serverfel');
+            saveSucceeded = true;
             fetchStatus.textContent = 'Data sparad i Google Sheets';
             fetchStatus.className = 'fetch-status success';
         } catch (err) { 
             console.error(err);
             if (err.name === 'AbortError') {
-                fetchStatus.textContent = 'Timeout – kontrollera anslutningen';
+                fetchStatus.textContent = 'Timeout – kontrollera anslutningen. Rapporten skickas som mejl istället.';
             } else {
-                fetchStatus.textContent = 'Kunde inte nå Google Sheets';
+                fetchStatus.textContent = 'Kunde inte spara i Google Sheets. Rapporten skickas som mejl istället.';
             }
             fetchStatus.className = 'fetch-status error';
         }
-        const mailSubject = `Skiftrapport, ${currentSkift}, ${data.datum}`;
-        let mailBody = `SKIFTRAPPORT\n`;
-        mailBody += `--------------------------------\n`;
-        mailBody += `Rapportör: ${data.signatur}\n`;
-        mailBody += `Datum: ${data.datum}\n`;
-        mailBody += `Skift: ${currentSkift}\n`;
-        mailBody += `Avdelning: ${data.avdelning}\n\n`;
-        mailBody += `TRUCKSTATUS: ${data.truckstatus}\n`;
-        if (truckArray.length > 0) {
-            truckArray.forEach(t => mailBody += `- ${t.id}: ${t.fel} [${t.status}] (${t.kom})\n`);
-        }
-        mailBody += `\n`;
-        mailBody += `MASKINER & VERKTYG: ${maskinArray.length > 0 ? 'Felanmälan' : 'OK'}\n`;
-        if (maskinArray.length > 0) {
-            maskinArray.forEach(m => mailBody += `- ${m.id}: ${m.fel} [${m.status}] (${m.kom})\n`);
-        }
-        mailBody += `\n`;
-        mailBody += `TILLSYN TRUCKAR: ${data.tillsyn}\n`;
-        if (data.tillsyn_kom) mailBody += `Kommentar: ${data.tillsyn_kom}\n`;
-        mailBody += `\n`;
-        mailBody += `RENGÖRING BANDNINGSMASKINER: ${data.rengoring}\n`;
-        if (data.rengoring_kom) mailBody += `Kommentar: ${data.rengoring_kom}\n`;
-        mailBody += `\n`;
-        mailBody += `DRIFTINFORMATION:\n${data.drift || "Ingen information angiven."}\n\n`;
-        mailBody += `AVVIKELSER:\n${data.avvikelse || "Inga avvikelser angivna."}\n\n`;
-        mailBody += `ÅTGÄRDER:\n${data.atgard || "Inga åtgärder angivna."}\n`;
-        mailBody += `--------------------------------\n`;
-        
-        const mailTo = ["rapport.vovlo@samhall.se", "volvooc@samhall.onmicrosoft.com"].join(navigator.userAgent.toLowerCase().includes("windows") ? ";" : ",");
-        window.location.href = `mailto:${mailTo}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
-        
-        Object.keys(localStorage).forEach(key => {
-            if (key.startsWith('draft_') && key !== 'draft_signatur' && key !== 'draft_avdelning') {
-                localStorage.removeItem(key);
-            }
-        });
         btn.disabled = false; 
         btn.innerText = "Skicka Rapport";
-        showConfirmScreen(data, isTruckNok ? truckArray : [], isMaskinNok ? maskinArray : []);
+
+        if (saveSucceeded) {
+            // Sparat i Sheets - inget behov av mejl-reserven. Rensa utkastet och visa bekräftelsen.
+            Object.keys(localStorage).forEach(key => {
+                if (key.startsWith('draft_') && key !== 'draft_signatur' && key !== 'draft_avdelning') {
+                    localStorage.removeItem(key);
+                }
+            });
+            showConfirmScreen(data, isTruckNok ? truckArray : [], isMaskinNok ? maskinArray : []);
+        } else {
+            // Sparningen misslyckades - behåll utkastet (inget går förlorat) och öppna
+            // mejl-reserven så rapporten ändå kan nå fram manuellt.
+            const mailSubject = `Skiftrapport, ${currentSkift}, ${data.datum}`;
+            let mailBody = `SKIFTRAPPORT\n`;
+            mailBody += `--------------------------------\n`;
+            mailBody += `Rapportör: ${data.signatur}\n`;
+            mailBody += `Datum: ${data.datum}\n`;
+            mailBody += `Skift: ${currentSkift}\n`;
+            mailBody += `Avdelning: ${data.avdelning}\n\n`;
+            mailBody += `TRUCKSTATUS: ${data.truckstatus}\n`;
+            if (truckArray.length > 0) {
+                truckArray.forEach(t => mailBody += `- ${t.id}: ${t.fel} [${t.status}] (${t.kom})\n`);
+            }
+            mailBody += `\n`;
+            mailBody += `MASKINER & VERKTYG: ${maskinArray.length > 0 ? 'Felanmälan' : 'OK'}\n`;
+            if (maskinArray.length > 0) {
+                maskinArray.forEach(m => mailBody += `- ${m.id}: ${m.fel} [${m.status}] (${m.kom})\n`);
+            }
+            mailBody += `\n`;
+            mailBody += `TILLSYN TRUCKAR: ${data.tillsyn}\n`;
+            if (data.tillsyn_kom) mailBody += `Kommentar: ${data.tillsyn_kom}\n`;
+            mailBody += `\n`;
+            mailBody += `RENGÖRING BANDNINGSMASKINER: ${data.rengoring}\n`;
+            if (data.rengoring_kom) mailBody += `Kommentar: ${data.rengoring_kom}\n`;
+            mailBody += `\n`;
+            mailBody += `DRIFTINFORMATION:\n${data.drift || "Ingen information angiven."}\n\n`;
+            mailBody += `AVVIKELSER:\n${data.avvikelse || "Inga avvikelser angivna."}\n\n`;
+            mailBody += `ÅTGÄRDER:\n${data.atgard || "Inga åtgärder angivna."}\n`;
+            mailBody += `--------------------------------\n`;
+
+            const mailTo = ["rapport.vovlo@samhall.se", "volvooc@samhall.onmicrosoft.com"].join(navigator.userAgent.toLowerCase().includes("windows") ? ";" : ",");
+            window.location.href = `mailto:${mailTo}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
+        }
     });
 });
 </script>
