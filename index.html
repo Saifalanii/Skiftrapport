@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#5b5fc7">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Astrid">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -406,6 +406,14 @@
             font-size: 0.85rem; font-weight: 700;
         }
         .stats-card-action svg { width: 16px; height: 16px; stroke: white; }
+        .stats-card-hint {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--teams-border);
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            font-size: 0.75rem; font-weight: 600; color: var(--text-sec);
+        }
+        .stats-card-hint svg { width: 14px; height: 14px; stroke: var(--text-sec); }
         .stats-card-sub { font-size: 0.75rem; color: var(--text-sec); margin-bottom: 10px; }
         .stats-field {
             display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
@@ -539,6 +547,13 @@
         body.dark-mode .fetch-status.success { background: rgba(39, 174, 96, 0.2); color: #6fe0a0; }
         body.dark-mode .fetch-status.error { background: rgba(192, 57, 43, 0.2); color: #ff8b7d; }
         .version-text { text-align: center; font-size: 10px; color: var(--text-sec); margin-top: 20px; opacity: 0.5; }
+        .status-bar-fill {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: env(safe-area-inset-top);
+            background: var(--teams-purple);
+            z-index: 2500;
+        }
         #splashScreen {
             position: fixed;
             inset: 0;
@@ -664,6 +679,7 @@ setTimeout(() => {
     if (s) { s.classList.add('splash-hidden'); setTimeout(() => s.remove(), 450); }
 }, 2500);
 </script>
+<div class="status-bar-fill"></div>
 <div id="splashScreen">
     <svg class="splash-logo" xmlns="http://www.w3.org/2000/svg" viewBox="25.2 25.0 787.7 234.8" fill="currentColor">
 <g transform="translate(0.000000,285.000000) scale(0.100000,-0.100000)">
@@ -1900,12 +1916,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         .forEach(m => nokDetails.push({ label: src.label, id: m[4], fel: m[5], kom: m[6], status: m[8], atgard: m[7] }));
                 });
             }
-            const isExpandable = !isCloseable && nokDetails.length > 0;
 
             let actionHtml = '';
             let clickAttr = '';
             let panelHtml = '';
             let extraClass = '';
+            let fieldsOutput = fieldsHtml;
+            let isExpandable = false;
 
             if (isCloseable) {
                 actionHtml = `
@@ -1913,24 +1930,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span>Tryck för att avsluta ärendet</span>
                     <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </div>`;
-            } else if (isExpandable) {
+            } else if (config.detailSources) {
+                // Rapporter-kort: håll kortet kompakt (bara titel + datum) tills man
+                // trycker på det, då visas alla fält och eventuella NOK-detaljer.
+                isExpandable = true;
                 skiftDrillCounter++;
                 const panelId = 'skift-drill-' + skiftDrillCounter;
                 clickAttr = ` onclick="toggleDrilldown('${panelId}'); vibrate(20);"`;
                 extraClass = ' card-expandable';
-                panelHtml = `<div class="drill-panel hidden" id="${panelId}">`
-                    + nokDetails.map(d =>
-                        `<div class="drill-item"><strong>${d.label} ${d.id}:</strong> ${d.fel}${d.kom ? ' — ' + d.kom : ''}`
-                        + (d.atgard ? ` <em>Åtgärd: ${d.atgard}</em>` : '')
-                        + ` <span class="status-badge ${statsBadgeClass(d.status)}" style="margin-left:6px;">${d.status === 'DONE' ? 'Klar' : d.status}</span></div>`
-                    ).join('')
-                    + `</div>`;
+                const nokHtml = nokDetails.map(d =>
+                    `<div class="drill-item"><strong>${d.label} ${d.id}:</strong> ${d.fel}${d.kom ? ' — ' + d.kom : ''}`
+                    + (d.atgard ? ` <em>Åtgärd: ${d.atgard}</em>` : '')
+                    + ` <span class="status-badge ${statsBadgeClass(d.status)}" style="margin-left:6px;">${d.status === 'DONE' ? 'Klar' : d.status}</span></div>`
+                ).join('');
+                panelHtml = `<div class="drill-panel hidden" id="${panelId}">${fieldsHtml}${nokHtml}</div>`;
+                fieldsOutput = '';
+                actionHtml = `
+                <div class="stats-card-hint">
+                    <span>Tryck för detaljer</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>`;
             }
 
             return `<div class="stats-card${(isCloseable || isExpandable) ? ' clickable' : ''}${extraClass}"${clickAttr}>`
                 + `<div class="stats-card-title">${config.title(r)}</div>`
                 + `<div class="stats-card-sub">${config.sub(r)}</div>`
-                + fieldsHtml
+                + fieldsOutput
                 + panelHtml
                 + actionHtml
                 + `</div>`;
