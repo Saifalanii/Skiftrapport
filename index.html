@@ -76,7 +76,7 @@
             font-size: 0.85rem;
             font-weight: 600;
             position: sticky;
-            top: 0;
+            top: env(safe-area-inset-top);
             z-index: 100;
         }
         .offline-banner.visible { display: block; }
@@ -385,6 +385,8 @@
             display: flex;
             flex-direction: column;
             height: 100%;
+            cursor: pointer;
+            user-select: none;
         }
         .stats-card.clickable:active { opacity: 0.9; }
         .stats-card-action {
@@ -1474,7 +1476,7 @@ document.addEventListener('DOMContentLoaded', () => {
         pickerConfig.onSelect(value);
         closePicker();
     };
-    const AVDELNING_OPTIONS = ['TVS-Inne', 'TVS-Ute', 'TPB-Inne', 'TPB-Ute'];
+    const AVDELNING_OPTIONS = ['TVS-Inne', 'TVS-Ute', 'TPB-Inne', 'TPB-Ute', 'TU-Ute', 'TU-Inne'];
     window.openAvdelningPicker = () => {
         openPicker({
             title: 'Välj avdelning',
