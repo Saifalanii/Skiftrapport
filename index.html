@@ -75,11 +75,14 @@
             padding: 8px 12px;
             font-size: 0.85rem;
             font-weight: 600;
-            position: sticky;
+            position: fixed;
             top: env(safe-area-inset-top);
-            z-index: 100;
+            left: 0;
+            right: 0;
+            z-index: 200;
         }
         .offline-banner.visible { display: block; }
+        body.is-offline .container { padding-top: calc(46px + 12px + env(safe-area-inset-top)); }
         .top-header-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
         .header-controls { display: flex; flex-direction: row; flex-wrap: wrap; gap: 10px 14px; align-items: center; flex-shrink: 0; background: var(--teams-card); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--teams-border); }
         .switch-group { display: flex; align-items: center; gap: 8px; }
@@ -385,6 +388,8 @@
             display: flex;
             flex-direction: column;
             height: 100%;
+        }
+        .stats-card.clickable.card-expandable {
             cursor: pointer;
             user-select: none;
         }
@@ -397,6 +402,8 @@
             color: white;
             border-radius: 8px;
             padding: 10px 14px;
+            cursor: pointer;
+            user-select: none;
             display: flex; align-items: center; justify-content: center; gap: 6px;
             font-size: 0.85rem; font-weight: 700;
         }
@@ -1153,11 +1160,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     function updateOnlineStatus() {
         const banner = document.getElementById('offlineBanner');
-        if (!navigator.onLine) {
-            banner.classList.add('visible');
-        } else {
-            banner.classList.remove('visible');
-        }
+        const isOffline = !navigator.onLine;
+        banner.classList.toggle('visible', isOffline);
+        document.body.classList.toggle('is-offline', isOffline);
     }
     window.addEventListener('online', updateOnlineStatus);
     window.addEventListener('offline', updateOnlineStatus);
@@ -1476,7 +1481,7 @@ document.addEventListener('DOMContentLoaded', () => {
         pickerConfig.onSelect(value);
         closePicker();
     };
-    const AVDELNING_OPTIONS = ['TVS-Inne', 'TVS-Ute', 'TPB-Inne', 'TPB-Ute', 'TU-Ute', 'TU-Inne'];
+    const AVDELNING_OPTIONS = ['TVS-Inne', 'TVS-Ute', 'TPB-Inne', 'TPB-Ute', 'TU-Inne', 'TU-Ute'];
     window.openAvdelningPicker = () => {
         openPicker({
             title: 'Välj avdelning',
@@ -1926,18 +1931,22 @@ document.addEventListener('DOMContentLoaded', () => {
             let actionHtml = '';
             let clickAttr = '';
             let panelHtml = '';
+            let extraClass = '';
 
             if (isCloseable) {
+                // Endast knappen är klickbar här - inte hela kortet, så det inte känns
+                // dubbeltydigt när det finns en tydlig knapp att trycka på.
                 actionHtml = `
-                <div class="stats-card-action">
+                <div class="stats-card-action" onclick="openCloseSheetFromRow(${idx}); vibrate(20);">
                     <span>Tryck för att avsluta ärendet</span>
                     <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </div>`;
-                clickAttr = ` onclick="openCloseSheetFromRow(${idx}); vibrate(20);"`;
             } else if (isExpandable) {
+                // Här finns ingen egen knapp - hela kortet är den enda ytan att trycka på.
                 skiftDrillCounter++;
                 const panelId = 'skift-drill-' + skiftDrillCounter;
                 clickAttr = ` onclick="toggleDrilldown('${panelId}'); vibrate(20);"`;
+                extraClass = ' card-expandable';
                 panelHtml = `<div class="drill-panel hidden" id="${panelId}">`
                     + nokDetails.map(d =>
                         `<div class="drill-item"><strong>${d.label} ${d.id}:</strong> ${d.fel}${d.kom ? ' — ' + d.kom : ''}`
@@ -1947,7 +1956,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     + `</div>`;
             }
 
-            return `<div class="stats-card${(isCloseable || isExpandable) ? ' clickable' : ''}"${clickAttr}>`
+            return `<div class="stats-card${(isCloseable || isExpandable) ? ' clickable' : ''}${extraClass}"${clickAttr}>`
                 + `<div class="stats-card-title">${config.title(r)}</div>`
                 + `<div class="stats-card-sub">${config.sub(r)}</div>`
                 + fieldsHtml
