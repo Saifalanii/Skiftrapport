@@ -385,7 +385,6 @@
             position: relative;
             display: flex;
             flex-direction: column;
-            height: 100%;
         }
         .stats-card.clickable.card-expandable {
             cursor: pointer;
@@ -1921,8 +1920,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let clickAttr = '';
             let panelHtml = '';
             let extraClass = '';
-            let fieldsOutput = fieldsHtml;
-            let isExpandable = false;
+            const isExpandable = !isCloseable && nokDetails.length > 0;
 
             if (isCloseable) {
                 actionHtml = `
@@ -1930,21 +1928,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span>Tryck för att avsluta ärendet</span>
                     <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </div>`;
-            } else if (config.detailSources) {
-                // Rapporter-kort: håll kortet kompakt (bara titel + datum) tills man
-                // trycker på det, då visas alla fält och eventuella NOK-detaljer.
-                isExpandable = true;
+            } else if (isExpandable) {
+                // Fälten syns alltid - bara NOK-detaljerna (vilken truck/maskin, feltyp,
+                // kommentar) döljs bakom "Tryck för detaljer" tills man trycker på kortet.
                 skiftDrillCounter++;
                 const panelId = 'skift-drill-' + skiftDrillCounter;
                 clickAttr = ` onclick="toggleDrilldown('${panelId}'); vibrate(20);"`;
                 extraClass = ' card-expandable';
-                const nokHtml = nokDetails.map(d =>
-                    `<div class="drill-item"><strong>${d.label} ${d.id}:</strong> ${d.fel}${d.kom ? ' — ' + d.kom : ''}`
-                    + (d.atgard ? ` <em>Åtgärd: ${d.atgard}</em>` : '')
-                    + ` <span class="status-badge ${statsBadgeClass(d.status)}" style="margin-left:6px;">${d.status === 'DONE' ? 'Klar' : d.status}</span></div>`
-                ).join('');
-                panelHtml = `<div class="drill-panel hidden" id="${panelId}">${fieldsHtml}${nokHtml}</div>`;
-                fieldsOutput = '';
+                panelHtml = `<div class="drill-panel hidden" id="${panelId}">`
+                    + nokDetails.map(d =>
+                        `<div class="drill-item"><strong>${d.label} ${d.id}:</strong> ${d.fel}${d.kom ? ' — ' + d.kom : ''}`
+                        + (d.atgard ? ` <em>Åtgärd: ${d.atgard}</em>` : '')
+                        + ` <span class="status-badge ${statsBadgeClass(d.status)}" style="margin-left:6px;">${d.status === 'DONE' ? 'Klar' : d.status}</span></div>`
+                    ).join('')
+                    + `</div>`;
                 actionHtml = `
                 <div class="stats-card-hint">
                     <span>Tryck för detaljer</span>
@@ -1955,7 +1952,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return `<div class="stats-card${(isCloseable || isExpandable) ? ' clickable' : ''}${extraClass}"${clickAttr}>`
                 + `<div class="stats-card-title">${config.title(r)}</div>`
                 + `<div class="stats-card-sub">${config.sub(r)}</div>`
-                + fieldsOutput
+                + fieldsHtml
                 + panelHtml
                 + actionHtml
                 + `</div>`;
