@@ -1126,6 +1126,7 @@ setTimeout(() => {
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    // En enda plats för webbappens URL - byt bara här nästa gång Apps Script omdistribueras.
     const GAS_URL = "https://script.google.com/macros/s/AKfycby0H3PrAAUOa9v0EeNVvBVJyjvj4Xq7adTe_zHbME0Y1zvyABDGFhl1jXZCmV02PxmX/exec";
     let truckArray = []; 
     let maskinArray = [];
@@ -1806,6 +1807,10 @@ document.addEventListener('DOMContentLoaded', () => {
         'Skiftrapport': {
             title: r => r[2] || 'Ej angivet',
             sub: r => [r[0], r[1], r[3]].filter(Boolean).join(' · '),
+            detailSources: [
+                { statusCol: 4, sheetName: 'Truckavvikelse', label: 'Truck' },
+                { statusCol: 7, sheetName: 'Maskiner', label: 'Maskin' }
+            ],
             fields: [
                 { label: 'Truckstatus', col: 4, badge: true },
                 { label: 'Tillsyn truckar', col: 5, badge: true },
@@ -1868,6 +1873,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return result.rows;
     }
     let lastRenderedRows = [];
+    let skiftDrillCounter = 0;
     function renderStatsCards(sheetName, rows, emptyMessage) {
         const config = STATS_SHEET_CONFIGS[sheetName];
         const container = document.getElementById('statsCards');
@@ -1887,18 +1893,62 @@ document.addEventListener('DOMContentLoaded', () => {
                 return `<div class="stats-field"><span class="stats-field-label">${f.label}</span>`
                     + `<span class="stats-field-value freetext">${raw}</span></div>`;
             }).join('');
+
             const status = (r[config.primaryStatusField] || '').toString().trim().toUpperCase();
-            const isOpen = config.closable && (status === 'SERVICE' || status === 'UR DRIFT');
-            const actionHtml = isOpen ? `
+            const isCloseable = config.closable && (status === 'SERVICE' || status === 'UR DRIFT');
+
+            // Vid NOK på Skiftrapport-kort: slå upp matchande rader i Truckavvikelse/Maskiner
+            // (samma datum+skift+avdelning+signatur) för att kunna visa vad som är NOK.
+            let nokDetails = [];
+            if (config.detailSources) {
+                const matchKey = row => row[0] === r[0] && row[1] === r[1] && row[2] === r[2] && row[3] === r[3];
+                config.detailSources.forEach(src => {
+                    const statusVal = (r[src.statusCol] || '').toString().trim().toUpperCase();
+                    if (statusVal !== 'NOK') return;
+
+                    // Fortfarande öppna ärenden (ligger kvar i Truckavvikelse/Maskiner).
+                    (statsCache[src.sheetName] || [])
+                        .filter(matchKey)
+                        .forEach(m => nokDetails.push({ label: src.label, id: m[4], fel: m[5], kom: m[6], status: m[7] }));
+
+                    // Redan avslutade ärenden (flyttade till Arkiv) - annars försvinner
+                    // detaljerna så fort någon trycker "Avsluta ärende".
+                    (statsCache['Arkiv'] || [])
+                        .filter(row => (row[9] || '').toString().trim() === src.sheetName && matchKey(row))
+                        .forEach(m => nokDetails.push({ label: src.label, id: m[4], fel: m[5], kom: m[6], status: m[8], atgard: m[7] }));
+                });
+            }
+            const isExpandable = !isCloseable && nokDetails.length > 0;
+
+            let actionHtml = '';
+            let clickAttr = '';
+            let panelHtml = '';
+
+            if (isCloseable) {
+                actionHtml = `
                 <div class="stats-card-action">
                     <span>Tryck för att avsluta ärendet</span>
                     <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </div>` : '';
-            const clickAttr = isOpen ? ` onclick="openCloseSheetFromRow(${idx}); vibrate(20);"` : '';
-            return `<div class="stats-card${isOpen ? ' clickable' : ''}"${clickAttr}>`
+                </div>`;
+                clickAttr = ` onclick="openCloseSheetFromRow(${idx}); vibrate(20);"`;
+            } else if (isExpandable) {
+                skiftDrillCounter++;
+                const panelId = 'skift-drill-' + skiftDrillCounter;
+                clickAttr = ` onclick="toggleDrilldown('${panelId}'); vibrate(20);"`;
+                panelHtml = `<div class="drill-panel hidden" id="${panelId}">`
+                    + nokDetails.map(d =>
+                        `<div class="drill-item"><strong>${d.label} ${d.id}:</strong> ${d.fel}${d.kom ? ' — ' + d.kom : ''}`
+                        + (d.atgard ? ` <em>Åtgärd: ${d.atgard}</em>` : '')
+                        + ` <span class="status-badge ${statsBadgeClass(d.status)}" style="margin-left:6px;">${d.status === 'DONE' ? 'Klar' : d.status}</span></div>`
+                    ).join('')
+                    + `</div>`;
+            }
+
+            return `<div class="stats-card${(isCloseable || isExpandable) ? ' clickable' : ''}"${clickAttr}>`
                 + `<div class="stats-card-title">${config.title(r)}</div>`
                 + `<div class="stats-card-sub">${config.sub(r)}</div>`
                 + fieldsHtml
+                + panelHtml
                 + actionHtml
                 + `</div>`;
         }).join('');
@@ -1910,6 +1960,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const n = parseFloat((value || '0').toString().replace(/\s/g, '').replace(',', '.'));
         return isNaN(n) ? 0 : n;
     }
+    // Öppna rader (Truckavvikelse/Maskiner) och Arkiv-rader har OLIKA kolumnordning.
+    // Vi normaliserar båda till samma objektform här en gång, så resten av koden
+    // aldrig behöver hålla reda på vilket index som betyder vad.
     function normalizeRow(r, isArkiv) {
         return {
             datum: r[0] || '', skift: r[1] || '', avd: r[2] || '', sign: r[3] || '',
@@ -2106,7 +2159,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         container.innerHTML = '<div class="stats-loading">Hämtar data...</div>';
         try {
-            await fetchStatsRows(sheetName);
+            if (config.detailSources) {
+                // Hämta även källbladen (Truckavvikelse/Maskiner) parallellt, så
+                // NOK-uppslagningen på korten kan slå upp detaljer direkt.
+                await Promise.all([
+                    fetchStatsRows(sheetName),
+                    ...config.detailSources.map(src => fetchStatsRows(src.sheetName)),
+                    fetchStatsRows('Arkiv')
+                ]);
+            } else {
+                await fetchStatsRows(sheetName);
+            }
             applyStatsFilters();
         } catch (err) {
             console.error('Kunde inte hämta status:', err);
