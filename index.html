@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#5b5fc7">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Astrid">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -73,16 +73,14 @@
             color: white;
             text-align: center;
             padding: 8px 12px;
+            padding-top: calc(8px + env(safe-area-inset-top));
             font-size: 0.85rem;
             font-weight: 600;
-            position: fixed;
-            top: env(safe-area-inset-top);
-            left: 0;
-            right: 0;
-            z-index: 200;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
         .offline-banner.visible { display: block; }
-        body.is-offline .container { padding-top: calc(46px + 12px + env(safe-area-inset-top)); }
         .top-header-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
         .header-controls { display: flex; flex-direction: row; flex-wrap: wrap; gap: 10px 14px; align-items: center; flex-shrink: 0; background: var(--teams-card); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--teams-border); }
         .switch-group { display: flex; align-items: center; gap: 8px; }
@@ -541,13 +539,6 @@
         body.dark-mode .fetch-status.success { background: rgba(39, 174, 96, 0.2); color: #6fe0a0; }
         body.dark-mode .fetch-status.error { background: rgba(192, 57, 43, 0.2); color: #ff8b7d; }
         .version-text { text-align: center; font-size: 10px; color: var(--text-sec); margin-top: 20px; opacity: 0.5; }
-        .status-bar-fill {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            height: env(safe-area-inset-top);
-            background: var(--teams-purple);
-            z-index: 2500;
-        }
         #splashScreen {
             position: fixed;
             inset: 0;
@@ -673,7 +664,6 @@ setTimeout(() => {
     if (s) { s.classList.add('splash-hidden'); setTimeout(() => s.remove(), 450); }
 }, 2500);
 </script>
-<div class="status-bar-fill"></div>
 <div id="splashScreen">
     <svg class="splash-logo" xmlns="http://www.w3.org/2000/svg" viewBox="25.2 25.0 787.7 234.8" fill="currentColor">
 <g transform="translate(0.000000,285.000000) scale(0.100000,-0.100000)">
@@ -1135,7 +1125,6 @@ setTimeout(() => {
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // En enda plats för webbappens URL - byt bara här nästa gång Apps Script omdistribueras.
     const GAS_URL = "https://script.google.com/macros/s/AKfycby-LXWk2nSXzC_LqJ4qGaOTozK1L-Z6H_dM-dtqbA0a3C2y2vSgztSV8EVq8Ix8VkvH/exec";
     let truckArray = []; 
     let maskinArray = [];
@@ -1153,16 +1142,13 @@ document.addEventListener('DOMContentLoaded', () => {
     
     };
     const TRUCK_FEL_OPTIONS = ['Hydraulik/Olja','Chassi','Stativ','Batteri','Drag','Däck','Linde Connect','Belysning','Felkod','Övrigt'];
-    // Kategoribilder för maskingrupperna i huvudformuläret (Ergopack, Bandmaskin osv.)
     const MACHINE_CATEGORY_IMAGES = {
         'Ergopack': 'ergopack.png', 'Bandmaskin': 'bandning.png', 'Movexx': 'Movexx.png',
         'Pallyftare': 'pallyft.png', 'Laddare': 'laddare.png'
     };
     function updateOnlineStatus() {
         const banner = document.getElementById('offlineBanner');
-        const isOffline = !navigator.onLine;
-        banner.classList.toggle('visible', isOffline);
-        document.body.classList.toggle('is-offline', isOffline);
+        banner.classList.toggle('visible', !navigator.onLine);
     }
     window.addEventListener('online', updateOnlineStatus);
     window.addEventListener('offline', updateOnlineStatus);
@@ -1173,7 +1159,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (h >= 17 || h < 2) return "Kvällskift";
         return "Nattskift"; 
     }
-    // Vänlig hälsning för visning i appen (mejlet använder fortfarande getSkift())
     const GREETING_ICONS = {
         sunrise: '<svg viewBox="0 0 24 24"><path d="M17 18a5 5 0 0 0-10 0"></path><line x1="12" y1="2" x2="12" y2="9"></line><line x1="4.22" y1="10.22" x2="5.64" y2="11.64"></line><line x1="1" y1="18" x2="3" y2="18"></line><line x1="21" y1="18" x2="23" y2="18"></line><line x1="18.36" y1="11.64" x2="19.78" y2="10.22"></line><line x1="23" y1="22" x2="1" y2="22"></line><polyline points="8 6 12 2 16 6"></polyline></svg>',
         sun: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>',
@@ -1208,7 +1193,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.vibrate = (ms = 40) => {
         if ('vibrate' in navigator) navigator.vibrate(ms);
     };
-    // ===================== EGEN ALERT/CONFIRM (ersätter native alert()/confirm()) =====================
     let appAlertConfirmCallback = null;
     window.showAlert = (message) => {
         appAlertConfirmCallback = null;
@@ -1571,7 +1555,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     };
-    // ===================== SNABBANMÄL =====================
     window.openQuickSheet = () => {
         resetQuickForm();
         document.getElementById('quickOverlay').classList.add('visible');
@@ -1745,14 +1728,12 @@ document.addEventListener('DOMContentLoaded', () => {
             statusMsg.className = 'fetch-status error';
         }
     };
-    // ===================== AVSLUTA ÄRENDE (direkt från Truckar/Maskiner) =====================
     window.openCloseSheetFromRow = (idx) => {
         const r = lastRenderedRows[idx];
         if (!r) return;
-        // Kolumner: datum(0), skift(1), avd(2), sign(3), id(4), fel(5), kom(6), status(7)
         window.currentCloseItem = {
             sheetName: currentStatsSheet,
-            rowIndex: 1, // Dummy-värde - backend hittar rätt rad via id+fel+sign+kom istället.
+            rowIndex: 1,
             id: r[4], fel: r[5], kom: r[6], sign: r[3], status: r[7]
         };
         const it = window.currentCloseItem;
@@ -1865,8 +1846,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (v === 'NOK' || v === 'UR DRIFT' || v === 'OPEN') return 'badge-urdrift';
         return 'badge-service';
     }
-    // Hämtar rader via backend (Kod.gs) istället för Googles publika gviz-endpoint,
-    // så att kalkylarket kan hållas helt privat och bara nås av skriptet självt.
     async function fetchStatsRows(sheetName) {
         if (statsCache[sheetName]) return statsCache[sheetName];
         const response = await fetch(GAS_URL, {
@@ -1905,8 +1884,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const isLegacyKlarInLiveSheet = status === 'KLAR' && currentStatsFilter !== 'KLAR';
             const isCloseable = config.closable && (status === 'SERVICE' || status === 'UR DRIFT' || isLegacyKlarInLiveSheet);
 
-            // Vid NOK på Skiftrapport-kort: slå upp matchande rader i Truckavvikelse/Maskiner
-            // (samma datum+skift+avdelning+signatur) för att kunna visa vad som är NOK.
             let nokDetails = [];
             if (config.detailSources) {
                 const matchKey = row => row[0] === r[0] && row[1] === r[1] && row[2] === r[2] && row[3] === r[3];
@@ -1914,13 +1891,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     const statusVal = (r[src.statusCol] || '').toString().trim().toUpperCase();
                     if (statusVal !== 'NOK') return;
 
-                    // Fortfarande öppna ärenden (ligger kvar i Truckavvikelse/Maskiner).
                     (statsCache[src.sheetName] || [])
                         .filter(matchKey)
                         .forEach(m => nokDetails.push({ label: src.label, id: m[4], fel: m[5], kom: m[6], status: m[7] }));
 
-                    // Redan avslutade ärenden (flyttade till Arkiv) - annars försvinner
-                    // detaljerna så fort någon trycker "Avsluta ärende".
                     (statsCache['Arkiv'] || [])
                         .filter(row => (row[9] || '').toString().trim() === src.sheetName && matchKey(row))
                         .forEach(m => nokDetails.push({ label: src.label, id: m[4], fel: m[5], kom: m[6], status: m[8], atgard: m[7] }));
@@ -1934,15 +1908,12 @@ document.addEventListener('DOMContentLoaded', () => {
             let extraClass = '';
 
             if (isCloseable) {
-                // Endast knappen är klickbar här - inte hela kortet, så det inte känns
-                // dubbeltydigt när det finns en tydlig knapp att trycka på.
                 actionHtml = `
                 <div class="stats-card-action" onclick="openCloseSheetFromRow(${idx}); vibrate(20);">
                     <span>Tryck för att avsluta ärendet</span>
                     <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </div>`;
             } else if (isExpandable) {
-                // Här finns ingen egen knapp - hela kortet är den enda ytan att trycka på.
                 skiftDrillCounter++;
                 const panelId = 'skift-drill-' + skiftDrillCounter;
                 clickAttr = ` onclick="toggleDrilldown('${panelId}'); vibrate(20);"`;
@@ -1965,16 +1936,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 + `</div>`;
         }).join('');
     }
-    // ===================== STATISTIK (egen knapp) =====================
     const PIE_COLORS = ['#5b5fc7', '#e67e22', '#27ae60', '#c0392b', '#f1c40f', '#16a085', '#8e44ad', '#2980b9', '#d35400', '#7f8c8d', '#a8e6cf', '#ffe08a'];
     let currentStatistikCategory = 'Truckavvikelse';
     function parseKostnad(value) {
         const n = parseFloat((value || '0').toString().replace(/\s/g, '').replace(',', '.'));
         return isNaN(n) ? 0 : n;
     }
-    // Öppna rader (Truckavvikelse/Maskiner) och Arkiv-rader har OLIKA kolumnordning.
-    // Vi normaliserar båda till samma objektform här en gång, så resten av koden
-    // aldrig behöver hålla reda på vilket index som betyder vad.
     function normalizeRow(r, isArkiv) {
         return {
             datum: r[0] || '', skift: r[1] || '', avd: r[2] || '', sign: r[3] || '',
@@ -2173,13 +2140,9 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const fetches = [fetchStatsRows(sheetName)];
             if (config.detailSources) {
-                // Hämta även källbladen (Truckavvikelse/Maskiner) parallellt, så
-                // NOK-uppslagningen på korten kan slå upp detaljer direkt.
                 fetches.push(...config.detailSources.map(src => fetchStatsRows(src.sheetName)));
             }
             if (config.detailSources || config.primaryStatusField !== undefined) {
-                // Behövs även för Klar-filtret på Truckar/Maskiner-sheets, som läser
-                // avslutade poster direkt från Arkiv.
                 fetches.push(fetchStatsRows('Arkiv'));
             }
             await Promise.all(fetches);
@@ -2202,8 +2165,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const searchTerm = document.getElementById('statsSearch').value.toLowerCase().trim();
         let allRows;
         if (currentStatsFilter === 'KLAR' && config.primaryStatusField !== undefined) {
-            // Klar-poster arkiveras direkt vid rapportering (se Kod.gs) och ligger
-            // därför i Arkiv, inte i det öppna bladet - "Klar"-filtret läser därifrån.
             allRows = (statsCache['Arkiv'] || [])
                 .filter(row => (row[9] || '').toString().trim() === currentStatsSheet)
                 .map(row => [row[0], row[1], row[2], row[3], row[4], row[5], row[6], 'Klar']);
@@ -2407,9 +2368,7 @@ document.addEventListener('DOMContentLoaded', () => {
     })();
     loadSavedData();
     updateAtgardVisibility();
-    // Splash screen: purely visual, runs after drafts are already loaded into the form.
-    // Doesn't touch localStorage/autosave logic at all.
-    const splashMinTime = 500; // ms, so it doesn't just flash on fast loads
+    const splashMinTime = 500;
     const splashStart = window.splashStartTime || Date.now();
     const splashEl = document.getElementById('splashScreen');
     if (splashEl) {
@@ -2530,7 +2489,6 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.innerText = "Skicka Rapport";
 
         if (saveSucceeded) {
-            // Sparat i Sheets - inget behov av mejl-reserven. Rensa utkastet och visa bekräftelsen.
             Object.keys(localStorage).forEach(key => {
                 if (key.startsWith('draft_') && key !== 'draft_signatur' && key !== 'draft_avdelning') {
                     localStorage.removeItem(key);
@@ -2538,8 +2496,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             showConfirmScreen(data, isTruckNok ? truckArray : [], isMaskinNok ? maskinArray : []);
         } else {
-            // Sparningen misslyckades - behåll utkastet (inget går förlorat) och öppna
-            // mejl-reserven så rapporten ändå kan nå fram manuellt.
             const mailSubject = `Skiftrapport, ${currentSkift}, ${data.datum}`;
             let mailBody = `SKIFTRAPPORT\n`;
             mailBody += `--------------------------------\n`;
