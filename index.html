@@ -676,7 +676,7 @@ window.splashStartTime = Date.now();
 setTimeout(() => {
     const s = document.getElementById('splashScreen');
     if (s) { s.classList.add('splash-hidden'); setTimeout(() => s.remove(), 450); }
-}, 2500);
+}, 8000);
 </script>
 <div class="status-bar-fill"></div>
 <div id="splashScreen">
@@ -1150,7 +1150,7 @@ setTimeout(() => {
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const GAS_URL = "https://script.google.com/macros/s/AKfycby-LXWk2nSXzC_LqJ4qGaOTozK1L-Z6H_dM-dtqbA0a3C2y2vSgztSV8EVq8Ix8VkvH/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxwRm6_pNIl0uey11PFEozpwZrCDc6uLJWgqN6lR0-VDGxGCJzwUSdS1UD8w6Mk44o1/exec";
     let truckArray = []; 
     let maskinArray = [];
     const machineIds = {
@@ -1200,7 +1200,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateSkiftBadge() {
         const greeting = getGreeting();
         const pill = document.getElementById('skiftPill');
-        if (pill) pill.innerHTML = `${GREETING_ICONS[greeting.icon]}<span>${greeting.text}</span>`;
+        const namn = document.getElementById('signatur')?.value.trim();
+        const text = namn ? `${greeting.text}, ${namn}` : greeting.text;
+        if (pill) pill.innerHTML = `${GREETING_ICONS[greeting.icon]}<span>${text}</span>`;
     }
     updateSkiftBadge();
     setInterval(updateSkiftBadge, 60000);
@@ -2376,32 +2378,36 @@ document.addEventListener('DOMContentLoaded', () => {
         if (datumEl && !datumEl.value) datumEl.value = today;
     }
     (function initSheetDrag() {
+        let activeSheet = null, activeOverlay = null, startY = 0, deltaY = 0, dragging = false;
+        function getY(e) { return e.touches ? e.touches[0].clientY : e.clientY; }
+        function onMove(e) {
+            if (!dragging) return;
+            deltaY = Math.max(0, getY(e) - startY);
+            activeSheet.style.transform = `translateY(${deltaY}px)`;
+        }
+        function onEnd() {
+            if (!dragging) return;
+            dragging = false;
+            activeSheet.style.transition = '';
+            activeSheet.style.transform = '';
+            if (deltaY > 100) {
+                activeOverlay.classList.remove('visible');
+                unlockBodyScroll();
+            }
+            deltaY = 0;
+            activeSheet = null;
+            activeOverlay = null;
+        }
         document.querySelectorAll('.bottom-sheet').forEach(sheet => {
             const overlay = sheet.closest('.sheet-overlay');
             const dragZones = [sheet.querySelector('.sheet-handle'), sheet.querySelector('.sheet-header')].filter(Boolean);
-            let startY = 0, deltaY = 0, dragging = false;
-            function getY(e) { return e.touches ? e.touches[0].clientY : e.clientY; }
             function onStart(e) {
                 if (window.innerWidth >= 700) return;
                 dragging = true;
+                activeSheet = sheet;
+                activeOverlay = overlay;
                 startY = getY(e);
                 sheet.style.transition = 'none';
-            }
-            function onMove(e) {
-                if (!dragging) return;
-                deltaY = Math.max(0, getY(e) - startY);
-                sheet.style.transform = `translateY(${deltaY}px)`;
-            }
-            function onEnd() {
-                if (!dragging) return;
-                dragging = false;
-                sheet.style.transition = '';
-                sheet.style.transform = '';
-                if (deltaY > 100) {
-                    overlay.classList.remove('visible');
-                    unlockBodyScroll();
-                }
-                deltaY = 0;
             }
             dragZones.forEach(el => {
                 el.addEventListener('touchstart', onStart, { passive: true });
@@ -2409,11 +2415,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 el.addEventListener('touchend', onEnd);
                 el.addEventListener('mousedown', onStart);
             });
-            document.addEventListener('mousemove', onMove);
-            document.addEventListener('mouseup', onEnd);
         });
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onEnd);
     })();
     loadSavedData();
+    updateSkiftBadge();
     updateAtgardVisibility();
     const splashMinTime = 500;
     const splashStart = window.splashStartTime || Date.now();
@@ -2444,9 +2451,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target.id === 'avvikelse') {
             updateAtgardVisibility();
         }
+        if (e.target.id === 'signatur') {
+            updateSkiftBadge();
+        }
     });
     document.getElementById('reportForm').addEventListener('submit', async function(e) {
         e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        const fetchStatus = document.getElementById('fetchStatus');
+        if (btn.disabled) return;
+        btn.disabled = true;
         let hasError = false;
         let firstErrorElement = null;
         const isTruckNok = document.getElementById('truck').value !== 'OK';
@@ -2479,12 +2493,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (hasError) { 
             window.vibrate([100, 50, 100]);
+            btn.disabled = false;
             firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return; 
         }
-        const btn = document.getElementById('submitBtn'); 
-        const fetchStatus = document.getElementById('fetchStatus');
-        btn.disabled = true; 
         btn.innerText = "Skickar...";
         
         const currentSkift = getSkift();
