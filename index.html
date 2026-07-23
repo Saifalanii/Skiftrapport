@@ -83,7 +83,7 @@
         .offline-banner.visible { display: block; }
         .mini-toolbar {
             position: fixed;
-            top: env(safe-area-inset-top);
+            top: 0;
             left: 0; right: 0;
             z-index: 1000;
             display: flex;
@@ -1188,7 +1188,7 @@ setTimeout(() => {
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxwRm6_pNIl0uey11PFEozpwZrCDc6uLJWgqN6lR0-VDGxGCJzwUSdS1UD8w6Mk44o1/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycby-LXWk2nSXzC_LqJ4qGaOTozK1L-Z6H_dM-dtqbA0a3C2y2vSgztSV8EVq8Ix8VkvH/exec";
     let truckArray = []; 
     let maskinArray = [];
     const machineIds = {
