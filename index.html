@@ -83,7 +83,7 @@
         .offline-banner.visible { display: block; }
         .mini-toolbar {
             position: fixed;
-            top: 0;
+            top: max(env(safe-area-inset-top), 54px);
             left: 0; right: 0;
             z-index: 1000;
             display: flex;
