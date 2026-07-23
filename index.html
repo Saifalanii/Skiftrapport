@@ -82,22 +82,28 @@
         }
         .offline-banner.visible { display: block; }
         .mini-toolbar {
-            position: fixed;
-            top: max(env(safe-area-inset-top), 54px);
-            left: 0; right: 0;
+            position: sticky;
+            top: 0;
             z-index: 1000;
             display: flex;
             justify-content: center;
+            align-items: center;
             gap: 14px;
             background: var(--teams-card);
-            padding: 8px 12px;
+            padding: 0 12px;
+            max-height: 0;
+            overflow: hidden;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            border-bottom: 1px solid var(--teams-border);
-            transform: translateY(-120%);
+            border-bottom: 1px solid transparent;
             opacity: 0;
-            transition: transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.4s ease;
+            transition: max-height 0.45s cubic-bezier(0.22, 0.61, 0.36, 1), padding 0.45s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.4s ease;
         }
-        .mini-toolbar.visible { transform: translateY(0); opacity: 1; }
+        .mini-toolbar.visible {
+            max-height: 80px;
+            padding: 8px 12px;
+            opacity: 1;
+            border-bottom-color: var(--teams-border);
+        }
         .mini-toolbar button {
             width: 40px; height: 40px;
             border-radius: 50%;
@@ -1188,7 +1194,7 @@ setTimeout(() => {
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const GAS_URL = "https://script.google.com/macros/s/AKfycby-LXWk2nSXzC_LqJ4qGaOTozK1L-Z6H_dM-dtqbA0a3C2y2vSgztSV8EVq8Ix8VkvH/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxwRm6_pNIl0uey11PFEozpwZrCDc6uLJWgqN6lR0-VDGxGCJzwUSdS1UD8w6Mk44o1/exec";
     let truckArray = []; 
     let maskinArray = [];
     const machineIds = {
